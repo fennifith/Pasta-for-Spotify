@@ -1,0 +1,65 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relative_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:overScrollMode="never"/>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/tutorial_button_left"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:text="IGNORE"
+            android:textColor="#ffffff" />
+
+        <ImageButton
+            android:id="@+id/tutorial_button_image_left"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="48dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/static_previous"
+            android:scaleType="centerInside" />
+
+        <com.alexandrepiveteau.library.tutorial.widgets.PageIndicator
+            android:id="@+id/tutorial_page_indicator"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/tutorial_button_image_right"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="48dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/animated_next_to_ok"
+            android:scaleType="centerInside" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

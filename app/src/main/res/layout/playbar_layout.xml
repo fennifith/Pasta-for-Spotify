@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/playbar"
+    android:elevation="8dp"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+    app:behavior_peekHeight="@dimen/playbar_size"
+    app:behavior_hideable="true"
+    android:fitsSystemWindows="true" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/playbar_size"
+        android:id="@+id/bg"
+        android:background="?android:textColorPrimary">
+
+        <ProgressBar
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progress"
+            android:layout_marginLeft="@dimen/playbar_size"
+            android:progressTint="?android:textColorPrimaryInverse"
+            android:layout_marginTop="-8dp"/>
+
+        <pasta.streamer.views.SquareImageView
+            android:id="@+id/art"
+            android:layout_width="@dimen/playbar_size"
+            android:layout_height="@dimen/playbar_size"
+            android:layout_gravity="left|top"
+            android:src="@drawable/preload"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/playbar_size"
+            android:layout_marginLeft="64dp"
+            android:orientation="horizontal"
+            android:layout_gravity="top">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:textColorPrimaryInverse"
+                    android:textSize="14dp"
+                    android:singleLine="true"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <TextView
+                    android:id="@+id/subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:textColorSecondaryInverse"
+                    android:textSize="14dp"
+                    android:singleLine="true"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_marginLeft="8dp"/>
+            </LinearLayout>
+
+            <pasta.streamer.views.SquareImageView
+                android:id="@+id/toggle"
+                android:layout_width="@dimen/playbar_size"
+                android:layout_height="@dimen/playbar_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="?android:textColorPrimaryInverse"
+                android:tintMode="src_in"
+                android:soundEffectsEnabled="false"
+                android:padding="12dp"
+                android:src="@drawable/ic_notify_play"/>
+
+            <pasta.streamer.views.SquareImageView
+                android:id="@+id/next"
+                android:layout_width="@dimen/playbar_size"
+                android:layout_height="@dimen/playbar_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="?android:textColorPrimaryInverse"
+                android:tintMode="src_in"
+                android:soundEffectsEnabled="false"
+                android:padding="12dp"
+                android:src="@drawable/ic_notify_next"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="288dp"
+        android:id="@+id/nextPlaying"
+        android:background="?android:colorBackground"
+        android:visibility="gone" />
+</LinearLayout>

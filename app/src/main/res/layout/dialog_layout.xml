@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:background="#424242">
+
+    <android.support.v7.widget.AppCompatEditText
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/title"
+        android:hint="@string/playlist_text"
+        android:layout_margin="4dp"
+        android:textColor="#fff"
+        android:textColorHint="#B3ffffff" />
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/pub"
+        android:layout_margin="4dp"
+        android:text="@string/pub"
+        android:textColor="#fff" />
+
+</LinearLayout>

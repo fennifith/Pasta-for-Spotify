@@ -1,0 +1,186 @@
+<resources>
+    <!-- Titles -->
+    <string name="app_name" translatable="false">Pasta for Spotify</string>
+    <string name="app_desc" translatable="true">A material design Spotify client</string>
+    <string name="app_desc_long" translatable="true">Pasta for Spotify is material design Spotify client made to be easier and faster to use than the official app.</string>
+
+    <!-- Activities -->
+    <string name="search_name" translatable="true">Search</string>
+    <string name="search_artists_edittext_hint" translatable="true">Search artists here…</string>
+    <string name="title_activity_home" translatable="true">Home</string>
+    <string name="title_activity_favorites" translatable="true">Favorites</string>
+    <string name="title_activity_categories" translatable="true">Categories</string>
+    <string name="title_activity_settings" translatable="true">Settings</string>
+    <string name="title_activity_playing" translatable="true">Now Playing</string>
+    <string name="title_activity_about" translatable="true">About</string>
+    <string name="title_about" translatable="true">About Pasta for Spotify</string>
+
+    <!-- Generic -->
+    <string name="ok" translatable="true">OK</string>
+    <string name="got_it" translatable="true">Got it</string>
+    <string name="save" translatable="true">Save</string>
+    <string name="delete" translatable="true">Delete</string>
+    <string name="close" translatable="true">Close</string>
+    <string name="cancel" translatable="true">Cancel</string>
+    <string name="empty" translatable="true">Nothing here…</string>
+    <string name="error" translatable="true">An error occurred.</string>
+    <string name="error_msg" translatable="true">Something went wrong while connecting to Spotify\'s servers.</string>
+    <string name="query" translatable="true">Enter search query…</string>
+    <string name="search" translatable="true">Search</string>
+    <string name="drawer_open" translatable="true">Open Drawer</string>
+    <string name="drawer_close" translatable="true">Close Drawer</string>
+    <string name="sign_in" translatable="true">Sign In</string>
+    <string name="sign_out" translatable="true">Sign Out</string>
+    <string name="sign_out_msg" translatable="true">Signing out will reset all of your settings as well as allowing you to sign into a different account with this app. Are you sure you want to do this?</string>
+    <string name="user_premium" translatable="true">Premium Account</string>
+    <string name="user_premium_msg" translatable="true">You do not have a premium account on Spotify, so this app will probably not function correctly. You can preview the content of the app using this account, however the app will run into a few errors.</string>
+
+    <!-- Tutorials -->
+    <string name="new_releases" translatable="true">New Releases</string>
+    <string name="new_releases_msg" translatable="true">Any newly released albums will appear in the new releases section.</string>
+    <string name="featured" translatable="true">Featured Playlists</string>
+    <string name="featured_msg" translatable="true">Playlists that are being featured by Spotify will show up here.</string>
+    <string name="favorite_tutorial" translatable="true">Favorites</string>
+    <string name="favorite_tutorial_msg" translatable="true">Anything that you have favorited will appear in the favorites section, sorted into different tabs. Click the heart icon to favorite an item.</string>
+    <string name="feedback" translatable="true">Feedback</string>
+    <string name="feedback_msg" translatable="true">Any feedback about this app is greatly appreciated. Please take some time to rate it on the play store.</string>
+
+    <!-- Items -->
+    <string name="fav" translatable="true">Favorite</string>
+    <string name="unfav" translatable="true">Unfavorite</string>
+    <string name="share" translatable="true">Share</string>
+    <string name="web" translatable="true">Open in Browser</string>
+
+    <!-- Playlists -->
+    <string name="add" translatable="true">Add to…</string>
+    <string name="added" translatable="true">Added to Playlist</string>
+    <string name="playlist_text" translatable="true">Playlist title…</string>
+    <string name="no_playlist_text" translatable="true">The playlist needs a title</string>
+    <string name="playlist_create" translatable="true">Create Playlist</string>
+    <string name="playlist_modify" translatable="true">Edit Playlist</string>
+    <string name="playlist_delete" translatable="true">Delete Playlist</string>
+    <string name="playlist_remove" translatable="true">Remove from Playlist</string>
+    <string name="playlist_removed" translatable="true">Removed from Playlist</string>
+    <string name="pub" translatable="true">Public</string>
+    <string name="edit" translatable="true">Edit</string>
+
+    <!-- Albums -->
+    <string name="album" translatable="true">Go to Album</string>
+
+    <!-- Artists -->
+    <string name="artist" translatable="true">Go to Artist</string>
+
+    <!-- Settings -->
+    <string name="restart" translatable="true">Restart</string>
+    <string name="restart_msg" translatable="true">Restart the app to apply changes…</string>
+    <string name="order" translatable="true">Select Track Order</string>
+    <string name="primary_color" translatable="true">Primary Color</string>
+    <string name="accent_color" translatable="true">Accent Color</string>
+
+    <string name="limit" translatable="true">Select Audio Quality</string>
+    <string-array name="limits" translatable="true">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+    </string-array>
+
+    <string name="quality" translatable="true">Select Audio Quality</string>
+    <string-array name="qualities" translatable="true">
+        <item>Low Quality</item>
+        <item>Medium Quality (default)</item>
+        <item>High Quality</item>
+    </string-array>
+
+    <string name="organize" translatable="true">Select Track Order</string>
+    <string-array name="organization" translatable="true">
+        <item>By Date Added (default)</item>
+        <item>By Name</item>
+        <item>By Artist Name</item>
+        <item>By Album Name</item>
+        <item>By Track Length</item>
+        <item>Randomized</item>
+    </string-array>
+
+    <!-- About -->
+    <string name="contributors" translatable="true">Contributors:</string>
+
+    <string-array name="people_names" translatable="false">
+        <item>James Fenn</item>
+        <item>Jan-Lk Else</item>
+        <item>Patrick J</item>
+        <item>Alexandre Piveteau</item>
+        <item>Vukašin Anđelković</item>
+        <item>Kevin Aguilar</item>
+    </string-array>
+
+    <string-array name="people_descs" translatable="true">
+        <item>A Java and web developer, started the project and wrote most of the spaghetti code ;)</item>
+        <item>A German student, developer, and blogger. Helped with performance issues and managed the Spotify api.</item>
+        <item>Another German developer, helped primarily with organization and file layout.</item>
+        <item>Gave helpful suggestions for occasional issues (and wasted a quarter of a year in our group chat).</item>
+        <item>The maker of CandyCons, designed Pasta\'s amazing icon and gave design feedback.</item>
+        <item>Founder of 221 Pixels, helped with UI design and color choice.</item>
+    </string-array>
+
+    <string-array name="people_primary" translatable="false">
+        <item>http://theandroidmaster.github.io/</item>
+        <item>https://plus.google.com/+JanLkElse</item>
+        <item>http://pddstudio.com/</item>
+        <item>https://plus.google.com/+AlexandrePiveteau</item>
+        <item>https://plus.google.com/+Vuka%C5%A1inAn%C4%91elkovi%C4%87zavukodlak</item>
+        <item>https://plus.google.com/+KevinAguilarC</item>
+    </string-array>
+
+    <string-array name="people_icons" translatable="false">
+        <item>http://theandroidmaster.github.io/images/headers/jamesorange.png</item>
+        <item>https://avatars.githubusercontent.com/u/8822316</item>
+        <item>http://pddstudio.com/img/photo.jpg</item>
+        <item>https://avatars.githubusercontent.com/u/6318990</item>
+        <item>https://avatars.githubusercontent.com/u/5407632</item>
+        <item>http://theandroidmaster.github.io/images/headers/ohlookitskevinwhatishedoingherewellyouseesinceimusingthegithubapitogetprofilepicsandkevindoesnthaveagithubimputtingitheresothere.jpg</item>
+    </string-array>
+
+    <string name="libraries" translatable="true">Libraries:</string>
+
+    <string-array name="library_names" translatable="false">
+        <item>Spotify Android SDK</item>
+        <item>Glide</item>
+        <item>Retrofit</item>
+        <item>OkHttp</item>
+        <item>MaterialDrawer</item>
+        <item>MaterialTutorial</item>
+        <item>Async</item>
+        <item>Sectioned RecyclerView</item>
+        <item>Material Dialogs</item>
+        <item>Butterknife</item>
+    </string-array>
+
+    <string-array name="library_descs" translatable="true">
+        <item>The Spotify Android SDK makes it easy to add audio streaming, user authentication and other Spotify features to Android apps.</item>
+        <item>Glide is a fast and efficient open source media management and image loading framework for Android that wraps media decoding, memory and disk caching, and resource pooling into a simple and easy to use interface.</item>
+        <item>Type-safe HTTP client for Android and Java by Square, Inc.</item>
+        <item>An HTTP+HTTP/2 client for Android and Java applications.</item>
+        <item>The flexible, easy to use, all in one drawer library for your Android project.</item>
+        <item>An Android library that provides a simple Material-Designed tutorial.</item>
+        <item>A library designed to make the organized execution of async processes in Java easy.</item>
+        <item>Sectioned RecyclerView allows you to easily split a RecyclerView into sections with headers.</item>
+        <item>A beautiful, easy-to-use, and customizable dialogs API, enabling you to use Material designed dialogs down to API 8.</item>
+        <item>Field and method binding for Android views which uses annotation processing to generate boilerplate codefor you.</item>
+    </string-array>
+
+    <string-array name="library_urls" translatable="false">
+        <item>https://developer.spotify.com/technologies/spotify-android-sdk/</item>
+        <item>https://github.com/bumptech/glide</item>
+        <item>https://github.com/square/retrofit</item>
+        <item>https://github.com/square/okhttp</item>
+        <item>https://github.com/mikepenz/MaterialDrawer</item>
+        <item>https://github.com/cadialex/MaterialTutorial</item>
+        <item>https://github.com/afollestad/async</item>
+        <item>https://github.com/afollestad/sectioned-recyclerview</item>
+        <item>https://github.com/afollestad/material-dialogs</item>
+        <item>https://github.com/JakeWharton/butterknife</item>
+    </string-array>
+
+</resources>

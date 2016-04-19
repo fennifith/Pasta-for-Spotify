@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/bg"
+              android:layout_width="match_parent"
+              android:layout_height="72dp"
+              android:background="?android:colorBackground"
+              android:orientation="horizontal">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="horizontal"
+            android:background="?attr/selectableItemBackground">
+
+        <pasta.streamer.views.CircleImageView
+                android:id="@+id/image"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/preload"
+                android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+            android:layout_marginLeft="16dp">
+
+            <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="something"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:singleLine="true"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+            <TextView
+                    android:id="@+id/extra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="something"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="14sp"
+                    android:singleLine="true"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="16dp"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="14sp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

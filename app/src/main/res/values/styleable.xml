@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PageIndicator">
+        <attr name="dotsSelectedColor" format="color" />
+        <attr name="dotsUnselectedColor" format="color" />
+    </declare-styleable>
+</resources>

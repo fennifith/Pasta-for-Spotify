@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="true">
+    <item android:drawable="@drawable/animated_next_p" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_o" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_n" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_m" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_l" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_k" android:duration="15"/>
+    <!--<item android:drawable="@drawable/animated_next_j" android:duration="15"/>-->
+    <item android:drawable="@drawable/animated_next_i" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_h" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_g" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_f" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_e" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_d" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_c" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_b" android:duration="15"/>
+    <item android:drawable="@drawable/animated_next_a" android:duration="15"/>
+</animation-list>

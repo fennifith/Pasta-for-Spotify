@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_fav"
+          android:title="@string/fav"
+          android:icon="@drawable/ic_unfav"
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_add"
+          android:title="@string/add"
+          app:showAsAction="never"/>
+    <item android:id="@+id/action_album"
+          android:title="@string/album"
+          app:showAsAction="never"/>
+</menu>

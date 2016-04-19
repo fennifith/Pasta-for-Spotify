@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="bottom_playbar_padding">72dp</dimen>
+    <dimen name="playbar_size">56dp</dimen>
+</resources>

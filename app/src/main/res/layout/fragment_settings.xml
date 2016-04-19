@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="pasta.streamer.utils.Settings"/>
+    </data>
+
+    <android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/bottom_playbar_padding"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pasta"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold"
+                    android:layout_margin="8dp"
+                    android:textSize="14sp"/>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_height="52dp"
+                    android:layout_width="match_parent"
+                    android:id="@+id/preload"
+                    android:text="Preload Search Results"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:checked="@{Settings.isPreload(context)}"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Search Result Limit"
+                    android:id="@+id/limit"
+                    android:textSize="16sp"
+                    android:padding="8dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="?android:textColorPrimary"
+                    android:textAlignment="gravity"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Sign Out"
+                    android:id="@+id/signout"
+                    android:textSize="16sp"
+                    android:padding="8dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="?android:textColorPrimary"
+                    android:textAlignment="gravity"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Appearance"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold"
+                    android:layout_margin="8dp"
+                    android:textSize="14sp" />
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_height="52dp"
+                    android:layout_width="match_parent"
+                    android:id="@+id/darkmode"
+                    android:text="Dark Mode"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:checked="@{Settings.isDarkTheme(context)}"/>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_height="52dp"
+                    android:layout_width="match_parent"
+                    android:id="@+id/thumbnails"
+                    android:text="Load Thumbnails"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:checked="@{Settings.isThumbnails(context)}" />
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_height="52dp"
+                    android:layout_width="match_parent"
+                    android:id="@+id/palette"
+                    android:text="Dynamic Backgrounds"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:checked="@{Settings.isPalette(context)}"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/primary"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="Primary Color"
+                        android:textSize="16sp"
+                        android:padding="8dp"
+                        android:gravity="center_vertical|start"
+                        android:textColor="?android:textColorPrimary"
+                        android:textAlignment="gravity" />
+
+                    <pasta.streamer.views.CircleImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:id="@+id/primary_color"
+                        android:src="@{Settings.getPrimaryColor(context)}"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accent"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="Accent Color"
+                        android:textSize="16sp"
+                        android:padding="8dp"
+                        android:gravity="center_vertical|start"
+                        android:textColor="?android:textColorPrimary"
+                        android:textAlignment="gravity"/>
+
+                    <pasta.streamer.views.CircleImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:id="@+id/accent_color"
+                        android:src="@{Settings.getAccentColor(context)}"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Playback"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold"
+                    android:layout_margin="8dp"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Audio Quality"
+                    android:id="@+id/quality"
+                    android:textSize="16sp"
+                    android:padding="8dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="?android:textColorPrimary"
+                    android:textAlignment="gravity"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Track Order"
+                    android:id="@+id/organize"
+                    android:textSize="16sp"
+                    android:padding="8dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="?android:textColorPrimary"
+                    android:textAlignment="gravity"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+</layout>
