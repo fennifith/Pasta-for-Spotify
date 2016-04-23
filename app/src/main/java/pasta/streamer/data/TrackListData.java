@@ -33,8 +33,14 @@ public class TrackListData implements Parcelable {
         this.trackName = track.name;
         this.albumName = track.album.name;
         this.albumId = track.album.id;
-        this.trackImage = track.album.images.get(1).url;
-        this.trackImageLarge = track.album.images.get(0).url;
+        if (track.album.images.size() > 0) {
+            if (track.album.images.size() > 1) this.trackImage = track.album.images.get(1).url;
+            else this.trackImage = track.album.images.get(0).url;
+            this.trackImageLarge = track.album.images.get(0).url;
+        } else {
+            this.trackImage = "";
+            this.trackImageLarge = "";
+        }
         this.trackDuration = String.valueOf(track.duration_ms);
         this.artistName = track.artists.get(0).name;
         this.artistId = track.artists.get(0).id;

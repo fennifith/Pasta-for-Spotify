@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.spotify.sdk.android.player.Config;
+import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.PlayConfig;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerNotificationCallback;
@@ -116,6 +117,30 @@ public class PlayerService extends Service {
                 onError(errorType.name() + " " + s);
             }
         });
+
+        spotifyPlayer.addConnectionStateCallback(new ConnectionStateCallback() {
+            @Override
+            public void onLoggedIn() {
+            }
+
+            @Override
+            public void onLoggedOut() {
+            }
+
+            @Override
+            public void onLoginFailed(Throwable throwable) {
+                onError("Login Failed: " + throwable.getMessage());
+            }
+
+            @Override
+            public void onTemporaryError() {
+                onError("Random error, please restart the app.");
+            }
+
+            @Override
+            public void onConnectionMessage(String s) {
+            }
+        });
     }
 
     private void onError(String message) {
@@ -127,7 +152,7 @@ public class PlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) return START_STICKY;
+        if (intent == null || !spotifyPlayer.isInitialized()) return START_STICKY;
         String action = intent.getAction();
         if (action == null) return START_STICKY;
         switch (action) {
