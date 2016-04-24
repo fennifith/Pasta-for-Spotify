@@ -303,7 +303,11 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                 Pasta pasta = (Pasta) activity.getApplicationContext();
                                                 Album album = pasta.spotifyService.getAlbum(((TrackListData) list.get(holder.getAdapterPosition())).albumId);
                                                 Artist artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-                                                return new AlbumListData(album, artist.images.get(artist.images.size() / 2).url);
+
+                                                String image = "";
+                                                if (artist.images.size() > 0) image = artist.images.get(artist.images.size() / 2).url;
+
+                                                return new AlbumListData(album, image);
                                             }
 
                                             @Override

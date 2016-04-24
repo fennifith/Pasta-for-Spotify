@@ -203,12 +203,9 @@ public class ArtistFragment extends FullScreenFragment {
                                 return null;
                             }
 
-                            String image;
-                            try {
-                                image = artist.images.get(album.images.size() / 2).url;
-                            } catch (IndexOutOfBoundsException e) {
-                                image = "";
-                            }
+                            String image = "";
+                            if (artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
+
                             return new AlbumListData(album, image);
                         }
 

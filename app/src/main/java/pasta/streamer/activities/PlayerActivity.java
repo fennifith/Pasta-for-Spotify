@@ -281,7 +281,10 @@ public class PlayerActivity extends AppCompatActivity {
                             return null;
                         }
 
-                        return new AlbumListData(album, a.images.get(a.images.size() / 2).url);
+                        String image = "";
+                        if (a.images.size() > 0) image = a.images.get(a.images.size() / 2).url;
+
+                        return new AlbumListData(album, image);
                     }
 
                     @Override

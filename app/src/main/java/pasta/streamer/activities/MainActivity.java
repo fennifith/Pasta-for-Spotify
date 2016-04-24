@@ -133,7 +133,11 @@ public class MainActivity extends AppCompatActivity {
                             ArrayList<AlbumListData> albums = new ArrayList<>();
                             for (SavedAlbum album : albumPager.items) {
                                 Artist a = pasta.spotifyService.getArtist(album.album.artists.get(0).id);
-                                albums.add(new AlbumListData(album.album, a.images.get(a.images.size() / 2).url));
+
+                                String image = "";
+                                if (a.images.size() > 0) image = a.images.get(a.images.size() / 2).url;
+
+                                albums.add(new AlbumListData(album.album, image));
                             }
                             pasta.albums = albums;
 

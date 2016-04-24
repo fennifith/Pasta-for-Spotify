@@ -10,7 +10,7 @@
         <item name="android:textColorPrimaryInverse">#DE000000</item>
         <item name="android:textColorSecondaryInverse">#8A000000</item>
 
-        <item name="colorButtonNormal">@color/colorAccent</item>s
+        <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
