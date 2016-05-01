@@ -51,7 +51,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:textColor="?android:textColorPrimary"
-                        android:textSize="16dp"
+                        android:textSize="16sp"
                         android:singleLine="true"
                         android:lines="1"
                         android:maxLines="1"
@@ -65,11 +65,11 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:textColor="?android:textColorSecondary"
-                        android:textSize="12dp"
+                        android:textSize="12sp"
                         android:singleLine="true"
                         android:lines="1"
                         android:maxLines="1"
-                        android:ellipsize="end"/>
+                        android:ellipsize="end" />
 
                 </LinearLayout>
 
