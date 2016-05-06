@@ -70,7 +70,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private PlaylistListData playlistdata;
     private Drawable preload;
     private Drawable art_preload;
-    private boolean thumbnails, palette;
+    private boolean thumbnails, palette, dark;
     private int behavior = 0;
     public final static int BEHAVIOR_NONE = 0, BEHAVIOR_PLAYLIST = 1, BEHAVIOR_FAVORITE = 2, BEHAVIOR_ALBUM = 3;
 
@@ -88,6 +88,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         thumbnails = Settings.isThumbnails(activity);
         palette = Settings.isPalette(activity);
+        dark = Settings.isDarkTheme(activity);
 
         preload = ContextCompat.getDrawable(activity, R.drawable.preload);
         art_preload = new ColorDrawable(Color.TRANSPARENT);
@@ -937,7 +938,10 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(palette.getMutedColor(Color.GRAY))});
+                        int color = palette.getLightVibrantColor(Color.LTGRAY);
+                        if (dark) color = palette.getDarkVibrantColor(Color.DKGRAY);
+
+                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(color)});
                         holderView.findViewById(R.id.bg).setBackground(td);
                         td.startTransition(250);
                     }

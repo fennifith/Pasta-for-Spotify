@@ -17,8 +17,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
         <item name="android:colorBackground">@color/colorBackgroundLight</item>
         <item name="colorBackground">@color/colorBackgroundLight</item>
+        <item name="cardBackgroundColor">@color/colorBackgroundFloatingLight</item>
+
         <item name="android:textColorPrimary">#DE000000</item>
         <item name="android:textColorSecondary">#8A000000</item>
         <item name="android:textColorPrimaryInverse">#ffffff</item>
@@ -30,6 +33,8 @@
     <style name="AppTheme.Dark" parent="AppTheme">
         <item name="android:colorBackground">@color/colorBackgroundDark</item>
         <item name="colorBackground">@color/colorBackgroundDark</item>
+        <item name="cardBackgroundColor">@color/colorBackgroundFloatingDark</item>
+
         <item name="android:textColorSecondary">#B3ffffff</item>
         <item name="android:textColorPrimary">#ffffff</item>
         <item name="android:textColorPrimaryInverse">#DE000000</item>

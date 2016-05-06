@@ -62,7 +62,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
     private ArrayList list;
     private Drawable preload;
     private Drawable art_preload;
-    private boolean thumbnails, palette;
+    private boolean thumbnails, palette, dark;
 
     public SectionedOmniAdapter(AppCompatActivity activity, ArrayList list) {
         tracks = new ArrayList<>();
@@ -74,6 +74,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         thumbnails = Settings.isThumbnails(activity);
         palette = Settings.isPalette(activity);
+        dark = Settings.isDarkTheme(activity);
 
         preload = ContextCompat.getDrawable(activity, R.drawable.preload);
         art_preload = new ColorDrawable(Color.TRANSPARENT);
@@ -691,7 +692,10 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                 Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(palette.getMutedColor(Color.GRAY))});
+                        int color = palette.getLightVibrantColor(Color.LTGRAY);
+                        if (dark) color = palette.getDarkVibrantColor(Color.DKGRAY);
+
+                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(color)});
                         holderView.findViewById(R.id.bg).setBackground(td);
                         td.startTransition(250);
                     }

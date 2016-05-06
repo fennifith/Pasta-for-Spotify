@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="2dp"
-    app:cardUseCompatPadding="true">
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="?attr/cardBackgroundColor" >
 
     <LinearLayout
         android:id="@+id/bg"
@@ -25,9 +26,13 @@
                 android:orientation="vertical"
                 android:paddingTop="36dp"
                 android:paddingBottom="36dp"
+                android:paddingRight="24dp"
+                android:paddingEnd="24dp"
+                android:paddingLeft="24dp"
+                android:paddingStart="24dp"
                 android:layout_marginBottom="42dp"
-                android:layout_marginLeft="168dp"
-                android:layout_marginStart="168dp" >
+                android:layout_marginLeft="144dp"
+                android:layout_marginStart="144dp" >
 
                 <TextView
                     android:id="@+id/name"

@@ -401,7 +401,8 @@ public class PlayerActivity extends AppCompatActivity {
                         Palette.from(result).generate(new Palette.PaletteAsyncListener() {
                             @Override
                             public void onGenerated(Palette palette) {
-                                int color = palette.getMutedColor(Color.GRAY);
+                                int color = palette.getDarkVibrantColor(Color.DKGRAY);
+                                if (Settings.isDarkTheme(PlayerActivity.this)) color = palette.getLightVibrantColor(Color.LTGRAY);
 
                                 TransitionDrawable tb = new TransitionDrawable(new Drawable[]{bg.getBackground(), new ColorDrawable(color)});
                                 bg.setBackground(tb);

@@ -62,7 +62,7 @@ public class Playbar {
     private PlaybarListener listener;
 
     private Drawable play, pause;
-    private boolean thumbnails, palette;
+    private boolean thumbnails, palette, dark;
 
     public Playbar(Activity activity) {
         this.activity = activity;
@@ -79,6 +79,7 @@ public class Playbar {
     public void initPlayBar(View playbar) {
         thumbnails = Settings.isThumbnails(activity);
         palette = Settings.isPalette(activity);
+        dark = Settings.isDarkTheme(activity);
 
         art = (CustomImageView) playbar.findViewById(R.id.art);
         prev = (ImageView) playbar.findViewById(R.id.prev);
@@ -225,7 +226,9 @@ public class Playbar {
                         Palette.from(result).generate(new Palette.PaletteAsyncListener() {
                             @Override
                             public void onGenerated(Palette palette) {
-                                int color = palette.getMutedColor(Color.GRAY);
+                                int color = palette.getDarkVibrantColor(Color.DKGRAY);
+                                if (dark) color = palette.getLightVibrantColor(Color.LTGRAY);
+
                                 Drawable prev = bg.getBackground();
                                 if (prev instanceof TransitionDrawable)
                                     prev = ((TransitionDrawable) prev).getDrawable(1);

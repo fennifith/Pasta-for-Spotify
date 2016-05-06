@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="2dp"
-    app:cardUseCompatPadding="true">
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="?attr/cardBackgroundColor">
 
     <FrameLayout
         android:layout_width="match_parent"

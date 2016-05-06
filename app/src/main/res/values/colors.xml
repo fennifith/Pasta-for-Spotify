@@ -5,7 +5,9 @@
     <color name="colorPrimaryDark">#455a64</color>
     <color name="colorAccent">#00c853</color>
 
-    <color name="colorBackgroundLight">#f5f5f5</color>
+    <color name="colorBackgroundLight">#fafafa</color>
     <color name="colorBackgroundDark">#303030</color>
+    <color name="colorBackgroundFloatingLight">#ffffff</color>
+    <color name="colorBackgroundFloatingDark">#424242</color>
 
 </resources>
