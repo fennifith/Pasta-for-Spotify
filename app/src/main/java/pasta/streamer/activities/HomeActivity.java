@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.util.ArrayMap;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -49,10 +50,12 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.AlbumSimple;
 import kaaes.spotify.webapi.android.models.AlbumsPager;
@@ -121,8 +124,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         DataBindingUtil.setContentView(this, R.layout.activity_home);
         ButterKnife.bind(this);
 
-        limitMap = new ArrayMap<>();
-        limitMap.put("limit", (Settings.getLimit(this) + 1) * 10);
+        limitMap = new HashMap<>();
+        limitMap.put(SpotifyService.LIMIT, (Settings.getLimit(this) + 1) * 10);
 
         preload = Settings.isPreload(this);
         pasta = (Pasta) getApplicationContext();

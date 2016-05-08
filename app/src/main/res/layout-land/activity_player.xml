@@ -33,6 +33,54 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/image_gradient"/>
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="bottom"
+                android:scaleType="fitXY"
+                android:rotation="180"
+                android:src="@drawable/image_gradient"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:layout_gravity="bottom"
+                android:id="@+id/seekBarLayout"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:id="@+id/currentDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="00:00"
+                    android:textColor="#B3ffffff"
+                    android:gravity="right"/>
+
+                <android.support.v7.widget.AppCompatSeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.3"
+                    app:theme="@style/Widget.AppCompat.SeekBar"
+                    android:progressTint="#eee"
+                    android:thumbTint="#fff" />
+
+                <TextView
+                    android:id="@+id/finalDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="00:00"
+                    android:textColor="#B3ffffff"
+                    android:gravity="left"/>
+            </LinearLayout>
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -65,7 +113,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="104dp"
                     android:orientation="vertical"
-                    android:background="#1fffffff"
                     android:gravity="center_vertical"
                     android:padding="16dp">
 
@@ -79,7 +126,7 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="?android:textColorPrimaryInverse" />
+                        android:textColor="?android:textColorPrimary" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -90,7 +137,7 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="?android:textColorSecondaryInverse"
+                        android:textColor="?android:textColorSecondary"
                         android:layout_marginBottom="2dp" />
 
                     <TextView
@@ -102,50 +149,20 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="?android:textColorSecondaryInverse" />
+                        android:textColor="?android:textColorSecondary" />
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:orientation="horizontal"
-                    android:id="@+id/seekBarLayout">
-
-                    <TextView
-                        android:id="@+id/currentDuration"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:text="00:00"
-                        android:textColor="?android:textColorSecondaryInverse"
-                        android:gravity="right"/>
-
-                    <android.support.v7.widget.AppCompatSeekBar
-                        android:id="@+id/seekBar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="0.3"
-                        app:theme="@style/Widget.AppCompat.SeekBar"
-                        android:progressTint="?android:textColorSecondaryInverse"
-                        android:thumbTint="?android:textColorPrimaryInverse"/>
-
-                    <TextView
-                        android:id="@+id/finalDuration"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:text="00:00"
-                        android:textColor="?android:textColorSecondaryInverse"
-                        android:gravity="left"/>
-                </LinearLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="#1f000000" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
                     android:layout_weight="1">
@@ -157,11 +174,13 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_notify_prev"
-                        android:tint="?android:textColorSecondaryInverse"
+                        android:tint="?android:textColorSecondary"
                         android:tintMode="src_in"
                         android:layout_weight="1"
                         android:layout_marginLeft="32dp"
+                        android:layout_marginStart="32dp"
                         android:layout_marginRight="8dp"
+                        android:layout_marginEnd="8dp"
                         android:layout_gravity="center_vertical"
                         android:padding="8dp" />
 
@@ -172,7 +191,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_notify_play"
-                        android:tint="?android:textColorPrimaryInverse"
+                        android:tint="?android:textColorPrimary"
                         android:tintMode="src_in"
                         android:layout_weight="1"
                         android:layout_gravity="center"
@@ -186,11 +205,13 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_notify_next"
-                        android:tint="?android:textColorSecondaryInverse"
+                        android:tint="?android:textColorSecondary"
                         android:tintMode="src_in"
                         android:layout_weight="1"
                         android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:layout_marginRight="32dp"
+                        android:layout_marginEnd="32dp"
                         android:padding="8dp" />
                 </LinearLayout>
 

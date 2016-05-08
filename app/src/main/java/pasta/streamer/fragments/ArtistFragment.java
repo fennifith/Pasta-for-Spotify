@@ -37,6 +37,7 @@ import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
@@ -94,7 +95,7 @@ public class ArtistFragment extends FullScreenFragment {
         palette = Settings.isPalette(getContext());
         pasta = (Pasta) getContext().getApplicationContext();
         limitMap = new HashMap<>();
-        limitMap.put("limit", (Settings.getLimit(getContext()) + 1) * 10);
+        limitMap.put(SpotifyService.LIMIT, (Settings.getLimit(getContext()) + 1) * 10);
 
         setHasOptionsMenu(true);
         toolbar.setNavigationIcon(R.drawable.drawer_back);

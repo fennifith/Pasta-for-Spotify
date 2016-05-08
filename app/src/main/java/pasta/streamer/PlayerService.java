@@ -72,6 +72,7 @@ public class PlayerService extends Service {
     }
 
     private void initPlayer() {
+        debugPlaying = false;
         Pasta pasta = (Pasta) getApplicationContext();
 
         Config playerConfig = new Config(this, pasta.token, pasta.CLIENT_ID);

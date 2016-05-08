@@ -23,6 +23,7 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnPageChange;
+import kaaes.spotify.webapi.android.SpotifyService;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.adapters.FavoritePagerAdapter;
@@ -80,7 +81,7 @@ public class FavoritesFragment extends FabFragment {
                             return;
                         }
 
-                        final Map<String, Object> map = new HashMap<String, Object>();
+                        final Map<String, Object> map = new HashMap<>();
                         map.put("name", ((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString());
                         map.put("public", ((AppCompatCheckBox) layout.findViewById(R.id.pub)).isChecked());
 

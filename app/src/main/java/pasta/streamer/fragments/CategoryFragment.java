@@ -21,6 +21,7 @@ import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import kaaes.spotify.webapi.android.models.PlaylistsPager;
 import pasta.streamer.Pasta;
@@ -55,7 +56,7 @@ public class CategoryFragment extends FullScreenFragment {
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("category");
         limitMap = new HashMap<>();
-        limitMap.put("limit", (Settings.getLimit(getContext()) + 1) * 10);
+        limitMap.put(SpotifyService.LIMIT, (Settings.getLimit(getContext()) + 1) * 10);
 
         toolbar.setTitle(data.categoryName);
         toolbar.setNavigationIcon(R.drawable.drawer_back);

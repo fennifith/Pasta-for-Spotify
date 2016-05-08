@@ -47,6 +47,8 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.Playlist;
 import kaaes.spotify.webapi.android.models.PlaylistTrack;
 import pasta.streamer.Pasta;
@@ -82,6 +84,7 @@ public class PlaylistFragment extends FullScreenFragment {
     @Bind(R.id.tracksLength)
     TextView tracksLength;
 
+    private Pasta pasta;
     private PlaylistListData data;
     private ArrayList<TrackListData> trackList;
     private Pool pool;
@@ -94,6 +97,7 @@ public class PlaylistFragment extends FullScreenFragment {
         View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_tracks, container, false).getRoot();
         ButterKnife.bind(this, rootView);
 
+        pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("playlist");
 
         palette = Settings.isPalette(getContext());
@@ -135,18 +139,24 @@ public class PlaylistFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<TrackListData> run() throws InterruptedException {
-                Playlist playlist;
-                try {
-                    playlist = ((Pasta) getContext().getApplicationContext()).spotifyService.getPlaylist(data.playlistOwnerId, data.playlistId);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                ArrayList<TrackListData> trackList = new ArrayList<>();
+                Map<String, Object> options = new HashMap<>();
+
+                for (int i = 0; i < data.tracks; i += 100) {
+                    Pager<PlaylistTrack> tracks;
+                    try {
+                        options.put(SpotifyService.OFFSET, i);
+                        tracks = pasta.spotifyService.getPlaylistTracks(data.playlistOwnerId, data.playlistId, options);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+
+                    for (PlaylistTrack track : tracks.items) {
+                        trackList.add(new TrackListData(track.track));
+                    }
                 }
 
-                ArrayList<TrackListData> trackList = new ArrayList<>();
-                for (PlaylistTrack track : playlist.tracks.items) {
-                    trackList.add(new TrackListData(track.track));
-                }
                 return trackList;
             }
 
@@ -264,7 +274,7 @@ public class PlaylistFragment extends FullScreenFragment {
             @Override
             protected Boolean run() throws InterruptedException {
                 try {
-                    return ((Pasta) getContext().getApplicationContext()).isFavorite(data);
+                    return pasta.isFavorite(data);
                 } catch (RetrofitError e) {
                     e.printStackTrace();
                     return null;
@@ -303,9 +313,9 @@ public class PlaylistFragment extends FullScreenFragment {
                     @Nullable
                     @Override
                     protected Boolean run() throws InterruptedException {
-                        if (!((Pasta) getContext().getApplicationContext()).toggleFavorite(data)) {
+                        if (!pasta.toggleFavorite(data)) {
                             return null;
-                        } else return ((Pasta) getContext().getApplicationContext()).isFavorite(data);
+                        } else return pasta.isFavorite(data);
                     }
 
                     @Override
@@ -337,7 +347,7 @@ public class PlaylistFragment extends FullScreenFragment {
                             return;
                         }
 
-                        final Map<String, Object> map = new HashMap<String, Object>();
+                        final Map<String, Object> map = new HashMap<>();
                         map.put("name", ((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString());
                         map.put("public", ((AppCompatCheckBox) layout.findViewById(R.id.pub)).isChecked());
 
@@ -352,7 +362,7 @@ public class PlaylistFragment extends FullScreenFragment {
                             @Override
                             protected Boolean run() throws InterruptedException {
                                 try {
-                                    ((Pasta) getContext().getApplicationContext()).spotifyService.changePlaylistDetails(((Pasta) getContext().getApplicationContext()).me.id, data.playlistId, map);
+                                    pasta.spotifyService.changePlaylistDetails(pasta.me.id, data.playlistId, map);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     return false;
