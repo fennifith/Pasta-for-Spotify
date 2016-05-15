@@ -653,6 +653,19 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                         break;
                     case 1:
                         holderView = ((AlbumViewHolder) holder).v;
+
+                        ImageView artistView = (ImageView) holderView.findViewById(R.id.artist_image);
+                        if (artistView != null) {
+                            if (!thumbnails || result == null) {
+                                artistView.setVisibility(View.GONE);
+                            } else if (artistView instanceof CustomImageView) {
+                                ((CustomImageView) artistView).transition(new BitmapDrawable(activity.getResources(), result[1]));
+                            } else {
+                                TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
+                                artistView.setImageDrawable(td);
+                                td.startTransition(250);
+                            }
+                        }
                         break;
                     case 2:
                         holderView = ((PlaylistViewHolder) holder).v;
@@ -675,20 +688,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                     td.startTransition(250);
                 }
 
-                if (getItemViewType(holder.getAdapterPosition()) == 1) {
-                    ImageView artistView = (ImageView) holderView.findViewById(R.id.artist_image);
-                    if (!thumbnails || result == null) {
-                        imageView.setVisibility(View.GONE);
-                    } else if (artistView instanceof CustomImageView) {
-                        ((CustomImageView) artistView).transition(new BitmapDrawable(activity.getResources(), result[1]));
-                    } else {
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
-                        artistView.setImageDrawable(td);
-                        td.startTransition(250);
-                    }
-                }
-
-                if (!thumbnails || !palette || result == null || getItemViewType(holder.getAdapterPosition()) == 0) return;
+                if (!thumbnails || !palette || result == null || holderView.findViewById(R.id.bg) == null) return;
                 Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {

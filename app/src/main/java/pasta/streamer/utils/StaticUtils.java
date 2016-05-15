@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import pasta.streamer.Pasta;
 import pasta.streamer.PlayerService;
@@ -64,8 +65,16 @@ public class StaticUtils {
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
                 Pasta pasta = (Pasta) context.getApplicationContext();
+                Pager<PlaylistSimple> pager;
+                try {
+                    pager = pasta.spotifyService.getMyPlaylists();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
                 ArrayList<PlaylistListData> playlists = new ArrayList<PlaylistListData>();
-                for (PlaylistSimple playlist : pasta.spotifyService.getMyPlaylists().items) {
+                for (PlaylistSimple playlist : pager.items) {
                     PlaylistListData data = new PlaylistListData(playlist, pasta.me);
                     if (data.editable) playlists.add(data);
                 }

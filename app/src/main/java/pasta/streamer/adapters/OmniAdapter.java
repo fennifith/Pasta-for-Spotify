@@ -521,38 +521,41 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 AlbumListData albumData = (AlbumListData) list.get(position);
 
-                ((TextView) albumView.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
-                ((TextView) albumView.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
+                View artist = albumView.v.findViewById(R.id.artist);
+                if (artist != null) {
+                    ((TextView) albumView.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
+                    ((TextView) albumView.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
 
-                albumView.v.findViewById(R.id.artist).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new Action<ArtistListData>() {
-                            @NonNull
-                            @Override
-                            public String id() {
-                                return "gotoArtist";
-                            }
+                    artist.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new Action<ArtistListData>() {
+                                @NonNull
+                                @Override
+                                public String id() {
+                                    return "gotoArtist";
+                                }
 
-                            @Nullable
-                            @Override
-                            protected ArtistListData run() throws InterruptedException {
-                                return new ArtistListData(((Pasta) activity.getApplicationContext()).spotifyService.getArtist(((AlbumListData) list.get(holder.getAdapterPosition())).artistId));
-                            }
+                                @Nullable
+                                @Override
+                                protected ArtistListData run() throws InterruptedException {
+                                    return new ArtistListData(((Pasta) activity.getApplicationContext()).spotifyService.getArtist(((AlbumListData) list.get(holder.getAdapterPosition())).artistId));
+                                }
 
-                            @Override
-                            protected void done(@Nullable ArtistListData result) {
-                                Bundle args = new Bundle();
-                                args.putParcelable("artist", result);
+                                @Override
+                                protected void done(@Nullable ArtistListData result) {
+                                    Bundle args = new Bundle();
+                                    args.putParcelable("artist", result);
 
-                                Fragment f = new ArtistFragment();
-                                f.setArguments(args);
+                                    Fragment f = new ArtistFragment();
+                                    f.setArguments(args);
 
-                                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                            }
-                        }.execute();
-                    }
-                });
+                                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                                }
+                            }.execute();
+                        }
+                    });
+                }
 
                 ((TextView) albumView.v.findViewById(R.id.name)).setText(albumData.albumName);
                 ((TextView) albumView.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");
@@ -899,6 +902,19 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         break;
                     case 1:
                         holderView = ((AlbumViewHolder) holder).v;
+
+                        ImageView artistView = (ImageView) holderView.findViewById(R.id.artist_image);
+                        if (artistView != null) {
+                            if (!thumbnails || result == null) {
+                                artistView.setVisibility(View.GONE);
+                            } else if (artistView instanceof CustomImageView) {
+                                ((CustomImageView) artistView).transition(new BitmapDrawable(activity.getResources(), result[1]));
+                            } else {
+                                TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
+                                artistView.setImageDrawable(td);
+                                td.startTransition(250);
+                            }
+                        }
                         break;
                     case 2:
                         holderView = ((PlaylistViewHolder) holder).v;
@@ -919,19 +935,6 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[0])});
                     imageView.setImageDrawable(td);
                     td.startTransition(250);
-                }
-
-                if (getItemViewType(holder.getAdapterPosition()) == 1) {
-                    ImageView artistView = (ImageView) holderView.findViewById(R.id.artist_image);
-                    if (!thumbnails || result == null) {
-                        imageView.setVisibility(View.GONE);
-                    } else if (artistView instanceof CustomImageView) {
-                        ((CustomImageView) artistView).transition(new BitmapDrawable(activity.getResources(), result[1]));
-                    } else {
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
-                        artistView.setImageDrawable(td);
-                        td.startTransition(250);
-                    }
                 }
 
                 if (!thumbnails || !palette || result == null) return;
