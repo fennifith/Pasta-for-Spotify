@@ -2,6 +2,7 @@ package pasta.streamer.utils;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -36,7 +37,13 @@ public class Settings {
     }
 
     public static int getPrimaryColor(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getInt(PRIMARY, ContextCompat.getColor(context, R.color.primary));
+        int color = PreferenceManager.getDefaultSharedPreferences(context).getInt(PRIMARY, ContextCompat.getColor(context, R.color.primary));
+
+        if (Color.alpha(color) < 255) {
+            color = Color.argb(255, Color.red(color), Color.blue(color), Color.green(color));
+        }
+
+        return color;
     }
 
     public static int getAccentColor(Context context) {

@@ -334,7 +334,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 appbar.setTargetElevation(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
             } else appbar.setTargetElevation(0f);
 
-            if (f instanceof SearchFragment && !searchPool.isExecuting() && (searchDatas != null && searchDatas.size() > 0)) {
+            if (f instanceof SearchFragment && (searchPool == null || !searchPool.isExecuting()) && (searchDatas != null && searchDatas.size() > 0)) {
                 ((SearchFragment) f).swapData(searchDatas);
             }
         }
