@@ -70,7 +70,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private PlaylistListData playlistdata;
     private Drawable preload;
     private Drawable art_preload;
-    private boolean thumbnails, palette, dark;
+    private boolean thumbnails, cards, palette, dark;
     private int behavior = 0;
     public final static int BEHAVIOR_NONE = 0, BEHAVIOR_PLAYLIST = 1, BEHAVIOR_FAVORITE = 2, BEHAVIOR_ALBUM = 3;
 
@@ -87,6 +87,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.activity = activity;
 
         thumbnails = Settings.isThumbnails(activity);
+        cards = Settings.isCards(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
 
@@ -196,13 +197,13 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case 0:
-                return new TrackViewHolder(inflater.inflate(R.layout.track_item_card, null));
+                return new TrackViewHolder(inflater.inflate(cards ? R.layout.track_item_card : R.layout.track_item_tile, null));
             case 1:
-                return new AlbumViewHolder(inflater.inflate(R.layout.album_item_card, null));
+                return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, null));
             case 2:
-                return new PlaylistViewHolder(inflater.inflate(R.layout.playlist_item_card, null));
+                return new PlaylistViewHolder(inflater.inflate(cards ? R.layout.playlist_item_card : R.layout.playlist_item_tile, null));
             case 3:
-                return new ArtistViewHolder(inflater.inflate(R.layout.artist_item_card, null));
+                return new ArtistViewHolder(inflater.inflate(cards ? R.layout.artist_item_card : R.layout.artist_item_tile, null));
             default:
                 return null;
         }
@@ -425,7 +426,9 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 AlbumViewHolder albumView = (AlbumViewHolder) holder;
                 ((ImageView) albumView.v.findViewById(R.id.image)).setImageDrawable(preload);
                 albumView.v.findViewById(R.id.bg).setBackground(art_preload);
-                ((ImageView) albumView.v.findViewById(R.id.artist_image)).setImageDrawable(preload);
+
+                ImageView artistImage = (ImageView) albumView.v.findViewById(R.id.artist_image);
+                if (artistImage != null) artistImage.setImageDrawable(preload);
 
                 albumView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -903,15 +906,15 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     case 1:
                         holderView = ((AlbumViewHolder) holder).v;
 
-                        ImageView artistView = (ImageView) holderView.findViewById(R.id.artist_image);
-                        if (artistView != null) {
+                        ImageView artistImage = (ImageView) holderView.findViewById(R.id.artist_image);
+                        if (artistImage != null) {
                             if (!thumbnails || result == null) {
-                                artistView.setVisibility(View.GONE);
-                            } else if (artistView instanceof CustomImageView) {
-                                ((CustomImageView) artistView).transition(new BitmapDrawable(activity.getResources(), result[1]));
+                                artistImage.setVisibility(View.GONE);
+                            } else if (artistImage instanceof CustomImageView) {
+                                ((CustomImageView) artistImage).transition(new BitmapDrawable(activity.getResources(), result[1]));
                             } else {
                                 TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
-                                artistView.setImageDrawable(td);
+                                artistImage.setImageDrawable(td);
                                 td.startTransition(250);
                             }
                         }
@@ -941,12 +944,15 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
-                        int color = palette.getLightVibrantColor(Color.LTGRAY);
+                        int color = palette.getLightVibrantColor(Color.WHITE);
                         if (dark) color = palette.getDarkVibrantColor(Color.DKGRAY);
 
                         TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(color)});
                         holderView.findViewById(R.id.bg).setBackground(td);
                         td.startTransition(250);
+
+                        View artist = holderView.findViewById(R.id.artist);
+                        if (artist != null) artist.setBackgroundColor(Color.argb(255, Math.max(Color.red(color) - 10, 0), Math.max(Color.green(color) - 10, 0), Math.max(Color.blue(color) - 10, 0)));
                     }
                 });
             }

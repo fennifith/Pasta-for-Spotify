@@ -166,6 +166,13 @@ public class SettingsFragment extends Fragment {
         prefs.edit().putBoolean(Settings.THUMBNAILS, thumbnails).apply();
     }
 
+    @OnCheckedChanged(R.id.cards)
+    public void changeCards(boolean cards) {
+        if (prefs == null) return;
+        if (cards != Settings.isCards(getContext())) onChange();
+        prefs.edit().putBoolean(Settings.CARDS, cards).apply();
+    }
+
     @OnCheckedChanged(R.id.palette)
     public void changePalette(boolean palette) {
         if (prefs == null) return;

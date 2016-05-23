@@ -18,6 +18,7 @@ import com.afollestad.async.Action;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,6 +43,7 @@ public class CategoryFragment extends FullScreenFragment {
     Toolbar toolbar;
 
     OmniAdapter adapter;
+    GridLayoutManager manager;
     CategoryListData data;
     Action action;
     Map<String, Object> limitMap;
@@ -71,7 +73,18 @@ public class CategoryFragment extends FullScreenFragment {
 
         spinner.setVisibility(View.VISIBLE);
 
-        recycler.setLayoutManager(new GridLayoutManager(getContext(), 1));
+        manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false));
+
+        if (Settings.isCards(getContext())) {
+            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return manager.getSpanCount();
+                }
+            });
+        }
+
+        recycler.setLayoutManager(manager);
         adapter = new OmniAdapter((AppCompatActivity) getActivity(), null);
         recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);

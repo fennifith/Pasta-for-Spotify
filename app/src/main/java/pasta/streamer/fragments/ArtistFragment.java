@@ -124,7 +124,7 @@ public class ArtistFragment extends FullScreenFragment {
 
         adapter = new SectionedOmniAdapter((AppCompatActivity) getActivity(), null);
         topTenTrackView.setAdapter(adapter);
-        topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+        topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false)));
 
         pool = Async.parallel(new Action<ArrayList<TrackListData>>() {
             @NonNull

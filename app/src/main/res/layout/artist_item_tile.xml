@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/cardBackgroundColor">
+    android:padding="4dp">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -13,6 +12,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/cardBackgroundColor"
+        android:id="@+id/bg"
         android:orientation="vertical">
 
         <pasta.streamer.views.CircleImageView
@@ -21,65 +22,60 @@
             android:layout_height="64dp"
             android:src="@drawable/preload"
             android:scaleType="centerCrop"
-            android:layout_margin="64dp"
+            android:layout_margin="32dp"
             android:layout_gravity="center_horizontal" />
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:id="@+id/bg"
             android:background="@android:color/transparent"
-            android:layout_height="68dp">
+            android:layout_height="68dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:paddingRight="16dp"
+            android:paddingEnd="16dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight="1"
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:paddingLeft="16dp"
-                android:paddingStart="16dp">
+                android:textColor="?android:textColorPrimary"
+                android:textSize="16sp"
+                android:singleLine="true"
+                android:lines="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textIsSelectable="false"/>
 
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp"
-                    android:singleLine="true"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textIsSelectable="false"/>
+            <TextView
+                android:id="@+id/extra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textColor="?android:textColorSecondary"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:lines="1"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-                <TextView
-                    android:id="@+id/extra"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:textColor="?android:textColorSecondary"
-                    android:textSize="12sp"
-                    android:singleLine="true"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="56dp"
-                android:layout_height="68dp"
-                android:id="@+id/menu"
-                android:src="@drawable/menu"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="16dp"
-                android:tint="?android:textColorPrimary"/>
         </LinearLayout>
 
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="56dp"
+        android:layout_height="68dp"
+        android:id="@+id/menu"
+        android:src="@drawable/menu"
+        android:gravity="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="16dp"
+        android:tint="?android:textColorPrimary"
+        android:layout_gravity="bottom|end" />
 
 </FrameLayout>

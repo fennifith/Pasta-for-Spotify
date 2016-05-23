@@ -120,6 +120,19 @@
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
                     android:layout_width="match_parent"
+                    android:id="@+id/cards"
+                    android:text="Show Cards"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:checked="@{Settings.isCards(context)}" />
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_height="52dp"
+                    android:layout_width="match_parent"
                     android:id="@+id/palette"
                     android:text="Dynamic Backgrounds"
                     android:textColor="?android:textColorPrimary"

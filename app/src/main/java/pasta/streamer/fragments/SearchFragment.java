@@ -17,6 +17,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import pasta.streamer.R;
 import pasta.streamer.adapters.SectionedOmniAdapter;
+import pasta.streamer.utils.Settings;
 
 public class SearchFragment extends Fragment {
 
@@ -38,14 +39,23 @@ public class SearchFragment extends Fragment {
         else spinner.setVisibility(View.GONE);
 
         adapter = new SectionedOmniAdapter((AppCompatActivity) getActivity(), list) ;
-        manager = new GridLayoutManager(getContext(), 1);
-        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (adapter.getItemViewType(position) != 0) return manager.getSpanCount();
-                return 1;
-            }
-        });
+        manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false));
+        if (Settings.isCards(getContext())) {
+            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return manager.getSpanCount();
+                }
+            });
+        } else {
+            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4) return manager.getSpanCount();
+                    else return 1;
+                }
+            });
+        }
         recycler.setLayoutManager(manager);
         recycler.setAdapter(adapter);
 
