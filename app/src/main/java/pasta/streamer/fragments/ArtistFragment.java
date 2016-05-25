@@ -63,7 +63,7 @@ public class ArtistFragment extends FullScreenFragment {
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
     @Bind(R.id.topTenTrackListView)
-    RecyclerView topTenTrackView;
+    RecyclerView recycler;
     @Bind(R.id.header)
     CustomImageView header;
     @Bind(R.id.title)
@@ -79,6 +79,7 @@ public class ArtistFragment extends FullScreenFragment {
 
     private ArtistListData data;
     private SectionedOmniAdapter adapter;
+    private GridLayoutManager manager;
     private Pool pool;
     private boolean palette;
     private Pasta pasta;
@@ -122,9 +123,28 @@ public class ArtistFragment extends FullScreenFragment {
 
         spinner.setVisibility(View.VISIBLE);
 
+        manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false));
+        if (Settings.isCards(getContext())) {
+            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return manager.getSpanCount();
+                }
+            });
+        } else {
+            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4) return manager.getSpanCount();
+                    else return 1;
+                }
+            });
+        }
+        recycler.setLayoutManager(manager);
+
+
         adapter = new SectionedOmniAdapter((AppCompatActivity) getActivity(), null);
-        topTenTrackView.setAdapter(adapter);
-        topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false)));
+        recycler.setAdapter(adapter);
 
         pool = Async.parallel(new Action<ArrayList<TrackListData>>() {
             @NonNull
