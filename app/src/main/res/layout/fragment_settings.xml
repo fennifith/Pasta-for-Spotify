@@ -57,8 +57,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"
-                    android:textAlignment="gravity"/>
+                    android:textColor="?android:textColorPrimary"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -69,8 +68,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"
-                    android:textAlignment="gravity"/>
+                    android:textColor="?android:textColorPrimary"/>
 
             </LinearLayout>
 
@@ -121,7 +119,7 @@
                     android:layout_height="52dp"
                     android:layout_width="match_parent"
                     android:id="@+id/cards"
-                    android:text="Show Cards"
+                    android:text="Use Cards"
                     android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:paddingLeft="8dp"
@@ -134,7 +132,7 @@
                     android:layout_height="52dp"
                     android:layout_width="match_parent"
                     android:id="@+id/lists"
-                    android:text="List Tracks"
+                    android:text="Prefer Lists to Grids"
                     android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:paddingLeft="8dp"
@@ -169,8 +167,7 @@
                         android:textSize="16sp"
                         android:padding="8dp"
                         android:gravity="center_vertical|start"
-                        android:textColor="?android:textColorPrimary"
-                        android:textAlignment="gravity" />
+                        android:textColor="?android:textColorPrimary" />
 
                     <pasta.streamer.views.CircleImageView
                         android:layout_width="36dp"
@@ -196,8 +193,7 @@
                         android:textSize="16sp"
                         android:padding="8dp"
                         android:gravity="center_vertical|start"
-                        android:textColor="?android:textColorPrimary"
-                        android:textAlignment="gravity"/>
+                        android:textColor="?android:textColorPrimary"/>
 
                     <pasta.streamer.views.CircleImageView
                         android:layout_width="36dp"
@@ -238,8 +234,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"
-                    android:textAlignment="gravity"/>
+                    android:textColor="?android:textColorPrimary"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -250,8 +245,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"
-                    android:textAlignment="gravity"/>
+                    android:textColor="?android:textColorPrimary"/>
             </LinearLayout>
 
         </LinearLayout>

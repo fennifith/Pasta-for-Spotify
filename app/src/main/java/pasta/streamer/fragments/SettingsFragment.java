@@ -71,9 +71,10 @@ public class SettingsFragment extends Fragment {
 
     @OnCheckedChanged(R.id.preload)
     public void changePreload(boolean preload) {
-        if (prefs == null) return;
-        if (preload != Settings.isPreload(getContext())) onChange();
-        prefs.edit().putBoolean(Settings.PRELOAD, preload).apply();
+        if (prefs != null && preload != Settings.isPreload(getContext())) {
+            prefs.edit().putBoolean(Settings.PRELOAD, preload).apply();
+            onChange();
+        }
     }
 
     @OnClick(R.id.limit)
@@ -154,37 +155,42 @@ public class SettingsFragment extends Fragment {
 
     @OnCheckedChanged(R.id.darkmode)
     public void changeDarkMode(boolean dark) {
-        if (prefs == null) return;
-        if (dark != Settings.isDarkTheme(getContext())) onChange();
-        prefs.edit().putBoolean(Settings.DARK_THEME, dark).apply();
+        if (prefs != null && dark != Settings.isDarkTheme(getContext())) {
+            prefs.edit().putBoolean(Settings.DARK_THEME, dark).apply();
+            onChange();
+        }
     }
 
     @OnCheckedChanged(R.id.thumbnails)
     public void changeThumbnails(boolean thumbnails) {
-        if (prefs == null) return;
-        if (thumbnails != Settings.isThumbnails(getContext())) onChange();
-        prefs.edit().putBoolean(Settings.THUMBNAILS, thumbnails).apply();
+        if (prefs != null && thumbnails != Settings.isThumbnails(getContext())) {
+            prefs.edit().putBoolean(Settings.THUMBNAILS, thumbnails).apply();
+            onChange();
+        }
     }
 
     @OnCheckedChanged(R.id.cards)
     public void changeCards(boolean cards) {
-        if (prefs == null) return;
-        if (cards != Settings.isCards(getContext())) onChange();
-        prefs.edit().putBoolean(Settings.CARDS, cards).apply();
+        if (prefs != null && cards != Settings.isCards(getContext())) {
+            prefs.edit().putBoolean(Settings.CARDS, cards).apply();
+            onChange();
+        }
     }
 
     @OnCheckedChanged(R.id.lists)
     public void changeListTracks(boolean listTracks) {
-        if (prefs == null) return;
-        if (listTracks != Settings.isListTracks(getContext())) onChange();
-        prefs.edit().putBoolean(Settings.CARDS, listTracks).apply();
+        if (prefs != null && listTracks != Settings.isListTracks(getContext())) {
+            prefs.edit().putBoolean(Settings.LIST_TRACKS, listTracks).apply();
+            onChange();
+        }
     }
 
     @OnCheckedChanged(R.id.palette)
     public void changePalette(boolean palette) {
-        if (prefs == null) return;
-        if (palette != Settings.isPalette(getContext())) onChange();
-        prefs.edit().putBoolean(Settings.PALETTE, palette).apply();
+        if (prefs != null && palette != Settings.isPalette(getContext())) {
+            prefs.edit().putBoolean(Settings.PALETTE, palette).apply();
+            onChange();
+        }
     }
 
     @OnClick(R.id.primary)
