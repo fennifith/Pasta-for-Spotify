@@ -136,7 +136,7 @@ public class AlbumFragment extends FullScreenFragment {
         adapter = new OmniAdapter((AppCompatActivity) getActivity(), null);
         adapter.setAlbumBehavior();
         topTenTrackView.setAdapter(adapter);
-        topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
+        topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         topTenTrackView.setHasFixedSize(true);
 
         pool = Async.parallel(new Action<ArrayList<TrackListData>>() {

@@ -173,6 +173,13 @@ public class SettingsFragment extends Fragment {
         prefs.edit().putBoolean(Settings.CARDS, cards).apply();
     }
 
+    @OnCheckedChanged(R.id.lists)
+    public void changeListTracks(boolean listTracks) {
+        if (prefs == null) return;
+        if (listTracks != Settings.isListTracks(getContext())) onChange();
+        prefs.edit().putBoolean(Settings.CARDS, listTracks).apply();
+    }
+
     @OnCheckedChanged(R.id.palette)
     public void changePalette(boolean palette) {
         if (prefs == null) return;

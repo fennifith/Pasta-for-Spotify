@@ -70,7 +70,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private PlaylistListData playlistdata;
     private Drawable preload;
     private Drawable art_preload;
-    private boolean thumbnails, cards, palette, dark;
+    private boolean thumbnails, cards, trackList, palette, dark;
     private int behavior = 0;
     public final static int BEHAVIOR_NONE = 0, BEHAVIOR_PLAYLIST = 1, BEHAVIOR_FAVORITE = 2, BEHAVIOR_ALBUM = 3;
 
@@ -88,6 +88,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         thumbnails = Settings.isThumbnails(activity);
         cards = Settings.isCards(activity);
+        trackList = Settings.isListTracks(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
 
@@ -197,7 +198,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case 0:
-                return new TrackViewHolder(inflater.inflate(cards ? R.layout.track_item_card : R.layout.track_item_tile, null));
+                return new TrackViewHolder(inflater.inflate(trackList ? R.layout.track_item : (cards ? R.layout.track_item_card : R.layout.track_item_tile), null));
             case 1:
                 return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, null));
             case 2:
@@ -215,9 +216,15 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case 0:
                 TrackViewHolder trackView = (TrackViewHolder) holder;
                 ((ImageView) trackView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                trackView.v.findViewById(R.id.bg).setBackground(art_preload);
 
-                trackView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                View trackBg = trackView.v.findViewById(R.id.bg);
+                if (trackBg != null) trackBg.setBackground(art_preload);
+
+                View trackMenu = trackView.v.findViewById(R.id.menu);
+                if (trackMenu.getVisibility() == View.GONE) {
+                    trackMenu.setVisibility(View.VISIBLE);
+                }
+                trackMenu.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -940,7 +947,8 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     td.startTransition(250);
                 }
 
-                if (!thumbnails || !palette || result == null) return;
+                View bg = holderView.findViewById(R.id.bg);
+                if (!thumbnails || !palette || result == null || bg == null) return;
                 Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
