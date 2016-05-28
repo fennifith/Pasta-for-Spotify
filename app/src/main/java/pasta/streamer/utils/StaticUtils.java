@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -158,6 +159,26 @@ public class StaticUtils {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public static Bitmap blurBitmap(Bitmap bitmap) {
+        Paint paint = new Paint();
+        paint.setAlpha(180);
+
+        Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(resultBitmap);
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+        int blurRadius = 12;
+        for (int row = -blurRadius; row < blurRadius; row += 2) {
+            for (int column = -blurRadius; column < blurRadius; column += 2) {
+                if (column * column + row * row <= blurRadius * blurRadius) {
+                    paint.setAlpha((blurRadius * blurRadius) / ((column * column + row * row) + 1) * 2);
+                    canvas.drawBitmap(bitmap, row, column, paint);
+                }
+            }
+        }
+
+        return resultBitmap;
     }
 
     public static String getAlbumUrl(String id) {

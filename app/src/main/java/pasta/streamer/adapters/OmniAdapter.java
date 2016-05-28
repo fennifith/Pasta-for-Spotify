@@ -184,7 +184,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (position >= list.size() || position == -1) return -1;
+        if (position >= list.size() || position < 0) return -1;
         Object o = list.get(position);
         if (o instanceof TrackListData) return 0;
         else if (o instanceof AlbumListData) return 1;

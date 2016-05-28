@@ -18,8 +18,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.util.ArrayMap;
-import android.support.v4.util.SimpleArrayMap;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -104,6 +102,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     FloatingActionButton fab;
     @Bind(R.id.status_background)
     FrameLayout statusBackground;
+    @Nullable @Bind(R.id.content)
+    FrameLayout content;
 
     private Playbar playbar;
     private Drawer materialDrawer;
@@ -133,6 +133,12 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer_toggle);
+
+        if (content != null) {
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParams.topMargin = StaticUtils.getStatusBarMargin(this);
+            content.setLayoutParams(layoutParams);
+        }
 
         fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(this)));
 

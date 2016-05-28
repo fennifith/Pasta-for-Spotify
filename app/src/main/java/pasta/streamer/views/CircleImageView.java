@@ -76,7 +76,7 @@ public class CircleImageView extends CustomImageView {
                     rSecond = RoundedBitmapDrawableFactory.create(resources, ThumbnailUtils.extractThumbnail(image2, size, size));
                     rSecond.setCornerRadius(size / 2) ;
                     rSecond.setAntiAlias(true);
-                } catch (OutOfMemoryError e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }

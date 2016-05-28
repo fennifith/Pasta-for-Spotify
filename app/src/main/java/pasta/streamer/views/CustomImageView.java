@@ -49,7 +49,7 @@ public class CustomImageView extends ImageView {
                     if (image2 != null) {
                         image2 = ThumbnailUtils.extractThumbnail(image2, size, size);
                     }
-                } catch (OutOfMemoryError e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 

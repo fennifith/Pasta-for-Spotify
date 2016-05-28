@@ -76,6 +76,8 @@ public class ArtistFragment extends FullScreenFragment {
     Toolbar toolbar;
     @Bind(R.id.somethingbar)
     View somethingbar;
+    @Nullable @Bind(R.id.backgroundImage)
+    CustomImageView backgroundImage;
 
     private ArtistListData data;
     private SectionedOmniAdapter adapter;
@@ -317,6 +319,8 @@ public class ArtistFragment extends FullScreenFragment {
                 if (result == null) return;
 
                 header.transition(new BitmapDrawable(getResources(), result));
+
+                if (backgroundImage != null) backgroundImage.transition(new BitmapDrawable(getResources(), StaticUtils.blurBitmap(result)));
 
                 if (!palette) return;
                 Palette.from(result).generate(new Palette.PaletteAsyncListener() {
