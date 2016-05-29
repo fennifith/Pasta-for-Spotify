@@ -888,16 +888,17 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             @Override
             protected Bitmap[] run() throws InterruptedException {
                 if (!thumbnails) return null;
-                switch (getItemViewType(holder.getAdapterPosition())) {
+                int position = holder.getAdapterPosition();
+                switch (getItemViewType(position)) {
                     case 0:
-                        return new Bitmap[]{Downloader.downloadImage(activity, ((TrackListData) OmniAdapter.this.list.get(holder.getAdapterPosition())).trackImage)};
+                        return new Bitmap[]{Downloader.downloadImage(activity, ((TrackListData) OmniAdapter.this.list.get(position)).trackImage)};
                     case 1:
-                        AlbumListData album = (AlbumListData) OmniAdapter.this.list.get(holder.getAdapterPosition());
+                        AlbumListData album = (AlbumListData) OmniAdapter.this.list.get(position);
                         return new Bitmap[]{Downloader.downloadImage(activity, album.albumImage), Downloader.downloadImage(activity, album.artistImage)};
                     case 2:
-                        return new Bitmap[]{Downloader.downloadImage(activity, ((PlaylistListData) OmniAdapter.this.list.get(holder.getAdapterPosition())).playlistImage)};
+                        return new Bitmap[]{Downloader.downloadImage(activity, ((PlaylistListData) OmniAdapter.this.list.get(position)).playlistImage)};
                     case 3:
-                        return new Bitmap[]{Downloader.downloadImage(activity, ((ArtistListData) OmniAdapter.this.list.get(holder.getAdapterPosition())).artistImage)};
+                        return new Bitmap[]{Downloader.downloadImage(activity, ((ArtistListData) OmniAdapter.this.list.get(position)).artistImage)};
                     default:
                         return null;
                 }

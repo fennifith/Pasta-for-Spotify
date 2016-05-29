@@ -135,7 +135,7 @@ public class PlayerService extends Service {
 
             @Override
             public void onTemporaryError() {
-                onError("Random error, please restart the app.");
+                onError("Random error");
             }
 
             @Override
@@ -147,7 +147,8 @@ public class PlayerService extends Service {
     private void onError(String message) {
         errorCount++;
         if (errorCount < 5) {
-            initPlayer();
+            Toast.makeText(getApplicationContext(), message + ", please restart the app.", Toast.LENGTH_LONG).show();
+            stopSelf();
         } else Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
@@ -226,7 +227,7 @@ public class PlayerService extends Service {
                 }
 
                 if (debugPlaying && !playerState.playing && playerState.durationInMs == 0) {
-                    onError("Unknown error, please restart the app.");
+                    onError("Unknown error");
                     return;
                 }
 

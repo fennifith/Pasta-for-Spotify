@@ -3,13 +3,12 @@
         <import type="pasta.streamer.utils.Settings"/>
     </data>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/bg"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
         android:background="@{Settings.getPrimaryColor(context)}">
 
         <FrameLayout
@@ -58,7 +57,7 @@
                     android:layout_weight="1"
                     android:text="00:00"
                     android:textColor="#B3ffffff"
-                    android:gravity="right"/>
+                    android:gravity="end"/>
 
                 <android.support.v7.widget.AppCompatSeekBar
                     android:id="@+id/seekBar"
@@ -78,7 +77,7 @@
                     android:layout_weight="1"
                     android:text="00:00"
                     android:textColor="#B3ffffff"
-                    android:gravity="left"/>
+                    android:gravity="start"/>
             </LinearLayout>
 
             <android.support.v7.widget.Toolbar
@@ -98,10 +97,7 @@
 
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/frame"
-            android:layout_toEndOf="@+id/frame"
-            android:layout_gravity="end">
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -229,5 +225,5 @@
 
         </android.support.design.widget.CoordinatorLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 </layout>

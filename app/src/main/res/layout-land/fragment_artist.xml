@@ -14,6 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/image_gradient"
+            android:scaleType="centerCrop"
             android:id="@+id/backgroundImage" />
 
         <android.support.design.widget.CoordinatorLayout

@@ -27,10 +27,12 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -68,6 +70,8 @@ public class PlayerActivity extends AppCompatActivity {
     Toolbar toolbar;
     @Bind(R.id.trackImage)
     CustomImageView art;
+    @Nullable @Bind(R.id.backgroundImage)
+    CustomImageView backgroundImage;
     @Bind(R.id.currentDuration)
     TextView currentDuration;
     @Bind(R.id.finalDuration)
@@ -138,8 +142,19 @@ public class PlayerActivity extends AppCompatActivity {
 
         byte[] b = getIntent().getByteArrayExtra("preload");
         if (b != null) {
-            Bitmap bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
+            Bitmap bmp = StaticUtils.blurBitmap(BitmapFactory.decodeByteArray(b, 0, b.length));
             art.setImageBitmap(bmp);
+
+            if (backgroundImage != null) backgroundImage.setImageBitmap(bmp);
+        }
+
+        if (backgroundImage != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            TypedValue value = new TypedValue();
+            getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, TypedValue.complexToDimensionPixelSize(value.data, getResources().getDisplayMetrics()));
+            params.topMargin = StaticUtils.getStatusBarMargin(this);
+            toolbar.setLayoutParams(params);
         }
 
         setLoading(true);
@@ -394,8 +409,12 @@ public class PlayerActivity extends AppCompatActivity {
                     protected void done(@Nullable Bitmap result) {
                         if (result == null) {
                             art.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.preload));
+                            if (backgroundImage != null) backgroundImage.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.image_gradient));
                             return;
-                        } else art.transition(new BitmapDrawable(getResources(), result));
+                        }
+
+                        art.transition(new BitmapDrawable(getResources(), result));
+                        if (backgroundImage != null) backgroundImage.transition(new BitmapDrawable(getResources(), StaticUtils.blurBitmap(result)));
 
                         if (!palette) return;
                         Palette.from(result).generate(new Palette.PaletteAsyncListener() {
