@@ -41,8 +41,6 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import kaaes.spotify.webapi.android.models.Album;
-import kaaes.spotify.webapi.android.models.TrackSimple;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
@@ -53,7 +51,6 @@ import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
-import retrofit.RetrofitError;
 
 public class AlbumFragment extends FullScreenFragment {
 
@@ -78,6 +75,7 @@ public class AlbumFragment extends FullScreenFragment {
 
     private AlbumListData data;
     private ArrayList<TrackListData> trackList;
+    private Pasta pasta;
     private Pool pool;
     private int selectedOrder;
     private OmniAdapter adapter;
@@ -88,6 +86,7 @@ public class AlbumFragment extends FullScreenFragment {
         View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_tracks, container, false).getRoot();
         ButterKnife.bind(this, rootView);
 
+        pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("album");
 
         palette = Settings.isPalette(getContext());
@@ -149,26 +148,14 @@ public class AlbumFragment extends FullScreenFragment {
                 @Nullable
                 @Override
                 protected ArrayList<TrackListData> run() throws InterruptedException {
-                    Album album;
-                    try {
-                        album = ((Pasta) getContext().getApplicationContext()).spotifyService.getAlbum(data.albumId);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-
-                        ArrayList<TrackListData> trackList = new ArrayList<>();
-                    for (TrackSimple track : album.tracks.items) {
-                        trackList.add(new TrackListData(track, data.albumName, data.albumId, data.albumImage, data.albumImageLarge));
-                    }
-                    return trackList;
+                    return pasta.getTracks(data);
                 }
 
                 @Override
                 protected void done(@Nullable ArrayList<TrackListData> result) {
                     if (spinner != null) spinner.setVisibility(View.GONE);
                     if (result == null) {
-                        StaticUtils.onNetworkError(getActivity());
+                        pasta.onNetworkError(getContext());
                         return;
                     }
                     adapter.swapData(result);
@@ -260,18 +247,13 @@ public class AlbumFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected Boolean run() throws InterruptedException {
-                try {
-                    return ((Pasta) getContext().getApplicationContext()).isFavorite(data);
-                } catch (RetrofitError e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                return pasta.isFavorite(data);
             }
 
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity());
                     return;
                 }
                 if (result) {
@@ -300,15 +282,15 @@ public class AlbumFragment extends FullScreenFragment {
                     @Nullable
                     @Override
                     protected Boolean run() throws InterruptedException {
-                        if (!((Pasta) getContext().getApplicationContext()).toggleFavorite(data)) {
+                        if (!pasta.toggleFavorite(data)) {
                             return null;
-                        } else return ((Pasta) getContext().getApplicationContext()).isFavorite(data);
+                        } else return pasta.isFavorite(data);
                     }
 
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            StaticUtils.onNetworkError(getActivity());
+                            pasta.onNetworkError(getActivity());
                             return;
                         }
                         if (result) {

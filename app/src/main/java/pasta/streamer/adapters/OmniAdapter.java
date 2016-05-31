@@ -42,8 +42,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import kaaes.spotify.webapi.android.models.Album;
-import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.TrackToRemove;
 import kaaes.spotify.webapi.android.models.TracksToRemove;
 import pasta.streamer.Pasta;
@@ -66,6 +64,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList original;
     private ArrayList list;
     private AppCompatActivity activity;
+    private Pasta pasta;
     private int menures = R.menu.menu_track;
     private PlaylistListData playlistdata;
     private Drawable preload;
@@ -85,6 +84,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
         this.activity = activity;
+        pasta = (Pasta) activity.getApplicationContext();
 
         thumbnails = Settings.isThumbnails(activity);
         cards = Settings.isCards(activity);
@@ -243,7 +243,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite((TrackListData) list.get(holder.getAdapterPosition()));
+                                return pasta.isFavorite((TrackListData) list.get(holder.getAdapterPosition()));
                             }
 
                             @Override
@@ -273,21 +273,19 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite((TrackListData) list.get(holder.getAdapterPosition()))) {
+                                                if (!pasta.toggleFavorite((TrackListData) list.get(holder.getAdapterPosition()))) {
                                                     return null;
-                                                } else
-                                                    return ((Pasta) activity.getApplicationContext()).isFavorite((TrackListData) list.get(holder.getAdapterPosition()));
+                                                } else return pasta.isFavorite((TrackListData) list.get(holder.getAdapterPosition()));
                                             }
 
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, "An error occured", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
                                                     return;
                                                 }
-                                                if (result) {
-                                                    item.setTitle(R.string.unfav);
-                                                } else {
+                                                if (result) item.setTitle(R.string.unfav);
+                                                else {
                                                     item.setTitle(R.string.fav);
                                                     if (behavior == BEHAVIOR_FAVORITE) removeData(holder.getAdapterPosition());
                                                 }
@@ -309,14 +307,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             @Nullable
                                             @Override
                                             protected AlbumListData run() throws InterruptedException {
-                                                Pasta pasta = (Pasta) activity.getApplicationContext();
-                                                Album album = pasta.spotifyService.getAlbum(((TrackListData) list.get(holder.getAdapterPosition())).albumId);
-                                                Artist artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-
-                                                String image = "";
-                                                if (artist.images.size() > 0) image = artist.images.get(artist.images.size() / 2).url;
-
-                                                return new AlbumListData(album, image);
+                                                return pasta.getAlbum(((TrackListData) list.get(holder.getAdapterPosition())).albumId);
                                             }
 
                                             @Override
@@ -342,7 +333,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             @Nullable
                                             @Override
                                             protected ArtistListData run() throws InterruptedException {
-                                                return new ArtistListData(((Pasta) activity.getApplicationContext()).spotifyService.getArtist(((TrackListData) list.get(holder.getAdapterPosition())).artistId));
+                                                return pasta.getArtist(((TrackListData) list.get(holder.getAdapterPosition())).artistId);
                                             }
 
                                             @Override
@@ -373,7 +364,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                 trackRemove.uri = ((TrackListData) list.get(holder.getAdapterPosition())).trackUri;
                                                 tracksRemove.tracks = Collections.singletonList(trackRemove);
                                                 if (behavior == BEHAVIOR_PLAYLIST && playlistdata != null) {
-                                                    ((Pasta) activity.getApplicationContext()).spotifyService.removeTracksFromPlaylist(playlistdata.playlistOwnerId, playlistdata.playlistId, tracksRemove);
+                                                    pasta.spotifyService.removeTracksFromPlaylist(playlistdata.playlistOwnerId, playlistdata.playlistId, tracksRemove);
                                                     return true;
                                                 } else return false;
                                             }
@@ -456,7 +447,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite((AlbumListData) list.get(holder.getAdapterPosition()));
+                                return pasta.isFavorite((AlbumListData) list.get(holder.getAdapterPosition()));
                             }
 
                             @Override
@@ -486,10 +477,9 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite((AlbumListData) list.get(holder.getAdapterPosition()))) {
+                                                if (!pasta.toggleFavorite((AlbumListData) list.get(holder.getAdapterPosition()))) {
                                                     return null;
-                                                } else
-                                                    return ((Pasta) activity.getApplicationContext()).isFavorite((AlbumListData) list.get(holder.getAdapterPosition()));
+                                                } else return pasta.isFavorite((AlbumListData) list.get(holder.getAdapterPosition()));
                                             }
 
                                             @Override
@@ -549,7 +539,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                 @Nullable
                                 @Override
                                 protected ArtistListData run() throws InterruptedException {
-                                    return new ArtistListData(((Pasta) activity.getApplicationContext()).spotifyService.getArtist(((AlbumListData) list.get(holder.getAdapterPosition())).artistId));
+                                    return pasta.getArtist(((AlbumListData) list.get(holder.getAdapterPosition())).artistId);
                                 }
 
                                 @Override
@@ -607,7 +597,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite((PlaylistListData) list.get(holder.getAdapterPosition()));
+                                return pasta.isFavorite((PlaylistListData) list.get(holder.getAdapterPosition()));
                             }
 
                             @Override
@@ -637,10 +627,9 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite((PlaylistListData) list.get(holder.getAdapterPosition()))) {
+                                                if (!pasta.toggleFavorite((PlaylistListData) list.get(holder.getAdapterPosition()))) {
                                                     return null;
-                                                } else
-                                                    return ((Pasta) activity.getApplicationContext()).isFavorite((PlaylistListData) list.get(holder.getAdapterPosition()));
+                                                } else return pasta.isFavorite((PlaylistListData) list.get(holder.getAdapterPosition()));
                                             }
 
                                             @Override
@@ -689,7 +678,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                     @Override
                                                     protected Boolean run() throws InterruptedException {
                                                         try {
-                                                            ((Pasta) activity.getApplicationContext()).spotifyService.changePlaylistDetails(((Pasta) activity.getApplicationContext()).me.id, editData.playlistId, map);
+                                                            pasta.spotifyService.changePlaylistDetails(pasta.me.id, editData.playlistId, map);
                                                         } catch (Exception e) {
                                                             e.printStackTrace();
                                                             return false;
@@ -783,7 +772,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite((ArtistListData) list.get(holder.getAdapterPosition()));
+                                return pasta.isFavorite((ArtistListData) list.get(holder.getAdapterPosition()));
                             }
 
                             @Override
@@ -813,10 +802,10 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite((ArtistListData) list.get(holder.getAdapterPosition()))) {
+                                                if (!pasta.toggleFavorite((ArtistListData) list.get(holder.getAdapterPosition()))) {
                                                     return null;
                                                 } else
-                                                    return ((Pasta) activity.getApplicationContext()).isFavorite((ArtistListData) list.get(holder.getAdapterPosition()));
+                                                    return pasta.isFavorite((ArtistListData) list.get(holder.getAdapterPosition()));
                                             }
 
                                             @Override

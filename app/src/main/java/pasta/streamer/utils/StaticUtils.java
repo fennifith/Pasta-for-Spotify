@@ -1,6 +1,5 @@
 package pasta.streamer.utils;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -32,25 +31,32 @@ import pasta.streamer.PlayerService;
 import pasta.streamer.R;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class StaticUtils {
 
-    public static void onNetworkError(final Activity activity) {
-        ((Pasta) activity.getApplicationContext()).onNetworkError(activity);
+    public static boolean shouldResendRequest(Exception e) {
+        if (e != null && e instanceof RetrofitError) {
+            Response response = ((RetrofitError) e).getResponse();
+            int status = -1;
+            if (response != null) status = response.getStatus();
+            return status == 429 || status == 502 || status == 520;
+        } else return false;
     }
 
-    public static void restart(Activity activity) {
+    public static void restart(Context context) {
         try {
-            Intent i = activity.getPackageManager().getLaunchIntentForPackage(activity.getPackageName());
+            Intent i = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             int mPendingIntentId = 223344;
-            PendingIntent mPendingIntent = PendingIntent.getActivity(activity, mPendingIntentId, i, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager mgr = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+            PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, i, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
-            activity.finish();
+            System.exit(0);
         }
     }
 

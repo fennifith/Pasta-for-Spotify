@@ -18,7 +18,6 @@ import com.afollestad.async.Action;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -99,13 +98,17 @@ public class CategoryFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
-                PlaylistsPager pager;
-                try {
-                    pager = pasta.spotifyService.getPlaylistsForCategory(data.categoryId, limitMap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                PlaylistsPager pager = null;
+                for (int i = 0; pager == null && i < Settings.getRetryCount(getContext()); i++) {
+                    try {
+                        pager = pasta.spotifyService.getPlaylistsForCategory(data.categoryId, limitMap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (pager == null) return null;
 
                 ArrayList<PlaylistListData> list = new ArrayList<>();
                 for (PlaylistSimple playlist : pager.playlists.items) {
@@ -118,7 +121,7 @@ public class CategoryFragment extends FullScreenFragment {
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity());
                     return;
                 }
                 adapter.swapData(result);

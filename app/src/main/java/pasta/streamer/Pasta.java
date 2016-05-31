@@ -1,21 +1,33 @@
 package pasta.streamer;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Album;
+import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.Pager;
+import kaaes.spotify.webapi.android.models.PlaylistSimple;
+import kaaes.spotify.webapi.android.models.PlaylistTrack;
+import kaaes.spotify.webapi.android.models.PlaylistsPager;
+import kaaes.spotify.webapi.android.models.Track;
+import kaaes.spotify.webapi.android.models.TrackSimple;
+import kaaes.spotify.webapi.android.models.Tracks;
 import kaaes.spotify.webapi.android.models.UserPrivate;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
+import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 
 public class Pasta extends Application {
@@ -29,28 +41,15 @@ public class Pasta extends Application {
 
     private AppCompatDialog errorDialog;
 
-    public void onNetworkError(final Activity activity) {
+    public void onNetworkError(final Context context) {
         if (errorDialog == null || !errorDialog.isShowing()) {
-            errorDialog = new AlertDialog.Builder(activity).setIcon(R.drawable.ic_error).setTitle(R.string.error).setMessage(R.string.error_msg).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
+            errorDialog = new AlertDialog.Builder(context).setIcon(R.drawable.ic_error).setTitle(R.string.error).setMessage(R.string.error_msg).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
-                    StaticUtils.restart(activity);
+                    StaticUtils.restart(context);
                 }
             }).setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    System.exit(0);
-                }
-            }).setCancelable(false).create();
-            errorDialog.show();
-        }
-    }
-
-    public void onNetworkError(Context context) {
-        if (errorDialog == null || !errorDialog.isShowing()) {
-            errorDialog = new AlertDialog.Builder(context).setIcon(R.drawable.ic_error).setTitle(R.string.error).setMessage(R.string.error_msg).setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
@@ -144,28 +143,195 @@ public class Pasta extends Application {
         return true;
     }
 
-    public boolean isFavorite(PlaylistListData data) {
-        return spotifyService.areFollowingPlaylist(data.playlistOwnerId, data.playlistId, me.id)[0];
+    @Nullable
+    public Boolean isFavorite(PlaylistListData data) throws InterruptedException {
+        Boolean favorite = null;
+        for (int i = 0; favorite == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                favorite = spotifyService.areFollowingPlaylist(data.playlistOwnerId, data.playlistId, me.id)[0];
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        return favorite;
     }
 
-    public boolean isFavorite(AlbumListData data) {
-        if (albums == null) return false;
+    @Nullable
+    public Boolean isFavorite(AlbumListData data) {
+        if (albums == null) return null;
         for (AlbumListData album : albums) {
             if (album.albumId.matches(data.albumId)) return true;
         }
         return false;
     }
 
-    public boolean isFavorite(TrackListData data) {
-        if (tracks == null) return false;
+    @Nullable
+    public Boolean isFavorite(TrackListData data) {
+        if (tracks == null) return null;
         for (TrackListData track : tracks) {
             if (track.trackId.matches(data.trackId)) return true;
         }
         return false;
     }
 
-    public boolean isFavorite(ArtistListData data) {
-        return spotifyService.isFollowingArtists(data.artistId)[0];
+    @Nullable
+    public Boolean isFavorite(ArtistListData data) throws InterruptedException {
+        Boolean favorite = null;
+        for (int i = 0; favorite == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                favorite = spotifyService.isFollowingArtists(data.artistId)[0];
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        return favorite;
     }
 
+    @Nullable
+    public ArtistListData getArtist(String id) throws InterruptedException {
+        Artist a = null;
+        for (int i = 0; a == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                a = spotifyService.getArtist(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        if (a == null) return null;
+        return new ArtistListData(a);
+    }
+
+    @Nullable
+    public AlbumListData getAlbum(String id) throws InterruptedException {
+        Album album = null;
+        for (int i = 0; album == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                album = spotifyService.getAlbum(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        if (album == null) return null;
+
+        String image = "";
+        if (album.artists.size() > 0) {
+            ArtistListData artist = getArtist(album.artists.get(0).id);
+            if (artist != null) image = artist.artistImageLarge;
+        }
+
+        return new AlbumListData(album, image);
+    }
+
+    @Nullable
+    public ArrayList<TrackListData> getTracks(PlaylistListData data) throws InterruptedException {
+        ArrayList<TrackListData> trackList = new ArrayList<>();
+        Map<String, Object> options = new HashMap<>();
+
+        for (int i = 0; i < data.tracks; i += 100) {
+            Pager<PlaylistTrack> tracks = null;
+            options.put(SpotifyService.OFFSET, i);
+            for (int l = 0; tracks == null && l < Settings.getRetryCount(this); l++) {
+                try {
+                    tracks = spotifyService.getPlaylistTracks(data.playlistOwnerId, data.playlistId, options);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                    else break;
+                }
+            }
+            if (tracks == null) return null;
+
+            for (PlaylistTrack track : tracks.items) {
+                trackList.add(new TrackListData(track.track));
+            }
+        }
+
+        return trackList;
+    }
+
+    @Nullable
+    public ArrayList<TrackListData> getTracks(ArtistListData data) throws InterruptedException {
+        Tracks tracks = null;
+        for (int i = 0; tracks == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                tracks = spotifyService.getArtistTopTrack(data.artistId, "US");
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        if (tracks == null) return null;
+
+        ArrayList<TrackListData> trackList = new ArrayList<>();
+        for (Track track : tracks.tracks) {
+            trackList.add(new TrackListData(track));
+        }
+        return trackList;
+    }
+
+    @Nullable
+    public ArrayList<TrackListData> getTracks(AlbumListData data) throws InterruptedException {
+        Pager<TrackSimple> tracks = null;
+        for (int i = 0; tracks == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                tracks = spotifyService.getAlbum(data.albumId).tracks;
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        if (tracks == null) return null;
+
+        ArrayList<TrackListData> trackList = new ArrayList<>();
+        for (TrackSimple track : tracks.items) {
+            trackList.add(new TrackListData(track, data.albumName, data.albumId, data.albumImage, data.albumImageLarge));
+        }
+        return trackList;
+    }
+
+    @Nullable
+    public Pager<PlaylistSimple> getMyPlaylists() throws InterruptedException {
+        Pager<PlaylistSimple> playlists = null;
+        for (int i = 0; playlists == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                playlists = spotifyService.getMyPlaylists();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        return playlists;
+    }
+
+    @Nullable
+    public ArrayList<PlaylistListData> searchPlaylists(String query, Map<String, Object> limitMap) throws InterruptedException {
+        PlaylistsPager playlists = null;
+        for (int i = 0; playlists == null && i < Settings.getRetryCount(this); i++) {
+            try {
+                playlists = spotifyService.searchPlaylists(query, limitMap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                else break;
+            }
+        }
+        if (playlists == null) return null;
+
+        ArrayList<PlaylistListData> playlistList = new ArrayList<>();
+        for (PlaylistSimple playlist : playlists.playlists.items) {
+            playlistList.add(new PlaylistListData(playlist, me));
+        }
+        return playlistList;
+    }
 }

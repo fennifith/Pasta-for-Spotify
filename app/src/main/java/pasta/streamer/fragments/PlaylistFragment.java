@@ -47,10 +47,6 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import kaaes.spotify.webapi.android.SpotifyService;
-import kaaes.spotify.webapi.android.models.Pager;
-import kaaes.spotify.webapi.android.models.Playlist;
-import kaaes.spotify.webapi.android.models.PlaylistTrack;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
@@ -61,7 +57,6 @@ import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
-import retrofit.RetrofitError;
 
 public class PlaylistFragment extends FullScreenFragment {
 
@@ -139,32 +134,14 @@ public class PlaylistFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<TrackListData> run() throws InterruptedException {
-                ArrayList<TrackListData> trackList = new ArrayList<>();
-                Map<String, Object> options = new HashMap<>();
-
-                for (int i = 0; i < data.tracks; i += 100) {
-                    Pager<PlaylistTrack> tracks;
-                    try {
-                        options.put(SpotifyService.OFFSET, i);
-                        tracks = pasta.spotifyService.getPlaylistTracks(data.playlistOwnerId, data.playlistId, options);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-
-                    for (PlaylistTrack track : tracks.items) {
-                        trackList.add(new TrackListData(track.track));
-                    }
-                }
-
-                return trackList;
+                return pasta.getTracks(data);
             }
 
             @Override
             protected void done(@Nullable ArrayList<TrackListData> result) {
                 spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getContext());
                     return;
                 }
                 adapter.swapData(result);
@@ -275,7 +252,7 @@ public class PlaylistFragment extends FullScreenFragment {
             protected Boolean run() throws InterruptedException {
                 try {
                     return pasta.isFavorite(data);
-                } catch (RetrofitError e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
@@ -284,7 +261,7 @@ public class PlaylistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity());
                     return;
                 }
                 if (result) {
@@ -321,7 +298,7 @@ public class PlaylistFragment extends FullScreenFragment {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            StaticUtils.onNetworkError(getActivity());
+                            pasta.onNetworkError(getContext());
                             return;
                         }
                         if (result) {
@@ -373,7 +350,7 @@ public class PlaylistFragment extends FullScreenFragment {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null || !result) {
-                                    StaticUtils.onNetworkError(getActivity());
+                                    pasta.onNetworkError(getContext());
                                 } else {
                                     data.playlistName = (String) map.get("name");
                                     data.playlistPublic = (Boolean) map.get("public");

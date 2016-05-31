@@ -20,6 +20,7 @@ import pasta.streamer.Pasta;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.fragments.OmniFragment;
+import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 
 public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
@@ -67,13 +68,8 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
                 ArrayList<PlaylistListData> playlists = new ArrayList<>();
-                Pager<PlaylistSimple> my;
-                try {
-                    my = pasta.spotifyService.getMyPlaylists();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                Pager<PlaylistSimple> my = pasta.getMyPlaylists();
+                if (my == null) return null;
 
                 for (PlaylistSimple playlist : my.items) {
                     playlists.add(new PlaylistListData(playlist, pasta.me));
@@ -85,7 +81,7 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(activity);
+                    pasta.onNetworkError(activity);
                     return;
                 }
                 playlistFragment.swapData(result);
@@ -105,15 +101,19 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Nullable
             @Override
             protected ArrayList<ArtistListData> run() throws InterruptedException {
-                ArrayList<ArtistListData> artists = new ArrayList<>();
-                ArtistsCursorPager followed;
-                try {
-                    followed = pasta.spotifyService.getFollowedArtists();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                ArtistsCursorPager followed = null;
+                for (int i = 0; followed == null && i < Settings.getRetryCount(activity); i++) {
+                    try {
+                        followed = pasta.spotifyService.getFollowedArtists();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (followed == null) return null;
 
+                ArrayList<ArtistListData> artists = new ArrayList<>();
                 for (Artist artist : followed.artists.items) {
                     artists.add(new ArtistListData(artist));
                 }
@@ -124,7 +124,7 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<ArtistListData> result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(activity);
+                    pasta.onNetworkError(activity);
                     return;
                 }
                 artistFragment.swapData(result);

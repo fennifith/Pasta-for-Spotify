@@ -23,12 +23,10 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnPageChange;
-import kaaes.spotify.webapi.android.SpotifyService;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.adapters.FavoritePagerAdapter;
 import pasta.streamer.utils.Settings;
-import pasta.streamer.utils.StaticUtils;
 
 public class FavoritesFragment extends FabFragment {
 
@@ -38,12 +36,15 @@ public class FavoritesFragment extends FabFragment {
     TabLayout tl;
 
     private FavoritePagerAdapter adapter;
+    private Pasta pasta;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false).getRoot();
         ButterKnife.bind(this, rootView);
+
+        pasta = (Pasta) getContext().getApplicationContext();
 
         adapter = new FavoritePagerAdapter(getActivity(), getActivity().getSupportFragmentManager());
         vp.setAdapter(adapter);
@@ -95,7 +96,6 @@ public class FavoritesFragment extends FabFragment {
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                Pasta pasta = (Pasta) getContext().getApplicationContext();
                                 try {
                                     pasta.spotifyService.createPlaylist(pasta.me.id, map);
                                 } catch (Exception e) {
@@ -108,7 +108,7 @@ public class FavoritesFragment extends FabFragment {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null || !result) {
-                                    StaticUtils.onNetworkError(getActivity());
+                                    pasta.onNetworkError(getActivity());
                                 } else {
                                     adapter.load();
                                 }

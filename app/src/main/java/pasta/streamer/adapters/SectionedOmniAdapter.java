@@ -63,6 +63,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
     private Drawable preload;
     private Drawable art_preload;
     private boolean thumbnails, cards, palette, dark;
+    private Pasta pasta;
 
     public SectionedOmniAdapter(AppCompatActivity activity, ArrayList list) {
         tracks = new ArrayList<>();
@@ -71,6 +72,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         artists = new ArrayList<>();
 
         this.activity = activity;
+        pasta = (Pasta) activity.getApplicationContext();
 
         thumbnails = Settings.isThumbnails(activity);
         cards = Settings.isCards(activity);
@@ -262,7 +264,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite(albums.get(getRelPosition(holder.getAdapterPosition())));
+                                return pasta.isFavorite(albums.get(getRelPosition(holder.getAdapterPosition())));
                             }
 
                             @Override
@@ -292,14 +294,14 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite(albums.get(getRelPosition(holder.getAdapterPosition())))) return null;
-                                                else return ((Pasta) activity.getApplicationContext()).isFavorite(albums.get(getRelPosition(holder.getAdapterPosition())));
+                                                if (!pasta.toggleFavorite(albums.get(getRelPosition(holder.getAdapterPosition())))) return null;
+                                                else return pasta.isFavorite(albums.get(getRelPosition(holder.getAdapterPosition())));
                                             }
 
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, "An error occured", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
                                                     return;
                                                 }
                                                 if (result) {
@@ -350,7 +352,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                                 @Nullable
                                 @Override
                                 protected ArtistListData run() throws InterruptedException {
-                                    return new ArtistListData(((Pasta) activity.getApplicationContext()).spotifyService.getArtist(albums.get(getRelPosition(holder.getAdapterPosition())).artistId));
+                                    return pasta.getArtist(albums.get(getRelPosition(holder.getAdapterPosition())).artistId);
                                 }
 
                                 @Override
@@ -411,16 +413,16 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite(playlists.get(getRelPosition(holder.getAdapterPosition())))) {
+                                                if (!pasta.toggleFavorite(playlists.get(getRelPosition(holder.getAdapterPosition())))) {
                                                     return null;
                                                 } else
-                                                    return ((Pasta) activity.getApplicationContext()).isFavorite(playlists.get(getRelPosition(holder.getAdapterPosition())));
+                                                    return pasta.isFavorite(playlists.get(getRelPosition(holder.getAdapterPosition())));
                                             }
 
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, "An error occured", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
                                                     return;
                                                 }
                                                 if (result) {
@@ -468,7 +470,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite(playlists.get(getRelPosition(holder.getAdapterPosition())));
+                                return pasta.isFavorite(playlists.get(getRelPosition(holder.getAdapterPosition())));
                             }
 
                             @Override
@@ -528,7 +530,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
-                                return ((Pasta) activity.getApplicationContext()).isFavorite(artists.get(getRelPosition(holder.getAdapterPosition())));
+                                return pasta.isFavorite(artists.get(getRelPosition(holder.getAdapterPosition())));
                             }
 
                             @Override
@@ -558,16 +560,16 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                                             @Nullable
                                             @Override
                                             protected Boolean run() throws InterruptedException {
-                                                if (!((Pasta) activity.getApplicationContext()).toggleFavorite(artists.get(getRelPosition(holder.getAdapterPosition())))) {
+                                                if (!pasta.toggleFavorite(artists.get(getRelPosition(holder.getAdapterPosition())))) {
                                                     return null;
                                                 } else
-                                                    return ((Pasta) activity.getApplicationContext()).isFavorite(artists.get(getRelPosition(holder.getAdapterPosition())));
+                                                    return pasta.isFavorite(artists.get(getRelPosition(holder.getAdapterPosition())));
                                             }
 
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, "An error occured", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
                                                     return;
                                                 }
                                                 if (result) {

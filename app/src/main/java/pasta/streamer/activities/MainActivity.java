@@ -34,7 +34,6 @@ import pasta.streamer.PlayerService;
 import pasta.streamer.R;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.StaticUtils;
 
 public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "spotifystreamer://callback";
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void done(@Nullable Boolean result) {
-                            if (result == null || !result) StaticUtils.onNetworkError(MainActivity.this);
+                            if (result == null || !result) pasta.onNetworkError(MainActivity.this);
                         }
                     }, new Action<Boolean>() {
                         @NonNull
@@ -146,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void done(@Nullable Boolean result) {
-                            if (result == null || !result) StaticUtils.onNetworkError(MainActivity.this);
+                            if (result == null || !result) pasta.onNetworkError(MainActivity.this);
                         }
                     }, new Action<Boolean>() {
                         @NonNull
@@ -177,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void done(@Nullable Boolean result) {
-                            if (result == null || !result) StaticUtils.onNetworkError(MainActivity.this);
+                            if (result == null || !result) pasta.onNetworkError(MainActivity.this);
                         }
                     }).done(new Done() {
                         @Override
@@ -206,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     break;
                 case ERROR:
-                    StaticUtils.onNetworkError(MainActivity.this);
+                    pasta.onNetworkError(MainActivity.this);
             }
         }
     }

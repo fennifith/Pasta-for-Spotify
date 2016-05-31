@@ -50,8 +50,6 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import kaaes.spotify.webapi.android.models.Album;
-import kaaes.spotify.webapi.android.models.Artist;
 import pasta.streamer.Pasta;
 import pasta.streamer.PlayerService;
 import pasta.streamer.R;
@@ -256,7 +254,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            StaticUtils.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this);
                             return;
                         }
                         if (result) {
@@ -282,30 +280,13 @@ public class PlayerActivity extends AppCompatActivity {
                     @Nullable
                     @Override
                     protected AlbumListData run() throws InterruptedException {
-                        Artist a;
-                        try {
-                            a = pasta.spotifyService.getArtist(trackList.get(curPosition).artistId);
-                        } catch (Exception e) {
-                            return null;
-                        }
-
-                        Album album;
-                        try {
-                            album = pasta.spotifyService.getAlbum(trackList.get(curPosition).albumId);
-                        } catch (Exception e) {
-                            return null;
-                        }
-
-                        String image = "";
-                        if (a.images.size() > 0) image = a.images.get(a.images.size() / 2).url;
-
-                        return new AlbumListData(album, image);
+                        return pasta.getAlbum(trackList.get(curPosition).albumId);
                     }
 
                     @Override
                     protected void done(@Nullable AlbumListData result) {
-                        if (result == null){
-                            StaticUtils.onNetworkError(PlayerActivity.this);
+                        if (result == null) {
+                            pasta.onNetworkError(PlayerActivity.this);
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
@@ -325,19 +306,13 @@ public class PlayerActivity extends AppCompatActivity {
                     @Nullable
                     @Override
                     protected ArtistListData run() throws InterruptedException {
-                        Artist artist;
-                        try {
-                            artist = pasta.spotifyService.getArtist(trackList.get(curPosition).artistId);
-                        } catch (Exception e) {
-                            return null;
-                        }
-                        return new ArtistListData(artist);
+                        return pasta.getArtist(trackList.get(curPosition).artistId);
                     }
 
                     @Override
                     protected void done(@Nullable ArtistListData result) {
                         if (result == null) {
-                            StaticUtils.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this);
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
@@ -450,7 +425,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            StaticUtils.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this);
                             return;
                         }
                         if (result) {

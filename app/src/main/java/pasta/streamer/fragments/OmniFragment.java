@@ -50,15 +50,13 @@ public class OmniFragment extends Fragment {
 
         adapter = new OmniAdapter((AppCompatActivity) getActivity(), list);
         manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels));
-        if (Settings.isCards(getContext())) {
-            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    if (adapter.getItemViewType(position) != 0) return manager.getSpanCount();
-                    return 1;
-                }
-            });
-        }
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if ((adapter.getItemViewType(position) == 0 && Settings.isListTracks(getContext())) || (adapter.getItemViewType(position) != 0 && Settings.isCards(getContext()))) return manager.getSpanCount();
+                else return 1;
+            }
+        });
 
         if (behavior == OmniAdapter.BEHAVIOR_FAVORITE) {
             adapter.setFavoriteBehavior();

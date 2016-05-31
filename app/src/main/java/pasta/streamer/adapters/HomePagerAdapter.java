@@ -22,6 +22,7 @@ import pasta.streamer.Pasta;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.fragments.OmniFragment;
+import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 
 public class HomePagerAdapter extends FragmentStatePagerAdapter {
@@ -32,7 +33,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
     OmniFragment albumFragment;
     OmniFragment playlistFragment;
 
-    public HomePagerAdapter(Activity activitiy, final FragmentManager manager) {
+    public HomePagerAdapter(final Activity activitiy, final FragmentManager manager) {
         super(manager);
         this.activity = activitiy;
         pasta = (Pasta) activity.getApplicationContext();
@@ -51,13 +52,17 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected ArrayList<String> run() throws InterruptedException {
                 ArrayList<String> albums = new ArrayList<>();
-                NewReleases releases;
-                try {
-                    releases = pasta.spotifyService.getNewReleases();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                NewReleases releases = null;
+                for (int i = 0; releases == null && i < Settings.getRetryCount(activity); i++) {
+                    try {
+                        releases = pasta.spotifyService.getNewReleases();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (releases == null) return null;
 
                 for (AlbumSimple album : releases.albums.items) {
                     albums.add(album.id);
@@ -68,9 +73,10 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<String> result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(activity);
+                    pasta.onNetworkError(activity);
                     return;
                 }
+
                 for (final String id : result) {
                     new Action<AlbumListData>() {
                         @NonNull
@@ -82,18 +88,31 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
                         @Nullable
                         @Override
                         protected AlbumListData run() throws InterruptedException {
-                            Album album;
-                            Artist artist;
-                            try {
-                                album = pasta.spotifyService.getAlbum(id);
-                                artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
+                            Album album = null;
+                            for (int i = 0; album == null && i < Settings.getRetryCount(activity); i++) {
+                                try {
+                                    album = pasta.spotifyService.getAlbum(id);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                                    else break;
+                                }
+                            }
+                            if (album == null) return null;
+
+                            Artist artist = null;
+                            for (int i = 0; artist == null && i < Settings.getRetryCount(activity); i++) {
+                                try {
+                                    artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                                    else break;
+                                }
                             }
 
                             String image = "";
-                            if (artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
+                            if (artist != null && artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
 
                             return new AlbumListData(album, image);
                         }
@@ -118,13 +137,17 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Nullable
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
-                FeaturedPlaylists featured;
-                try {
-                    featured = pasta.spotifyService.getFeaturedPlaylists();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                FeaturedPlaylists featured = null;
+                for (int i = 0; featured == null && i < Settings.getRetryCount(activity); i++) {
+                    try {
+                        featured = pasta.spotifyService.getFeaturedPlaylists();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (featured == null) return null;
 
                 ArrayList<PlaylistListData> playlists = new ArrayList<>();
                 for (PlaylistSimple playlist : featured.playlists.items) {
@@ -136,7 +159,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(activity);
+                    pasta.onNetworkError(activity);
                     return;
                 }
                 playlistFragment.swapData(result);

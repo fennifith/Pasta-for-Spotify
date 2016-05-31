@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 import com.afollestad.async.Action;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -37,6 +36,7 @@ public class CategoriesFragment extends Fragment {
     ProgressBar spinner;
 
     CategoryAdapter adapter;
+    Pasta pasta;
     Action action;
 
     @Nullable
@@ -44,6 +44,8 @@ public class CategoriesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recycler, container, false);
         ButterKnife.bind(this, rootView);
+
+        pasta = (Pasta) getContext().getApplicationContext();
 
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -63,15 +65,20 @@ public class CategoriesFragment extends Fragment {
             @Nullable
             @Override
             protected ArrayList<CategoryListData> run() throws InterruptedException {
-                ArrayList<CategoryListData> list = new ArrayList<>();
-                CategoriesPager pager;
-                try {
-                    pager = ((Pasta) getContext().getApplicationContext()).spotifyService.getCategories(null);
-                } catch (Exception e) {
-                    return null;
+                CategoriesPager categories = null;
+                for (int i = 0; categories == null && i < Settings.getRetryCount(getContext()); i++) {
+                    try {
+                        categories = pasta.spotifyService.getCategories(null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (categories == null) return null;
 
-                for (Category category : pager.categories.items) {
+                ArrayList<CategoryListData> list = new ArrayList<>();
+                for (Category category : categories.categories.items) {
                     list.add(new CategoryListData(category));
                 }
                 return list;
@@ -81,7 +88,7 @@ public class CategoriesFragment extends Fragment {
             protected void done(@Nullable ArrayList<CategoryListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity());
                     return;
                 }
                 adapter.swapData(result);

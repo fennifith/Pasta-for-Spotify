@@ -37,6 +37,10 @@ import com.afollestad.async.Done;
 import com.afollestad.async.Pool;
 import com.afollestad.async.Result;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -59,8 +63,6 @@ import kaaes.spotify.webapi.android.models.AlbumSimple;
 import kaaes.spotify.webapi.android.models.AlbumsPager;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
-import kaaes.spotify.webapi.android.models.PlaylistSimple;
-import kaaes.spotify.webapi.android.models.PlaylistsPager;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.TracksPager;
 import pasta.streamer.Pasta;
@@ -79,7 +81,6 @@ import pasta.streamer.fragments.FullScreenFragment;
 import pasta.streamer.fragments.HomeFragment;
 import pasta.streamer.fragments.SearchFragment;
 import pasta.streamer.fragments.SettingsFragment;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.Playbar;
@@ -107,6 +108,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
 
     private Playbar playbar;
     private Drawer materialDrawer;
+    private AccountHeader materialHeader;
 
     private Fragment f;
     private long selected;
@@ -155,11 +157,42 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         DrawableCompat.setTint(playing, tint);
         DrawableCompat.setTint(settings, tint);
 
+        materialHeader = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withCompactStyle(false)
+                .withHeaderBackground(R.mipmap.drawer_bg)
+                .withProfileImagesClickable(false)
+                .withSelectionListEnabledForSingleProfile(false)
+                .build();
+
+        if (pasta.me == null) {
+            pasta.onNetworkError(this);
+        } else {
+            ProfileDrawerItem profile;
+            try {
+                profile = new ProfileDrawerItem().withName(pasta.me.display_name.length() > 0 ? pasta.me.display_name : pasta.me.email.split("@")[0].toUpperCase()).withEmail(pasta.me.email);
+            } catch (Exception e) {
+                e.printStackTrace();
+                profile = new ProfileDrawerItem().withName(pasta.me.email.split("@")[0].toUpperCase()).withEmail(pasta.me.email);
+            }
+            materialHeader.addProfiles(profile);
+
+            if (pasta.me.images.size() > 0) {
+                Glide.with(this).load(pasta.me.images.get(0).url).into(new SimpleTarget<GlideDrawable>() {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        materialHeader.getActiveProfile().withIcon(resource);
+                        materialHeader.getHeaderBackgroundView().setImageBitmap(StaticUtils.blurBitmap(StaticUtils.drawableToBitmap(resource)));
+                    }
+                });
+            }
+        }
+
         DrawerBuilder builder = new DrawerBuilder()
                 .withActivity(this)
                 .withFullscreen(true)
                 .withToolbar(toolbar)
-                .withAccountHeader(getAccountHeader())
+                .withAccountHeader(materialHeader)
                 .withSelectedItem(0)
                 .addDrawerItems(
                         new SecondaryDrawerItem().withName(R.string.title_activity_home).withIdentifier(1).withIcon(home),
@@ -348,40 +381,6 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         if (searchPool != null && searchPool.isExecuting()) searchPool.cancel();
     }
 
-    private AccountHeader getAccountHeader() {
-        ProfileDrawerItem profile;
-        if (pasta.me == null) {
-            StaticUtils.onNetworkError(this);
-            return null;
-        }
-
-        try {
-            String url = pasta.me.images.get(0).url;
-            profile = new ProfileDrawerItem().withName(pasta.me.display_name.length() > 0 ? pasta.me.display_name : pasta.me.email.split("@")[0].toUpperCase()).withEmail(pasta.me.email).withIcon(Downloader.downloadImage(this, url));
-        } catch (Exception e) {
-            profile = new ProfileDrawerItem().withName(pasta.me.email.split("@")[0].toUpperCase()).withEmail(pasta.me.email);
-        }
-
-        if (profile != null) {
-            return new AccountHeaderBuilder()
-                    .withActivity(this)
-                    .withCompactStyle(false)
-                    .withHeaderBackground(R.mipmap.drawer_bg)
-                    .withProfileImagesClickable(false)
-                    .withSelectionListEnabledForSingleProfile(false)
-                    .addProfiles(profile)
-                    .build();
-        } else {
-            return new AccountHeaderBuilder()
-                    .withActivity(this)
-                    .withCompactStyle(false)
-                    .withHeaderBackground(R.mipmap.drawer_bg)
-                    .withProfileImagesClickable(false)
-                    .withSelectionListEnabledForSingleProfile(false)
-                    .build();
-        }
-    }
-
     private void search(final String searchTerm, final boolean pre) {
         if (searchTerm == null || searchTerm.length() < 1) return;
 
@@ -404,14 +403,17 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             @Override
             protected ArrayList<TrackListData> run() throws InterruptedException {
                 ArrayList<TrackListData> list = new ArrayList<>();
-                TracksPager tracksPager;
-
-                try {
-                    tracksPager = pasta.spotifyService.searchTracks(searchTerm, limitMap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                TracksPager tracksPager = null;
+                for (int i = 0; tracksPager == null && i < Settings.getRetryCount(HomeActivity.this); i++) {
+                    try {
+                        tracksPager = pasta.spotifyService.searchTracks(searchTerm, limitMap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (tracksPager == null) return null;
 
                 for (Track track : tracksPager.tracks.items) {
                     TrackListData trackData = new TrackListData(track);
@@ -437,14 +439,17 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             @Override
             protected ArrayList<String> run() throws InterruptedException {
                 ArrayList<String> list = new ArrayList<>();
-                AlbumsPager albumsPager;
-
-                try {
-                    albumsPager = pasta.spotifyService.searchAlbums(searchTerm, limitMap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                AlbumsPager albumsPager = null;
+                for (int i = 0; albumsPager == null && i < Settings.getRetryCount(HomeActivity.this); i++) {
+                    try {
+                        albumsPager = pasta.spotifyService.searchAlbums(searchTerm, limitMap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (albumsPager == null) return null;
 
                 for (AlbumSimple album : albumsPager.albums.items) {
                     list.add(album.id);
@@ -467,26 +472,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                         @Nullable
                         @Override
                         protected AlbumListData run() throws InterruptedException {
-                            Album album;
-                            try {
-                                album = pasta.spotifyService.getAlbum(id);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-
-                            Artist artist;
-                            try {
-                                artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-
-                            String image = "";
-                            if (artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
-
-                            return new AlbumListData(album, image);
+                            return pasta.getAlbum(id);
                         }
 
                         @Override
@@ -507,22 +493,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             @Nullable
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
-                ArrayList<PlaylistListData> list = new ArrayList<>();
-                PlaylistsPager playlistsPager;
-
-                try {
-                    playlistsPager = pasta.spotifyService.searchPlaylists(searchTerm, limitMap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-                for (PlaylistSimple playlist : playlistsPager.playlists.items) {
-                    PlaylistListData playlistData = new PlaylistListData(playlist, pasta.me);
-                    list.add(playlistData);
-                }
-
-                return list;
+                return pasta.searchPlaylists(searchTerm, limitMap);
             }
 
             @Override
@@ -541,14 +512,17 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             @Override
             protected ArrayList<ArtistListData> run() throws InterruptedException {
                 ArrayList<ArtistListData> list = new ArrayList<>();
-                ArtistsPager artistsPager;
-
-                try {
-                    artistsPager = pasta.spotifyService.searchArtists(searchTerm, limitMap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                ArtistsPager artistsPager = null;
+                for (int i = 0; artistsPager == null && i < Settings.getRetryCount(HomeActivity.this); i++) {
+                    try {
+                        artistsPager = pasta.spotifyService.searchArtists(searchTerm, limitMap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
                 }
+                if (artistsPager == null) return null;
 
                 for (Artist artist : artistsPager.artists.items) {
                     ArtistListData artistData = new ArtistListData(artist);

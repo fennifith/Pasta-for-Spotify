@@ -40,9 +40,8 @@ import butterknife.ButterKnife;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.PlaylistSimple;
-import kaaes.spotify.webapi.android.models.PlaylistsPager;
-import kaaes.spotify.webapi.android.models.Track;
+import kaaes.spotify.webapi.android.models.Artists;
+import kaaes.spotify.webapi.android.models.Pager;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.adapters.SectionedOmniAdapter;
@@ -54,7 +53,6 @@ import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
-import retrofit.RetrofitError;
 
 public class ArtistFragment extends FullScreenFragment {
 
@@ -158,22 +156,13 @@ public class ArtistFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<TrackListData> run() throws InterruptedException {
-                ArrayList<TrackListData> list = new ArrayList<>();
-                try {
-                    for (Track track : pasta.spotifyService.getArtistTopTrack(data.artistId, "US").tracks) {
-                        TrackListData trackData = new TrackListData(track);
-                        list.add(trackData);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return list;
+                return pasta.getTracks(data);
             }
 
             @Override
             protected void done(@Nullable ArrayList<TrackListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
-                if (result == null) StaticUtils.onNetworkError(getActivity());
+                if (result == null) pasta.onNetworkError(getActivity());
                 else adapter.addData(result);
             }
         }, new Action<ArrayList<String>>() {
@@ -186,23 +175,36 @@ public class ArtistFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<String> run() throws InterruptedException {
-                ArrayList<String> list = new ArrayList<>();
+                Pager<Album> albums = getAlbums();
+                if (albums == null) return null;
 
-                try {
-                    for (Album album : pasta.spotifyService.getArtistAlbums(data.artistId).items) {
-                        list.add(album.id);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                ArrayList<String> list = new ArrayList<>();
+                for (Album album : albums.items) {
+                    list.add(album.id);
                 }
 
                 return list;
             }
 
+            @Nullable
+            private Pager<Album> getAlbums() throws InterruptedException {
+                Pager<Album> albums = null;
+                for (int i = 0; albums == null && i < Settings.getRetryCount(getContext()); i++) {
+                    try {
+                        albums = pasta.spotifyService.getArtistAlbums(data.artistId);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
+                }
+                return albums;
+            }
+
             @Override
             protected void done(@Nullable ArrayList<String> result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity());
                     return;
                 }
                 for (final String id : result) {
@@ -250,25 +252,13 @@ public class ArtistFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
-                ArrayList<PlaylistListData> list = new ArrayList<>();
-
-                try {
-                    PlaylistsPager playlistsPager = pasta.spotifyService.searchPlaylists(data.artistName, limitMap);
-                    for (PlaylistSimple playlist : playlistsPager.playlists.items) {
-                        PlaylistListData playlistData = new PlaylistListData(playlist, pasta.me);
-                        list.add(playlistData);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                return list;
+                return pasta.searchPlaylists(data.artistName, limitMap);
             }
 
             @Override
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
-                if (result == null) StaticUtils.onNetworkError(getActivity());
+                if (result == null) pasta.onNetworkError(getContext());
                 else adapter.addData(result);
             }
         }, new Action<ArrayList<ArtistListData>>() {
@@ -281,24 +271,37 @@ public class ArtistFragment extends FullScreenFragment {
             @Nullable
             @Override
             protected ArrayList<ArtistListData> run() throws InterruptedException {
-                ArrayList<ArtistListData> list = new ArrayList<>();
+                Artists artists = getArtists();
+                if (artists == null) return null;
 
-                try {
-                    for (Artist artist : pasta.spotifyService.getRelatedArtists(data.artistId).artists) {
-                        ArtistListData artistData = new ArtistListData(artist);
-                        list.add(artistData);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                ArrayList<ArtistListData> list = new ArrayList<>();
+                for (Artist artist : artists.artists) {
+                    ArtistListData artistData = new ArtistListData(artist);
+                    list.add(artistData);
                 }
 
                 return list;
             }
 
+            @Nullable
+            private Artists getArtists() throws InterruptedException {
+                Artists artists = null;
+                for (int i = 0; artists == null && i < Settings.getRetryCount(getContext()); i++) {
+                    try {
+                        artists = pasta.spotifyService.getRelatedArtists(data.artistId);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
+                        else break;
+                    }
+                }
+                return artists;
+            }
+
             @Override
             protected void done(@Nullable ArrayList<ArtistListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
-                if (result == null) StaticUtils.onNetworkError(getActivity());
+                if (result == null) pasta.onNetworkError(getContext());
                 else adapter.addData(result);
             }
         }, new Action<Bitmap>() {
@@ -374,7 +377,7 @@ public class ArtistFragment extends FullScreenFragment {
             protected Boolean run() throws InterruptedException {
                 try {
                     return pasta.isFavorite(data);
-                } catch (RetrofitError e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
@@ -383,7 +386,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    StaticUtils.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity());
                     return;
                 }
                 if (result) {
@@ -420,7 +423,7 @@ public class ArtistFragment extends FullScreenFragment {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            StaticUtils.onNetworkError(getActivity());
+                            pasta.onNetworkError(getActivity());
                             return;
                         }
                         if (result) {
