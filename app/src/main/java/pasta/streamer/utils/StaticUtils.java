@@ -174,7 +174,7 @@ public class StaticUtils {
         Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(resultBitmap);
         canvas.drawBitmap(bitmap, 0, 0, paint);
-        int blurRadius = 12;
+        int blurRadius = Math.max(bitmap.getWidth(), bitmap.getHeight()) / 10;
         for (int row = -blurRadius; row < blurRadius; row += 2) {
             for (int column = -blurRadius; column < blurRadius; column += 2) {
                 if (column * column + row * row <= blurRadius * blurRadius) {
