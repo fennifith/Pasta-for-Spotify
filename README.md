@@ -42,6 +42,7 @@ Splash Screen | Home Screen | Now Playing
 - [Website](http://theandroidmaster.github.io/apps/pasta/)
 
 #### Contributors:
+- [James Fenn](http://theandroidmaster.github.io/)
 - [Jan-Lk Else](https://plus.google.com/+JanLkElse)
 - [Patrick J](http://pddstudio.com/)
 - [Alexandre Piveteau](https://plus.google.com/+AlexandrePivetea)
