@@ -45,7 +45,7 @@ Splash Screen | Home Screen | Now Playing
 - [James Fenn](http://theandroidmaster.github.io/)
 - [Jan-Lk Else](https://plus.google.com/+JanLkElse)
 - [Patrick J](http://pddstudio.com/)
-- [Alexandre Piveteau](https://plus.google.com/+AlexandrePivetea)
+- [Alexandre Piveteau](https://plus.google.com/+AlexandrePiveteau)
 - [Vukašin Anđelković](https://plus.google.com/+Vuka%C5%A1inAn%C4%91elkovi%C4%87zavukodlak)
 - [Kevin Aguilar](https://plus.google.com/+KevinAguilarC)
 
