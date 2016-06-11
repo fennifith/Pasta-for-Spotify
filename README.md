@@ -15,7 +15,7 @@ Pasta for Spotify is a material design Spotify client for android that attempts 
 #### Performance:
 Though I am not sure what the official Spotify client uses to switch layouts, many current users have reported a large increase in loading speed of Pasta for Spotify versus the official app. This could be because of a few things:
 - The app uses Aidan Follestad's [Async](https://github.com/afollestad/async) library to load content separately from the UI thread, which allows the user to navigate the app while content is loading, for example: navigating back to the previous task while content is loading will cancel the download.
-- [Butterknife](http://jakewharton.github.io/butterknife/), by Jake Wharton, is used to bind views instead of the standard view binding method. Truthfully I have no idea what this means but it's supposed to be better and faster, and it saves time so just go with it. ;)
+- [Butterknife](http://jakewharton.github.io/butterknife/), by Jake Wharton, is used to bind views instead of the standard view binding method. Truthfully I have no idea what this means but it saves time so just go with it. ;)
 - [Glide](https://github.com/bumptech/glide) is used to load image urls provided by the spotify api. This saves a lot of loading time by asynchronously loading an image while scrolling as well as compressing it to speed up the download as much as possible.
 
 It has almost all the features of the official app, though playlists cannot be downloaded because that could potentially create a way for users to export songs from the app, and I'm sure Spotify would not like that.
@@ -38,6 +38,7 @@ Splash Screen | Home Screen | Now Playing
 
 ## Links
 
+- [Play Store beta](https://play.google.com/apps/testing/pasta.streamer)
 - [Google Plus Community](https://plus.google.com/communities/101536497390778012419)
 - [Website](http://theandroidmaster.github.io/apps/pasta/)
 
@@ -51,16 +52,18 @@ Splash Screen | Home Screen | Now Playing
 
 ## License
 
-    Copyright 2016 James Fenn
+```
+Copyright 2016 James Fenn
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
