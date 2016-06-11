@@ -18,9 +18,8 @@ Though I am not sure what the official Spotify client uses to switch layouts, ma
 - [Butterknife](http://jakewharton.github.io/butterknife/), by Jake Wharton, is used to bind views instead of the standard view binding method. Truthfully I have no idea what this means but it saves time so just go with it. ;)
 - [Glide](https://github.com/bumptech/glide) is used to load image urls provided by the spotify api. This saves a lot of loading time by asynchronously loading an image while scrolling as well as compressing it to speed up the download as much as possible.
 
-It has almost all the features of the official app, though playlists cannot be downloaded because that could potentially create a way for users to export songs from the app, and I'm sure Spotify would not like that.
-
 ## Features
+Pasta for Spotify has almost all the features of the official app, though playlists cannot be downloaded because that could potentially create a way for users to export songs from the app, and I'm sure Spotify would not like that.
 - Shows newly released albums and featured playlists
 - A favorites section for playlists, albums, songs, and artists
 - Search through all of Spotify's database
@@ -30,7 +29,14 @@ It has almost all the features of the official app, though playlists cannot be d
 - Options to change the global color scheme of the app
 - Change the ordering of songs in playlists and albums
 
-## Screenshots
+### Limitations
+There are a few major issues with the implementation of the Spotify API, some of which are because of the API itself (meaning they cannot be fixed by me), and some are internal but require a lot of refactoring to come up with an appropriate solution. Examples:
+- [The app will occasionally refuse to play a song until a restart](https://github.com/TheAndroidMaster/Pasta-for-Spotify/issues/1). The "Unknown error, please restart" toast message is specific to this issue. 
+- It is not possible to download a track to play it offline. See [this issue](https://github.com/spotify/android-sdk/issues/2) for progress updates.
+- The 'restart' button usually causes an authentication error resulting in the app force closing.
+- The 'Sign Out' option in the settings menu will cause a crash if the official Spotify app is installed.
+
+### Screenshots
 
 Splash Screen | Home Screen | Now Playing
 ------------- | ----------- | -----------
