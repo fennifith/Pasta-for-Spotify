@@ -35,6 +35,7 @@ There are a few major issues with the implementation of the Spotify API, some of
 - It is not possible to download a track to play it offline. See [this issue](https://github.com/spotify/android-sdk/issues/2) for progress updates.
 - The 'restart' button usually causes an authentication error resulting in the app force closing.
 - The 'Sign Out' option in the settings menu will cause a crash if the official Spotify app is installed.
+- There are many features that are not accessible from a free account, such as playing songs and favoriting tracks.
 
 ### Screenshots
 
