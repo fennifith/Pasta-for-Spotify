@@ -1,14 +1,12 @@
 package pasta.streamer.adapters;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -16,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -34,16 +31,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.async.Action;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import kaaes.spotify.webapi.android.models.TrackToRemove;
-import kaaes.spotify.webapi.android.models.TracksToRemove;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
@@ -54,24 +51,17 @@ import pasta.streamer.data.TrackListData;
 import pasta.streamer.fragments.AlbumFragment;
 import pasta.streamer.fragments.ArtistFragment;
 import pasta.streamer.fragments.PlaylistFragment;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
-import pasta.streamer.views.CustomImageView;
 
-public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
     private ArrayList original;
     private ArrayList list;
     private AppCompatActivity activity;
     private Pasta pasta;
-    private int menures = R.menu.menu_track;
-    private PlaylistListData playlistdata;
-    private Drawable preload;
-    private Drawable art_preload;
     private boolean thumbnails, cards, trackList, palette, dark;
-    private int behavior = 0;
-    public final static int BEHAVIOR_NONE = 0, BEHAVIOR_PLAYLIST = 1, BEHAVIOR_FAVORITE = 2, BEHAVIOR_ALBUM = 3;
+    private boolean isFavoriteBehavior;
 
     public OmniAdapter(AppCompatActivity activity, ArrayList list) {
         original = list;
@@ -91,25 +81,10 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         trackList = Settings.isListTracks(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
-
-        preload = ContextCompat.getDrawable(activity, R.drawable.preload);
-        art_preload = new ColorDrawable(Color.TRANSPARENT);
-        behavior = BEHAVIOR_NONE;
-    }
-
-    public void setPlaylistBehavior(PlaylistListData data) {
-        menures = R.menu.menu_playlist_track;
-        playlistdata = data;
-        behavior = BEHAVIOR_PLAYLIST;
-    }
-
-    public void setAlbumBehavior() {
-        menures = R.menu.menu_album_track;
-        behavior = BEHAVIOR_ALBUM;
     }
 
     public void setFavoriteBehavior() {
-        behavior = BEHAVIOR_FAVORITE;
+        isFavoriteBehavior = true;
     }
 
     public void addData(Parcelable data) {
@@ -141,47 +116,6 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyItemRemoved(pos);
     }
 
-    public void sort(int order) {
-        switch (order) {
-            case Settings.ORDER_ADDED:
-                list = new ArrayList();
-                list.addAll(original);
-                break;
-            case Settings.ORDER_NAME:
-                Collections.sort(list, new Comparator<TrackListData>() {
-                    public int compare(TrackListData first, TrackListData second) {
-                        return first.trackName.compareTo(second.trackName);
-                    }
-                });
-                break;
-            case Settings.ORDER_ARTIST:
-                Collections.sort(list, new Comparator<TrackListData>() {
-                    public int compare(TrackListData first, TrackListData second) {
-                        return first.artistName.compareTo(second.artistName);
-                    }
-                });
-                break;
-            case Settings.ORDER_ALBUM:
-                Collections.sort(list, new Comparator<TrackListData>() {
-                    public int compare(TrackListData first, TrackListData second) {
-                        return first.albumName.compareTo(second.albumName);
-                    }
-                });
-                break;
-            case Settings.ORDER_LENGTH:
-                Collections.sort(list, new Comparator<TrackListData>() {
-                    public int compare(TrackListData first, TrackListData second) {
-                        return first.trackDuration.compareTo(second.trackDuration);
-                    }
-                });
-                break;
-            case Settings.ORDER_RANDOM:
-                Collections.shuffle(list);
-                break;
-        }
-        notifyDataSetChanged();
-    }
-
     @Override
     public int getItemViewType(int position) {
         if (position >= list.size() || position < 0) return -1;
@@ -194,7 +128,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case 0:
@@ -211,28 +145,27 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+
+        ImageView imageView;
+        String image;
+
         switch (getItemViewType(position)) {
             case 0:
-                TrackViewHolder trackView = (TrackViewHolder) holder;
-                ((ImageView) trackView.v.findViewById(R.id.image)).setImageDrawable(preload);
+                imageView = (ImageView) holder.v.findViewById(R.id.image);
 
-                View trackBg = trackView.v.findViewById(R.id.bg);
-                if (trackBg != null) trackBg.setBackground(art_preload);
+                View trackMenu = holder.v.findViewById(R.id.menu);
+                if (trackMenu.getVisibility() == View.GONE) trackMenu.setVisibility(View.VISIBLE);
 
-                View trackMenu = trackView.v.findViewById(R.id.menu);
-                if (trackMenu.getVisibility() == View.GONE) {
-                    trackMenu.setVisibility(View.VISIBLE);
-                }
                 trackMenu.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
                         MenuInflater inflater = popup.getMenuInflater();
-                        inflater.inflate(menures, popup.getMenu());
+                        inflater.inflate(R.menu.menu_track, popup.getMenu());
 
                         final MenuItem fav = popup.getMenu().findItem(R.id.action_fav);
-                        if (behavior == BEHAVIOR_FAVORITE) fav.setTitle(R.string.unfav);
+                        if (isFavoriteBehavior) fav.setTitle(R.string.unfav);
                         else new Action<Boolean>() {
                             @NonNull
                             @Override
@@ -287,7 +220,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                 if (result) item.setTitle(R.string.unfav);
                                                 else {
                                                     item.setTitle(R.string.fav);
-                                                    if (behavior == BEHAVIOR_FAVORITE) removeData(holder.getAdapterPosition());
+                                                    if (isFavoriteBehavior) removeData(holder.getAdapterPosition());
                                                 }
                                             }
 
@@ -348,40 +281,6 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                             }
                                         }.execute();
                                         break;
-                                    case R.id.action_playlist_remove:
-                                        new Action<Boolean>() {
-                                            @NonNull
-                                            @Override
-                                            public String id() {
-                                                return "removeFromPlaylist";
-                                            }
-
-                                            @Nullable
-                                            @Override
-                                            protected Boolean run() throws InterruptedException {
-                                                TracksToRemove tracksRemove = new TracksToRemove();
-                                                TrackToRemove trackRemove = new TrackToRemove();
-                                                trackRemove.uri = ((TrackListData) list.get(holder.getAdapterPosition())).trackUri;
-                                                tracksRemove.tracks = Collections.singletonList(trackRemove);
-                                                if (behavior == BEHAVIOR_PLAYLIST && playlistdata != null) {
-                                                    pasta.spotifyService.removeTracksFromPlaylist(playlistdata.playlistOwnerId, playlistdata.playlistId, tracksRemove);
-                                                    return true;
-                                                } else return false;
-                                            }
-
-                                            @Override
-                                            protected void done(@Nullable Boolean result) {
-                                                if (result == null || !result) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
-                                                    return;
-                                                }
-                                                Toast.makeText(activity, "Removed from Playlist", Toast.LENGTH_SHORT).show();
-                                                original.remove(original.indexOf(list.get(holder.getAdapterPosition())));
-                                                list.remove(holder.getAdapterPosition());
-                                                notifyDataSetChanged();
-                                            }
-                                        }.execute();
-                                        break;
                                 }
                                 return false;
                             }
@@ -392,10 +291,12 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 TrackListData trackData = (TrackListData) list.get(position);
 
-                ((TextView) trackView.v.findViewById(R.id.name)).setText(trackData.trackName);
-                ((TextView) trackView.v.findViewById(R.id.extra)).setText(trackData.artistName);
+                image = trackData.trackImage;
 
-                trackView.v.setOnClickListener(new View.OnClickListener() {
+                ((TextView) holder.v.findViewById(R.id.name)).setText(trackData.trackName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(trackData.artistName);
+
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         int position = 0;
@@ -421,14 +322,9 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
                 break;
             case 1:
-                AlbumViewHolder albumView = (AlbumViewHolder) holder;
-                ((ImageView) albumView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                albumView.v.findViewById(R.id.bg).setBackground(art_preload);
+                imageView = (ImageView) holder.v.findViewById(R.id.image);
 
-                ImageView artistImage = (ImageView) albumView.v.findViewById(R.id.artist_image);
-                if (artistImage != null) artistImage.setImageDrawable(preload);
-
-                albumView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -436,7 +332,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         inflater.inflate(R.menu.menu_basic, popup.getMenu());
 
                         final MenuItem fav = popup.getMenu().findItem(R.id.action_fav);
-                        if (behavior == BEHAVIOR_FAVORITE) fav.setTitle(R.string.unfav);
+                        if (isFavoriteBehavior) fav.setTitle(R.string.unfav);
                         else new Action<Boolean>() {
                             @NonNull
                             @Override
@@ -493,7 +389,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                 } else {
                                                     item.setTitle(R.string.fav);
 
-                                                    if (behavior == BEHAVIOR_FAVORITE) removeData(holder.getAdapterPosition());
+                                                    if (isFavoriteBehavior) removeData(holder.getAdapterPosition());
                                                 }
                                             }
 
@@ -521,10 +417,15 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 AlbumListData albumData = (AlbumListData) list.get(position);
 
-                View artist = albumView.v.findViewById(R.id.artist);
+                image = albumData.albumImage;
+
+                View artist = holder.v.findViewById(R.id.artist);
                 if (artist != null) {
-                    ((TextView) albumView.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
-                    ((TextView) albumView.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
+                    ((TextView) holder.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
+                    ((TextView) holder.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
+
+                    ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
+                    if (artistImage != null) Glide.with(activity).load(albumData.artistImage).into(artistImage);
 
                     artist.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -557,10 +458,10 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     });
                 }
 
-                ((TextView) albumView.v.findViewById(R.id.name)).setText(albumData.albumName);
-                ((TextView) albumView.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");
+                ((TextView) holder.v.findViewById(R.id.name)).setText(albumData.albumName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");
 
-                albumView.v.findViewById(R.id.album).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.album).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle args = new Bundle();
@@ -574,11 +475,9 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
                 break;
             case 2:
-                PlaylistViewHolder playlistView = (PlaylistViewHolder) holder;
-                ((ImageView) playlistView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                playlistView.v.findViewById(R.id.bg).setBackground(art_preload);
+                imageView = (ImageView) holder.v.findViewById(R.id.image);
 
-                playlistView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -586,7 +485,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         inflater.inflate(R.menu.menu_playlist, popup.getMenu());
 
                         final MenuItem fav = popup.getMenu().findItem(R.id.action_fav);
-                        if (behavior == BEHAVIOR_FAVORITE) fav.setTitle(R.string.unfav);
+                        if (isFavoriteBehavior) fav.setTitle(R.string.unfav);
                         else new Action<Boolean>() {
                             @NonNull
                             @Override
@@ -642,7 +541,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                     item.setTitle(R.string.unfav);
                                                 } else {
                                                     item.setTitle(R.string.fav);
-                                                    if (behavior == BEHAVIOR_FAVORITE) removeData(holder.getAdapterPosition());
+                                                    if (isFavoriteBehavior) removeData(holder.getAdapterPosition());
                                                 }
                                             }
 
@@ -732,10 +631,12 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 PlaylistListData playlistData = (PlaylistListData) list.get(position);
 
-                ((TextView) playlistView.v.findViewById(R.id.name)).setText(playlistData.playlistName);
-                ((TextView) playlistView.v.findViewById(R.id.extra)).setText(playlistData.tracks + " tracks");
+                image = playlistData.playlistImage;
 
-                playlistView.v.setOnClickListener(new View.OnClickListener() {
+                ((TextView) holder.v.findViewById(R.id.name)).setText(playlistData.playlistName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(playlistData.tracks + " tracks");
+
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle args = new Bundle();
@@ -749,11 +650,9 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
                 break;
             case 3:
-                ArtistViewHolder artistView = (ArtistViewHolder) holder;
-                ((ImageView) artistView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                artistView.v.findViewById(R.id.bg).setBackground(art_preload);
+                imageView = (ImageView) holder.v.findViewById(R.id.image);
 
-                artistView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -761,7 +660,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         inflater.inflate(R.menu.menu_basic, popup.getMenu());
 
                         final MenuItem fav = popup.getMenu().findItem(R.id.action_fav);
-                        if (behavior == BEHAVIOR_FAVORITE) fav.setTitle(R.string.unfav);
+                        if (isFavoriteBehavior) fav.setTitle(R.string.unfav);
                         else new Action<Boolean>() {
                             @NonNull
                             @Override
@@ -818,7 +717,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                     item.setTitle(R.string.unfav);
                                                 } else {
                                                     item.setTitle(R.string.fav);
-                                                    if (behavior == BEHAVIOR_FAVORITE) removeData(holder.getAdapterPosition());
+                                                    if (isFavoriteBehavior) removeData(holder.getAdapterPosition());
                                                 }
                                             }
 
@@ -846,10 +745,12 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 ArtistListData artistData = (ArtistListData) list.get(position);
 
-                ((TextView) artistView.v.findViewById(R.id.name)).setText(artistData.artistName);
-                ((TextView) artistView.v.findViewById(R.id.extra)).setText(String.valueOf(artistData.followers) + " followers");
+                image = artistData.artistImage;
 
-                artistView.v.setOnClickListener(new View.OnClickListener() {
+                ((TextView) holder.v.findViewById(R.id.name)).setText(artistData.artistName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(artistData.followers) + " followers");
+
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle args = new Bundle();
@@ -866,95 +767,40 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 return;
         }
 
-        new Action<Bitmap[]>() {
-            @NonNull
-            @Override
-            public String id() {
-                return "bindVH";
-            }
+        if (!thumbnails) imageView.setVisibility(View.GONE);
+        else {
+            Glide.with(activity).load(image).into(new GlideDrawableImageViewTarget(imageView) {
+                @Override
+                public void onResourceReady(GlideDrawable resource, final GlideAnimation<? super GlideDrawable> animation) {
+                    super.onResourceReady(resource, animation);
+                    if (!thumbnails) getView().setVisibility(View.GONE);
 
-            @Nullable
-            @Override
-            protected Bitmap[] run() throws InterruptedException {
-                if (!thumbnails) return null;
-                int position = holder.getAdapterPosition();
-                switch (getItemViewType(position)) {
-                    case 0:
-                        return new Bitmap[]{Downloader.downloadImage(activity, ((TrackListData) OmniAdapter.this.list.get(position)).trackImage)};
-                    case 1:
-                        AlbumListData album = (AlbumListData) OmniAdapter.this.list.get(position);
-                        return new Bitmap[]{Downloader.downloadImage(activity, album.albumImage), Downloader.downloadImage(activity, album.artistImage)};
-                    case 2:
-                        return new Bitmap[]{Downloader.downloadImage(activity, ((PlaylistListData) OmniAdapter.this.list.get(position)).playlistImage)};
-                    case 3:
-                        return new Bitmap[]{Downloader.downloadImage(activity, ((ArtistListData) OmniAdapter.this.list.get(position)).artistImage)};
-                    default:
-                        return null;
-                }
-            }
+                    View bg = holder.v.findViewById(R.id.bg);
+                    if (!thumbnails || !palette || bg == null) return;
+                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(Palette palette) {
+                            int defaultColor = dark ? Color.DKGRAY : Color.WHITE;
+                            int color = palette.getLightVibrantColor(defaultColor);
 
-            @Override
-            protected void done(@Nullable Bitmap[] result) {
-                final View holderView;
-                switch (getItemViewType(holder.getAdapterPosition())) {
-                    case 0:
-                        holderView = ((TrackViewHolder) holder).v;
-                        break;
-                    case 1:
-                        holderView = ((AlbumViewHolder) holder).v;
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
+                            animator.setDuration(250);
+                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    int color = (int) animation.getAnimatedValue();
+                                    holder.v.findViewById(R.id.bg).setBackgroundColor(color);
 
-                        ImageView artistImage = (ImageView) holderView.findViewById(R.id.artist_image);
-                        if (artistImage != null) {
-                            if (!thumbnails || result == null) {
-                                artistImage.setVisibility(View.GONE);
-                            } else if (artistImage instanceof CustomImageView) {
-                                ((CustomImageView) artistImage).transition(new BitmapDrawable(activity.getResources(), result[1]));
-                            } else {
-                                TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
-                                artistImage.setImageDrawable(td);
-                                td.startTransition(250);
-                            }
+                                    View artist = holder.v.findViewById(R.id.artist);
+                                    if (artist != null) artist.setBackgroundColor(Color.argb(255, Math.max(Color.red(color) - 10, 0), Math.max(Color.green(color) - 10, 0), Math.max(Color.blue(color) - 10, 0)));
+                                }
+                            });
+                            animator.start();
                         }
-                        break;
-                    case 2:
-                        holderView = ((PlaylistViewHolder) holder).v;
-                        break;
-                    case 3:
-                        holderView = ((ArtistViewHolder) holder).v;
-                        break;
-                    default:
-                        return;
+                    });
                 }
-
-                ImageView imageView = (ImageView) holderView.findViewById(R.id.image);
-                if (!thumbnails || result == null) {
-                    imageView.setVisibility(View.GONE);
-                } else if (imageView instanceof CustomImageView) {
-                    ((CustomImageView) imageView).transition(new BitmapDrawable(activity.getResources(), result[0]));
-                } else {
-                    TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[0])});
-                    imageView.setImageDrawable(td);
-                    td.startTransition(250);
-                }
-
-                View bg = holderView.findViewById(R.id.bg);
-                if (!thumbnails || !palette || result == null || bg == null) return;
-                Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int color = palette.getLightVibrantColor(Color.WHITE);
-                        if (dark) color = palette.getDarkVibrantColor(Color.DKGRAY);
-
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(color)});
-                        holderView.findViewById(R.id.bg).setBackground(td);
-                        td.startTransition(250);
-
-                        View artist = holderView.findViewById(R.id.artist);
-                        if (artist != null) artist.setBackgroundColor(Color.argb(255, Math.max(Color.red(color) - 10, 0), Math.max(Color.green(color) - 10, 0), Math.max(Color.blue(color) - 10, 0)));
-                    }
-                });
-            }
-        }.execute();
+            });
+        }
     }
 
     @Override
@@ -962,7 +808,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return list == null ? 0 : list.size();
     }
 
-    public static class TrackViewHolder extends RecyclerView.ViewHolder {
+    public static class TrackViewHolder extends ViewHolder {
         public View v;
 
         public TrackViewHolder(View v) {
@@ -971,7 +817,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public static class AlbumViewHolder extends RecyclerView.ViewHolder {
+    public static class AlbumViewHolder extends ViewHolder {
         public View v;
 
         public AlbumViewHolder(View v) {
@@ -980,7 +826,7 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public static class PlaylistViewHolder extends RecyclerView.ViewHolder {
+    public static class PlaylistViewHolder extends ViewHolder {
         public View v;
 
         public PlaylistViewHolder(View v) {
@@ -989,10 +835,19 @@ public class OmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public static class ArtistViewHolder extends RecyclerView.ViewHolder {
+    public static class ArtistViewHolder extends ViewHolder {
         public View v;
 
         public ArtistViewHolder(View v) {
+            super(v);
+            this.v = v;
+        }
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public View v;
+
+        public ViewHolder(View v) {
             super(v);
             this.v = v;
         }

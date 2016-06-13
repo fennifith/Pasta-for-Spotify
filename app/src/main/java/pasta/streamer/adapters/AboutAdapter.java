@@ -3,25 +3,20 @@ package pasta.streamer.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.afollestad.async.Action;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
 import pasta.streamer.R;
 import pasta.streamer.data.TextListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.views.CustomImageView;
 
 public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ContribViewHolder> {
@@ -64,25 +59,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ContribViewH
             image.setVisibility(View.VISIBLE);
             image.setImageDrawable(new ColorDrawable(Color.parseColor("#bdbdbd")));
 
-            new Action<Bitmap>() {
-                @NonNull
-                @Override
-                public String id() {
-                    return "getContribImage";
-                }
-
-                @Nullable
-                @Override
-                protected Bitmap run() throws InterruptedException {
-                    return Downloader.downloadImage(activity, contribList.get(holder.getAdapterPosition()).image);
-                }
-
-                @Override
-                protected void done(@Nullable Bitmap result) {
-                    if (result == null) return;
-                    ((CustomImageView) holder.v.findViewById(R.id.image)).transition(new BitmapDrawable(activity.getResources(), result));
-                }
-            }.execute();
+            Glide.with(activity).load(contribList.get(position).image).into(image);
         } else {
             holder.v.findViewById(R.id.image).setVisibility(View.GONE);
         }

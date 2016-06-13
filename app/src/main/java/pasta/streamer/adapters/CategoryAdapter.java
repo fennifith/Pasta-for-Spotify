@@ -1,12 +1,8 @@
 package pasta.streamer.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,14 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.afollestad.async.Action;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
 import pasta.streamer.R;
 import pasta.streamer.data.CategoryListData;
 import pasta.streamer.fragments.CategoryFragment;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.views.CustomImageView;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
@@ -51,26 +46,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        ((CustomImageView) holder.v.findViewById(R.id.image)).setImageDrawable(preload);
-        new Action<Bitmap>() {
-            @NonNull
-            @Override
-            public String id() {
-                return "getCategoryImage";
-            }
-
-            @Nullable
-            @Override
-            protected Bitmap run() throws InterruptedException {
-                return Downloader.downloadImage(activity, list.get(holder.getAdapterPosition()).categoryImage);
-            }
-
-            @Override
-            protected void done(@Nullable Bitmap result) {
-                if (result == null) return;
-                ((CustomImageView) holder.v.findViewById(R.id.image)).transition(new BitmapDrawable(activity.getResources(), result));
-            }
-        }.execute();
+        CustomImageView image = (CustomImageView) holder.v.findViewById(R.id.image);
+        image.setImageDrawable(preload);
+        Glide.with(activity).load(list.get(position).categoryImage).into(image);
 
         ((TextView) holder.v.findViewById(R.id.title)).setText(list.get(position).categoryName);
 

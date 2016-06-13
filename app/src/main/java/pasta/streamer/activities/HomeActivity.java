@@ -334,8 +334,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                     setTitle(title);
                     statusBackground.setBackgroundColor(StaticUtils.darkColor(statusColor));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(getTitle().toString(), StaticUtils.drawableToBitmap(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.ic_launcher)), windowColor);
-                        setTaskDescription(desc);
+                        setTaskDescription(new ActivityManager.TaskDescription(getTitle().toString(), StaticUtils.drawableToBitmap(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.ic_launcher)), windowColor));
                     }
                 }
             });

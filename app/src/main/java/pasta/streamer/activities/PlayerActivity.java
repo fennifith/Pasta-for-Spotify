@@ -11,7 +11,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -40,10 +39,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.afollestad.async.Action;
-import com.afollestad.async.Async;
-import com.afollestad.async.Done;
-import com.afollestad.async.Pool;
-import com.afollestad.async.Result;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
 
@@ -57,7 +56,6 @@ import pasta.streamer.adapters.NowPlayingAdapter;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
@@ -107,7 +105,7 @@ public class PlayerActivity extends AppCompatActivity {
     private NowPlayingAdapter adapter;
     private boolean palette;
     private Pasta pasta;
-    private Pool loadingPool;
+    private Action action;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -363,53 +361,44 @@ public class PlayerActivity extends AppCompatActivity {
 
             if (trackList == null || !trackList.equals(list)) trackList = list;
 
-            if (lastUri == null || !data.trackUri.matches(lastUri)) {
+            if ((lastUri == null || !data.trackUri.matches(lastUri))) {
                 if (!isLoading()) setLoading(true);
-                if (loadingPool != null && loadingPool.isExecuting()) loadingPool.cancel();
+                if (action != null && action.isExecuting()) action.cancel();
 
-                loadingPool = Async.parallel(new Action<Bitmap>() {
-                    @NonNull
+                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(art.getDrawable()).error(R.drawable.preload).into(new GlideDrawableImageViewTarget(art) {
                     @Override
-                    public String id() {
-                        return "setUi";
-                    }
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                        art.transition(resource);
+                        if (isLoading()) setLoading(false);
 
-                    @Nullable
-                    @Override
-                    protected Bitmap run() throws InterruptedException {
-                        return Downloader.downloadImage(PlayerActivity.this, data.trackImageLarge);
-                    }
-
-                    @Override
-                    protected void done(@Nullable Bitmap result) {
-                        if (result == null) {
-                            art.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.preload));
-                            if (backgroundImage != null) backgroundImage.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.image_gradient));
-                            return;
-                        }
-
-                        art.transition(new BitmapDrawable(getResources(), result));
-                        if (backgroundImage != null) backgroundImage.transition(new BitmapDrawable(getResources(), StaticUtils.blurBitmap(result)));
+                        Bitmap bitmap = StaticUtils.drawableToBitmap(resource);
+                        if (backgroundImage != null) backgroundImage.transition(StaticUtils.blurBitmap(bitmap));
 
                         if (!palette) return;
-                        Palette.from(result).generate(new Palette.PaletteAsyncListener() {
+                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                             @Override
                             public void onGenerated(Palette palette) {
-                                int color = palette.getLightVibrantColor(Color.LTGRAY) ;
-                                if (Settings.isDarkTheme(PlayerActivity.this)) color = palette.getDarkVibrantColor(Color.DKGRAY) ;
+                                int color = palette.getLightVibrantColor(Color.LTGRAY);
+                                if (Settings.isDarkTheme(PlayerActivity.this)) color = palette.getDarkVibrantColor(Color.DKGRAY);
 
                                 TransitionDrawable tb = new TransitionDrawable(new Drawable[]{bg.getBackground(), new ColorDrawable(color)});
                                 bg.setBackground(tb);
                                 tb.startTransition(250);
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(data.trackName, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(PlayerActivity.this, R.mipmap.ic_launcher)), color);
-                                    setTaskDescription(desc);
-                                }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTaskDescription(new ActivityManager.TaskDescription(data.trackName, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(PlayerActivity.this, R.mipmap.ic_launcher)), color));
                             }
                         });
                     }
-                }, new Action<Boolean>() {
+
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        super.onLoadFailed(e, errorDrawable);
+                        if (backgroundImage != null) backgroundImage.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.image_gradient));
+                        if (isLoading()) setLoading(false);
+                    }
+                });
+
+                action = new Action<Boolean>() {
                     @NonNull
                     @Override
                     public String id() {
@@ -428,6 +417,7 @@ public class PlayerActivity extends AppCompatActivity {
                             pasta.onNetworkError(PlayerActivity.this);
                             return;
                         }
+
                         if (result) {
                             fav.setIcon(R.drawable.ic_fav);
                         } else {
@@ -435,12 +425,7 @@ public class PlayerActivity extends AppCompatActivity {
                         }
                     }
 
-                }).done(new Done() {
-                    @Override
-                    public void result(@NonNull Result result) {
-                        if (isLoading()) setLoading(false);
-                    }
-                });
+                };
 
                 title.setText(data.trackName);
                 subtitle.setText(data.artistName);

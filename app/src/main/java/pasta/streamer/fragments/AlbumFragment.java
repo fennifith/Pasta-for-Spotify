@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -32,8 +31,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.async.Action;
-import com.afollestad.async.Async;
-import com.afollestad.async.Pool;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -44,10 +45,9 @@ import butterknife.OnClick;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
-import pasta.streamer.adapters.OmniAdapter;
+import pasta.streamer.adapters.TrackAdapter;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
@@ -76,9 +76,9 @@ public class AlbumFragment extends FullScreenFragment {
     private AlbumListData data;
     private ArrayList<TrackListData> trackList;
     private Pasta pasta;
-    private Pool pool;
+    private Action action;
     private int selectedOrder;
-    private OmniAdapter adapter;
+    private TrackAdapter adapter;
     private boolean palette;
 
     @Override
@@ -132,67 +132,56 @@ public class AlbumFragment extends FullScreenFragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        adapter = new OmniAdapter((AppCompatActivity) getActivity(), null);
+        adapter = new TrackAdapter((AppCompatActivity) getActivity(), null);
         adapter.setAlbumBehavior();
         topTenTrackView.setAdapter(adapter);
         topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         topTenTrackView.setHasFixedSize(true);
 
-        pool = Async.parallel(new Action<ArrayList<TrackListData>>() {
-                @NonNull
-                @Override
-                public String id() {
-                    return "getAlbumTracks";
-                }
+        action = new Action<ArrayList<TrackListData>>() {
+            @NonNull
+            @Override
+            public String id() {
+                return "getAlbumTracks";
+            }
 
-                @Nullable
-                @Override
-                protected ArrayList<TrackListData> run() throws InterruptedException {
-                    return pasta.getTracks(data);
-                }
+            @Nullable
+            @Override
+            protected ArrayList<TrackListData> run() throws InterruptedException {
+                return pasta.getTracks(data);
+            }
 
-                @Override
-                protected void done(@Nullable ArrayList<TrackListData> result) {
-                    if (spinner != null) spinner.setVisibility(View.GONE);
-                    if (result == null) {
-                        pasta.onNetworkError(getContext());
-                        return;
+            @Override
+            protected void done(@Nullable ArrayList<TrackListData> result) {
+                if (spinner != null) spinner.setVisibility(View.GONE);
+                if (result == null) {
+                    pasta.onNetworkError(getContext());
+                    return;
+                }
+                adapter.swapData(result);
+                adapter.sort(Settings.getTrackOrder(getContext()));
+                trackList = result;
+            }
+        };
+        action.execute();
+
+        Glide.with(getContext()).load(data.albumImageLarge).into(new GlideDrawableImageViewTarget(header) {
+            @Override
+            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                super.onResourceReady(resource, animation);
+
+                if (!palette) return;
+                Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        int primary = palette.getMutedColor(Color.GRAY);
+                        collapsingToolbarLayout.setContentScrimColor(primary);
+                        fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary))));
+                        bar.setBackgroundColor(primary);
+                        setData(data.albumName, primary, palette.getDarkVibrantColor(primary));
                     }
-                    adapter.swapData(result);
-                    adapter.sort(Settings.getTrackOrder(getContext()));
-                    trackList = result;
-                }
-            }, new Action<Bitmap>() {
-                @NonNull
-                @Override
-                public String id() {
-                    return "getAlbumHeader";
-                }
-
-                @Nullable
-                @Override
-                protected Bitmap run() throws InterruptedException {
-                    return Downloader.downloadImage(getContext(), data.albumImageLarge);
-                }
-
-                @Override
-                protected void done(@Nullable Bitmap result) {
-                    if (result == null) return;
-                    header.transition(new BitmapDrawable(getResources(), result));
-
-                    if (!palette) return;
-                    Palette.from(result).generate(new Palette.PaletteAsyncListener() {
-                        @Override
-                        public void onGenerated(Palette palette) {
-                            int primary = palette.getMutedColor(Color.GRAY);
-                            collapsingToolbarLayout.setContentScrimColor(primary);
-                            fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary)) ));
-                            bar.setBackgroundColor(primary);
-                            setData(data.albumName, primary, palette.getDarkVibrantColor(primary));
-                        }
-                    });
-                }
-
+                });
+            }
         });
 
         return rootView;
@@ -232,7 +221,7 @@ public class AlbumFragment extends FullScreenFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (pool != null && pool.isExecuting()) pool.cancel();
+        if (action != null && action.isExecuting()) action.cancel();
         ButterKnife.unbind(this);
     }
 

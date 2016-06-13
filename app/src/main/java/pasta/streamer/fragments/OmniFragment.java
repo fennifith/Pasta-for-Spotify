@@ -25,7 +25,7 @@ public class OmniFragment extends Fragment {
     private OmniAdapter adapter;
     private ArrayList list;
     private GridLayoutManager manager;
-    private int behavior;
+    private boolean isFavoriteBehavior;
 
     @Bind(R.id.progressBar)
     ProgressBar spinner;
@@ -58,9 +58,7 @@ public class OmniFragment extends Fragment {
             }
         });
 
-        if (behavior == OmniAdapter.BEHAVIOR_FAVORITE) {
-            adapter.setFavoriteBehavior();
-        }
+        if (isFavoriteBehavior) adapter.setFavoriteBehavior();
 
         recycler.setLayoutManager(manager);
         recycler.setAdapter(adapter);
@@ -88,9 +86,7 @@ public class OmniFragment extends Fragment {
         this.list = list;
         if (adapter != null) adapter.swapData(this.list);
         if (spinner != null) spinner.setVisibility(View.GONE);
-        if (empty != null) {
-            empty.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
-        }
+        if (empty != null) empty.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public void clear() {
@@ -101,6 +97,6 @@ public class OmniFragment extends Fragment {
 
     public void setFavoriteBehavior() {
         if (adapter != null) adapter.setFavoriteBehavior();
-        behavior = OmniAdapter.BEHAVIOR_FAVORITE;
+        isFavoriteBehavior = true;
     }
 }

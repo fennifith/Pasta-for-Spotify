@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -150,9 +151,8 @@ public class StaticUtils {
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) drawable).getBitmap();
-        }
+        if (drawable == null) drawable = new ColorDrawable(Color.TRANSPARENT);
+        if (drawable instanceof BitmapDrawable) return ((BitmapDrawable) drawable).getBitmap();
 
         int width = drawable.getIntrinsicWidth();
         width = width > 0 ? width : 1;

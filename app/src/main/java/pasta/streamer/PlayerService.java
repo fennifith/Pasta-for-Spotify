@@ -71,6 +71,12 @@ public class PlayerService extends Service {
         initPlayer();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        spotifyPlayer.shutdownNow();
+    }
+
     private void initPlayer() {
         debugPlaying = false;
         Pasta pasta = (Pasta) getApplicationContext();
@@ -234,7 +240,7 @@ public class PlayerService extends Service {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        checkForState();
+                        if (!spotifyPlayer.isShutdown()) checkForState();
                     }
                 }, UPDATE_INTERVAL);
             }

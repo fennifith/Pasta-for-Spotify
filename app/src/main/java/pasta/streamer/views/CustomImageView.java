@@ -2,6 +2,7 @@ package pasta.streamer.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.support.annotation.NonNull;
@@ -27,6 +28,10 @@ public class CustomImageView extends ImageView {
 
     public CustomImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+    }
+
+    public void transition(Bitmap second) {
+        transition(new BitmapDrawable(getResources(), second));
     }
 
     public void transition(final Drawable second) {

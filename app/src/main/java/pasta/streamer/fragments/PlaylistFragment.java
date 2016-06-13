@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -36,8 +35,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.async.Action;
-import com.afollestad.async.Async;
-import com.afollestad.async.Pool;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -50,10 +51,9 @@ import butterknife.OnClick;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
-import pasta.streamer.adapters.OmniAdapter;
+import pasta.streamer.adapters.TrackAdapter;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
@@ -82,9 +82,9 @@ public class PlaylistFragment extends FullScreenFragment {
     private Pasta pasta;
     private PlaylistListData data;
     private ArrayList<TrackListData> trackList;
-    private Pool pool;
+    private Action action;
     private int selectedOrder;
-    private OmniAdapter adapter;
+    private TrackAdapter adapter;
     private boolean palette;
 
     @Override
@@ -118,13 +118,13 @@ public class PlaylistFragment extends FullScreenFragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        adapter = new OmniAdapter((AppCompatActivity) getActivity(), null);
+        adapter = new TrackAdapter((AppCompatActivity) getActivity(), null);
         if (data.editable) adapter.setPlaylistBehavior(data);
         topTenTrackView.setAdapter(adapter);
         topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         topTenTrackView.setHasFixedSize(true);
 
-        pool = Async.parallel(new Action<ArrayList<TrackListData>>() {
+        action = new Action<ArrayList<TrackListData>>() {
             @NonNull
             @Override
             public String id() {
@@ -148,27 +148,16 @@ public class PlaylistFragment extends FullScreenFragment {
                 adapter.sort(Settings.getTrackOrder(getContext()));
                 trackList = result;
             }
-        }, new Action<Bitmap>() {
-            @NonNull
-            @Override
-            public String id() {
-                return "getPlaylistHeader";
-            }
+        };
+        action.execute();
 
-            @Nullable
+        Glide.with(getContext()).load(data.playlistImageLarge).into(new GlideDrawableImageViewTarget(header) {
             @Override
-            protected Bitmap run() throws InterruptedException {
-                return Downloader.downloadImage(getActivity(), data.playlistImageLarge);
-            }
-
-            @Override
-            protected void done(@Nullable Bitmap result) {
-                if (result == null) return;
-
-                header.transition(new BitmapDrawable(getResources(), result));
+            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                super.onResourceReady(resource, animation);
 
                 if (!palette) return;
-                Palette.from(result).generate(new Palette.PaletteAsyncListener() {
+                Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
                         int primary = palette.getMutedColor(Color.GRAY);
@@ -398,7 +387,7 @@ public class PlaylistFragment extends FullScreenFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (pool != null && pool.isExecuting()) pool.cancel();
+        if (action != null && action.isExecuting()) action.cancel();
         ButterKnife.unbind(this);
     }
 }
