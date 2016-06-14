@@ -1,5 +1,6 @@
 package pasta.streamer.activities;
 
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -280,6 +281,17 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             public void onBackStackChanged() {
                 HomeActivity.this.f = getSupportFragmentManager().findFragmentById(R.id.fragment);
                 setListeners(f);
+
+                ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+                animator.setDuration(250);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        View v = findViewById(R.id.fragment);
+                        if (v != null) v.setAlpha(Math.abs((float) animation.getAnimatedValue()));
+                    }
+                });
+                animator.start();
             }
         });
 

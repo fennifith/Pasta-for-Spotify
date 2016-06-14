@@ -357,7 +357,7 @@ public class PlayerActivity extends AppCompatActivity {
                 if (!isLoading()) setLoading(true);
                 if (action != null && action.isExecuting()) action.cancel();
 
-                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(art.getDrawable()).error(R.drawable.preload).into(new GlideDrawableImageViewTarget(art) {
+                Glide.with(PlayerActivity.this).load(data.trackImageLarge).error(R.drawable.preload).into(new GlideDrawableImageViewTarget(art) {
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                         art.transition(resource);

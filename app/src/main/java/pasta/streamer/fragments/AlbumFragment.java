@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
@@ -36,7 +34,6 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -191,18 +188,8 @@ public class AlbumFragment extends FullScreenFragment {
     @OnClick(R.id.fab)
     public void startFirst(View v) {
         if (trackList == null || trackList.size() < 1) return;
-
         StaticUtils.play(0, trackList, getContext());
-
-        Intent intent = new Intent(getActivity(), PlayerActivity.class);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        StaticUtils.drawableToBitmap(header.getDrawable()).compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] b = baos.toByteArray();
-        intent.putExtra("preload", b);
-
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeScaleUpAnimation(v, (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight());
-        startActivity(intent, options.toBundle());
+        startActivity(new Intent(getActivity(), PlayerActivity.class));
     }
 
     @Override

@@ -2,14 +2,14 @@ package pasta.streamer.adapters;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -30,7 +30,6 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -336,15 +335,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                 trackList.addAll(list);
                 StaticUtils.play(holder.getAdapterPosition(), trackList, activity);
 
-                Intent intent = new Intent(view.getContext(), PlayerActivity.class);
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                StaticUtils.drawableToBitmap(((ImageView) view.findViewById(R.id.image)).getDrawable()).compress(Bitmap.CompressFormat.PNG, 100, baos);
-                byte[] b = baos.toByteArray();
-                intent.putExtra("preload", b);
-
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeThumbnailScaleUpAnimation(view, StaticUtils.drawableToBitmap(((ImageView) view.findViewById(R.id.image)).getDrawable()), 5, 5);
-                activity.startActivity(intent, options.toBundle());
+                Intent i = new Intent(view.getContext(), PlayerActivity.class);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity, view.findViewById(R.id.image), "image");
+                    activity.startActivity(i, options.toBundle());
+                } else activity.startActivity(i);
             }
         });
 
