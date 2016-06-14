@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -59,7 +58,6 @@ public class Playbar {
 
     private NowPlayingAdapter adapter;
     private UpdateReceiver receiver;
-    private Action updateAction;
     private PlaybarListener listener;
 
     private Drawable play, pause;
@@ -197,31 +195,33 @@ public class Playbar {
                     first = false;
                 }
 
-                Glide.with(activity).load(data.trackImage).into(new GlideDrawableImageViewTarget(art) {
-                    @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                        art.transition(resource);
+                if (thumbnails) {
+                    Glide.with(activity).load(data.trackImage).into(new GlideDrawableImageViewTarget(art) {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                            art.transition(resource);
 
-                        if (!palette) return;
-                        Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
-                            @Override
-                            public void onGenerated(Palette palette) {
-                                int color = palette.getDarkVibrantColor(dark ? Color.LTGRAY : Color.DKGRAY);
+                            if (!palette) return;
+                            Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                                @Override
+                                public void onGenerated(Palette palette) {
+                                    int color = palette.getDarkVibrantColor(dark ? Color.LTGRAY : Color.DKGRAY);
 
-                                Drawable prev = bg.getBackground();
-                                if (prev instanceof TransitionDrawable) prev = ((TransitionDrawable) prev).getDrawable(1);
+                                    Drawable prev = bg.getBackground();
+                                    if (prev instanceof TransitionDrawable) prev = ((TransitionDrawable) prev).getDrawable(1);
 
-                                TransitionDrawable td = new TransitionDrawable(new Drawable[]{prev, new ColorDrawable(color)});
-                                bg.setBackground(td);
-                                td.startTransition(250);
+                                    TransitionDrawable td = new TransitionDrawable(new Drawable[]{prev, new ColorDrawable(color)});
+                                    bg.setBackground(td);
+                                    td.startTransition(250);
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    activity.getWindow().setNavigationBarColor(StaticUtils.darkColor(color));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        activity.getWindow().setNavigationBarColor(StaticUtils.darkColor(color));
+                                    }
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                }
 
                 title.setText(data.trackName);
                 subtitle.setText(data.artistName);
