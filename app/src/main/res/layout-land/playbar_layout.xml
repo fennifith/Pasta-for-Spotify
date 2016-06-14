@@ -31,7 +31,8 @@
             android:layout_width="@dimen/playbar_size"
             android:layout_height="@dimen/playbar_size"
             android:layout_gravity="left|top"
-            android:src="@drawable/preload"/>
+            android:src="@drawable/preload"
+            android:transitionName="image"/>
 
         <LinearLayout
             android:layout_width="match_parent"

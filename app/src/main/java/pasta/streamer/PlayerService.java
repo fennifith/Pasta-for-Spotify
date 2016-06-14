@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -30,6 +29,7 @@ import com.spotify.sdk.android.player.Spotify;
 import java.util.ArrayList;
 import java.util.List;
 
+import pasta.streamer.activities.MainActivity;
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.utils.Settings;
@@ -105,18 +105,20 @@ public class PlayerService extends Service {
             @Override
             public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
                 spotifyPlayerState = playerState;
-                if (!trackList.get(curPos).trackUri.matches(playerState.trackUri)) {
-                    if (trackList.get(getInfinitePos(curPos + 1)).trackUri.matches(playerState.trackUri)) curPos = getInfinitePos(curPos + 1);
-                    else {
-                        for (int i = 0; i < trackList.size(); i++) {
-                            if (trackList.get(i).trackUri.matches(playerState.trackUri)) {
-                                curPos = i;
-                                break;
+                if (trackList != null) {
+                    if (!trackList.get(curPos).trackUri.matches(playerState.trackUri)) {
+                        if (trackList.get(getInfinitePos(curPos + 1)).trackUri.matches(playerState.trackUri)) curPos = getInfinitePos(curPos + 1);
+                        else {
+                            for (int i = 0; i < trackList.size(); i++) {
+                                if (trackList.get(i).trackUri.matches(playerState.trackUri)) {
+                                    curPos = i;
+                                    break;
+                                }
                             }
                         }
                     }
+                    showNotification();
                 }
-                showNotification();
             }
 
             @Override
@@ -154,8 +156,12 @@ public class PlayerService extends Service {
     private void onError(String message) {
         errorCount++;
         if (errorCount < 5) {
-            Toast.makeText(getApplicationContext(), message + ", please restart the app.", Toast.LENGTH_LONG).show();
-            stopSelf();
+            Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
+            stopService(new Intent(this, PlayerService.class));
+
+            Intent i = new Intent(this, MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
         } else Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
@@ -268,7 +274,7 @@ public class PlayerService extends Service {
                 .setContentTitle(trackList.get(curPos).trackName)
                 .setContentText(trackList.get(curPos).artistName)
                 .addAction(R.drawable.ic_notify_prev, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(spotifyPlayerState.playing ? R.drawable.ic_notify_pause : R.drawable.ic_notify_play, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(spotifyPlayerState.playing ? R.drawable.ic_notify_pause : R.drawable.ic_notify_play, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(R.drawable.ic_notify_next, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(PendingIntent.getActivities(PlayerService.this, 0, new Intent[]{new Intent(PlayerService.this, PlayerActivity.class)}, 0));
     }
@@ -285,12 +291,6 @@ public class PlayerService extends Service {
                         startForeground(NOTIFICATION_ID, getNotificationBuilder().setLargeIcon(resource).setColor(palette.getVibrantColor(Color.GRAY)).build());
                     }
                 });
-            }
-
-            @Override
-            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                super.onLoadFailed(e, errorDrawable);
-                startForeground(NOTIFICATION_ID, getNotificationBuilder().build());
             }
         });
     }

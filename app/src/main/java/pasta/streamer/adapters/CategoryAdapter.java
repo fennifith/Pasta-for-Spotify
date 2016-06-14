@@ -1,15 +1,14 @@
 package pasta.streamer.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -19,18 +18,15 @@ import java.util.ArrayList;
 import pasta.streamer.R;
 import pasta.streamer.data.CategoryListData;
 import pasta.streamer.fragments.CategoryFragment;
-import pasta.streamer.views.CustomImageView;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
     AppCompatActivity activity;
     ArrayList<CategoryListData> list;
-    Drawable preload;
 
     public CategoryAdapter(AppCompatActivity activity, ArrayList<CategoryListData> list) {
         this.activity = activity;
         this.list = list;
-        preload = ContextCompat.getDrawable(activity, R.drawable.preload);
     }
 
     public void swapData(ArrayList<CategoryListData> list) {
@@ -46,9 +42,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        CustomImageView image = (CustomImageView) holder.v.findViewById(R.id.image);
-        image.setImageDrawable(preload);
-        Glide.with(activity).load(list.get(position).categoryImage).into(image);
+        Glide.with(activity).load(list.get(position).categoryImage).into((ImageView) holder.v.findViewById(R.id.image));
 
         ((TextView) holder.v.findViewById(R.id.title)).setText(list.get(position).categoryName);
 

@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -134,14 +133,6 @@ public class PlayerActivity extends AppCompatActivity {
         play = ContextCompat.getDrawable(this, R.drawable.ic_notify_play);
         pause = ContextCompat.getDrawable(this, R.drawable.ic_notify_pause);
         playButton.setImageDrawable(play);
-
-        byte[] b = getIntent().getByteArrayExtra("preload");
-        if (b != null) {
-            Bitmap bmp = StaticUtils.blurBitmap(BitmapFactory.decodeByteArray(b, 0, b.length));
-            art.setImageBitmap(bmp);
-
-            if (backgroundImage != null) backgroundImage.setImageBitmap(bmp);
-        }
 
         if (backgroundImage != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             TypedValue value = new TypedValue();
@@ -287,6 +278,7 @@ public class PlayerActivity extends AppCompatActivity {
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         i.putExtra("album", result);
                         startActivity(i);
                     }
@@ -313,6 +305,7 @@ public class PlayerActivity extends AppCompatActivity {
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         i.putExtra("artist", result);
                         startActivity(i);
                     }
@@ -377,10 +370,12 @@ public class PlayerActivity extends AppCompatActivity {
                             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                                 @Override
                                 public void onGenerated(Palette palette) {
-                                    final int color = palette.getLightVibrantColor(Settings.isDarkTheme(PlayerActivity.this) ? Color.DKGRAY : Color.LTGRAY);
+                                    final int color;
+                                    if (Settings.isDarkTheme(PlayerActivity.this)) color = palette.getDarkVibrantColor(Color.DKGRAY);
+                                    else color = palette.getLightVibrantColor(Color.LTGRAY);
 
                                     ValueAnimator animator = ValueAnimator.ofInt(-100, 100);
-                                    animator.setDuration(150);
+                                    animator.setDuration(250);
                                     animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
                                         boolean set;

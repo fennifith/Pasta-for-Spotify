@@ -53,6 +53,7 @@ import pasta.streamer.fragments.ArtistFragment;
 import pasta.streamer.fragments.PlaylistFragment;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
+import pasta.streamer.views.CustomImageView;
 
 public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
@@ -762,10 +763,10 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).into(new GlideDrawableImageViewTarget(imageView) {
+            Glide.with(activity).load(image).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(imageView) {
                 @Override
-                public void onResourceReady(GlideDrawable resource, final GlideAnimation<? super GlideDrawable> animation) {
-                    super.onResourceReady(resource, animation);
+                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                    ((CustomImageView) getView()).transition(resource);
                     if (!thumbnails) getView().setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);
@@ -775,6 +776,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                         public void onGenerated(Palette palette) {
                             int defaultColor = dark ? Color.DKGRAY : Color.WHITE;
                             int color = palette.getLightVibrantColor(defaultColor);
+                            if (dark) color = palette.getDarkVibrantColor(defaultColor);
 
                             ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
                             animator.setDuration(250);

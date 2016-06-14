@@ -55,7 +55,8 @@
                                 android:layout_gravity="center_vertical|top"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/preload"
-                                android:background="#fafafa"/>
+                                android:background="#fafafa"
+                                android:transitionName="image"/>
 
                             <ProgressBar
                                 android:id="@+id/progressBar"

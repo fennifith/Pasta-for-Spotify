@@ -24,7 +24,8 @@
                 android:layout_gravity="center_vertical|top"
                 android:scaleType="centerCrop"
                 android:src="@drawable/preload"
-                android:background="#fafafa"/>
+                android:background="#fafafa"
+                android:transitionName="image"/>
 
             <pasta.streamer.views.SecondSquareImageView
                 android:layout_width="wrap_content"

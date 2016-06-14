@@ -6,14 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.PopupMenu;
@@ -51,6 +48,7 @@ import pasta.streamer.fragments.AlbumFragment;
 import pasta.streamer.fragments.ArtistFragment;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
+import pasta.streamer.views.CustomImageView;
 
 public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
 
@@ -60,8 +58,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     private Pasta pasta;
     private int menures = R.menu.menu_track;
     private PlaylistListData playlistdata;
-    private Drawable preload;
-    private Drawable art_preload;
     private boolean thumbnails, cards, trackList, palette, dark;
 
     public TrackAdapter(AppCompatActivity activity, ArrayList<TrackListData> list) {
@@ -82,9 +78,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         trackList = Settings.isListTracks(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
-
-        preload = ContextCompat.getDrawable(activity, R.drawable.preload);
-        art_preload = new ColorDrawable(Color.TRANSPARENT);
     }
 
     public void setPlaylistBehavior(PlaylistListData data) {
@@ -165,11 +158,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        ((ImageView) holder.v.findViewById(R.id.image)).setImageDrawable(preload);
-
-        View trackBg = holder.v.findViewById(R.id.bg);
-        if (trackBg != null) trackBg.setBackground(art_preload);
-
         View trackMenu = holder.v.findViewById(R.id.menu);
         if (trackMenu.getVisibility() == View.GONE) {
             trackMenu.setVisibility(View.VISIBLE);
@@ -360,10 +348,13 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             }
         });
 
-        Glide.with(activity).load(list.get(position).trackImage).into(new GlideDrawableImageViewTarget((ImageView) holder.v.findViewById(R.id.image)) {
+        View bg = holder.v.findViewById(R.id.bg);
+        if (bg != null) bg.setBackgroundColor(dark ? Color.DKGRAY : Color.WHITE);
+
+        Glide.with(activity).load(list.get(position).trackImage).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget((ImageView) holder.v.findViewById(R.id.image)) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                super.onResourceReady(resource, animation);
+                ((CustomImageView) getView()).transition(resource);
 
                 View bg = holder.v.findViewById(R.id.bg);
                 if (!thumbnails || !palette || bg == null) return;
@@ -372,6 +363,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                     public void onGenerated(Palette palette) {
                         int defaultColor = dark ? Color.DKGRAY : Color.WHITE;
                         int color = palette.getLightVibrantColor(defaultColor);
+                        if (dark) color = palette.getDarkVibrantColor(defaultColor);
 
                         ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
                         animator.setDuration(250);
