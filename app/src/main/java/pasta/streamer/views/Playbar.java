@@ -8,13 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +26,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.async.Action;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.adapters.NowPlayingAdapter;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 
@@ -196,42 +197,19 @@ public class Playbar {
                     first = false;
                 }
 
-                if (updateAction != null && updateAction.isExecuting()) updateAction.cancel();
-                updateAction = new Action<Bitmap>() {
-                    @NonNull
+                Glide.with(activity).load(data.trackImage).into(new GlideDrawableImageViewTarget(art) {
                     @Override
-                    public String id() {
-                        return "setUi";
-                    }
-
-                    @Nullable
-                    @Override
-                    protected Bitmap run() throws InterruptedException {
-                        if (thumbnails) return Downloader.downloadImage(activity, data.trackImage);
-                        else return null;
-                    }
-
-                    @Override
-                    protected void done(@Nullable Bitmap result) {
-                        if (!thumbnails) {
-                            return;
-                        } else if (result == null) {
-                            art.setImageResource(R.drawable.preload);
-                            return;
-                        }
-
-                        art.transition(new BitmapDrawable(activity.getResources(), result));
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                        art.transition(resource);
 
                         if (!palette) return;
-                        Palette.from(result).generate(new Palette.PaletteAsyncListener() {
+                        Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                             @Override
                             public void onGenerated(Palette palette) {
-                                int color = palette.getDarkVibrantColor(Color.DKGRAY);
-                                if (dark) color = palette.getLightVibrantColor(Color.LTGRAY);
+                                int color = palette.getDarkVibrantColor(dark ? Color.LTGRAY : Color.DKGRAY);
 
                                 Drawable prev = bg.getBackground();
-                                if (prev instanceof TransitionDrawable)
-                                    prev = ((TransitionDrawable) prev).getDrawable(1);
+                                if (prev instanceof TransitionDrawable) prev = ((TransitionDrawable) prev).getDrawable(1);
 
                                 TransitionDrawable td = new TransitionDrawable(new Drawable[]{prev, new ColorDrawable(color)});
                                 bg.setBackground(td);
@@ -243,8 +221,7 @@ public class Playbar {
                             }
                         });
                     }
-                };
-                updateAction.execute();
+                });
 
                 title.setText(data.trackName);
                 subtitle.setText(data.artistName);

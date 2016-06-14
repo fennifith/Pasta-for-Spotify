@@ -147,13 +147,10 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        ImageView imageView;
         String image;
 
         switch (getItemViewType(position)) {
             case 0:
-                imageView = (ImageView) holder.v.findViewById(R.id.image);
-
                 View trackMenu = holder.v.findViewById(R.id.menu);
                 if (trackMenu.getVisibility() == View.GONE) trackMenu.setVisibility(View.VISIBLE);
 
@@ -322,8 +319,6 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                 });
                 break;
             case 1:
-                imageView = (ImageView) holder.v.findViewById(R.id.image);
-
                 holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -475,8 +470,6 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                 });
                 break;
             case 2:
-                imageView = (ImageView) holder.v.findViewById(R.id.image);
-
                 holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -650,8 +643,6 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                 });
                 break;
             case 3:
-                imageView = (ImageView) holder.v.findViewById(R.id.image);
-
                 holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -766,6 +757,8 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
             default:
                 return;
         }
+
+        ImageView imageView = (ImageView) holder.v.findViewById(R.id.image);
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {

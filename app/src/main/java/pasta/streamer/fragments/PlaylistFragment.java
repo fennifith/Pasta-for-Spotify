@@ -151,23 +151,24 @@ public class PlaylistFragment extends FullScreenFragment {
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.playlistImageLarge).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                super.onResourceReady(resource, animation);
+                header.transition(resource);
 
-                if (!palette) return;
-                Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int primary = palette.getMutedColor(Color.GRAY);
-                        int accent = palette.getVibrantColor(StaticUtils.darkColor(primary));
-                        collapsingToolbarLayout.setContentScrimColor(primary);
-                        fab.setBackgroundTintList(ColorStateList.valueOf(accent));
-                        bar.setBackgroundColor(primary);
-                        setData(data.playlistName, primary, accent);
-                    }
-                });
+                if (palette) {
+                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(Palette palette) {
+                            int primary = palette.getMutedColor(Color.GRAY);
+                            int accent = palette.getVibrantColor(StaticUtils.darkColor(primary));
+                            collapsingToolbarLayout.setContentScrimColor(primary);
+                            fab.setBackgroundTintList(ColorStateList.valueOf(accent));
+                            bar.setBackgroundColor(primary);
+                            setData(data.playlistName, primary, accent);
+                        }
+                    });
+                }
             }
         });
 

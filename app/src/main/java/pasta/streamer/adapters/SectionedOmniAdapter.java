@@ -1,14 +1,12 @@
 package pasta.streamer.adapters;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -16,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.PopupMenu;
@@ -31,6 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.async.Action;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -47,12 +48,10 @@ import pasta.streamer.data.TrackListData;
 import pasta.streamer.fragments.AlbumFragment;
 import pasta.streamer.fragments.ArtistFragment;
 import pasta.streamer.fragments.PlaylistFragment;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
-import pasta.streamer.views.CustomImageView;
 
-public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdapter.ViewHolder> {
 
     private ArrayList<TrackListData> tracks;
     private ArrayList<AlbumListData> albums;
@@ -60,8 +59,6 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
     private ArrayList<ArtistListData> artists;
     private AppCompatActivity activity;
     private ArrayList list;
-    private Drawable preload;
-    private Drawable art_preload;
     private boolean thumbnails, cards, palette, dark;
     private Pasta pasta;
 
@@ -78,9 +75,6 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         cards = Settings.isCards(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
-
-        preload = ContextCompat.getDrawable(activity, R.drawable.preload);
-        art_preload = new ColorDrawable(Color.TRANSPARENT);
 
         if (list == null) {
             this.list = new ArrayList();
@@ -185,7 +179,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case 0:
@@ -205,23 +199,20 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
 
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        if (getItemViewType(position) == 4) {
-            ((TextView) ((HeaderViewHolder) holder).v).setText(getSectionName(position));
-            return;
-        }
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+
+        String image;
 
         switch (getItemViewType(holder.getAdapterPosition())) {
             case 0:
-                TrackViewHolder trackView = (TrackViewHolder) holder;
-                ((ImageView) trackView.v.findViewById(R.id.image)).setImageDrawable(preload);
-
                 TrackListData trackData = tracks.get(getRelPosition(holder.getAdapterPosition()));
 
-                ((TextView) trackView.v.findViewById(R.id.name)).setText(trackData.trackName);
-                ((TextView) trackView.v.findViewById(R.id.extra)).setText(trackData.artistName);
+                image = trackData.trackImage;
 
-                trackView.v.setOnClickListener(new View.OnClickListener() {
+                ((TextView) holder.v.findViewById(R.id.name)).setText(trackData.trackName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(trackData.artistName);
+
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         StaticUtils.play(getRelPosition(holder.getAdapterPosition()), tracks, activity);
@@ -239,14 +230,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                 });
                 break;
             case 1:
-                AlbumViewHolder albumView = (AlbumViewHolder) holder;
-                ((ImageView) albumView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                albumView.v.findViewById(R.id.bg).setBackground(art_preload);
-
-                ImageView artistImage = (ImageView) albumView.v.findViewById(R.id.artist_image);
-                if (artistImage != null) artistImage.setImageDrawable(preload);
-
-                albumView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -335,11 +319,16 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 AlbumListData albumData = albums.get(getRelPosition(holder.getAdapterPosition()));
 
-                ((TextView) albumView.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
-                ((TextView) albumView.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
+                image = albumData.albumImage;
+
+                ((TextView) holder.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
+                ((TextView) holder.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
+
+                ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
+                if (artistImage != null) Glide.with(activity).load(albumData.artistImage).into(artistImage);
 
                 if (!(activity.getSupportFragmentManager().findFragmentById(R.id.fragment) instanceof ArtistFragment)) {
-                    albumView.v.findViewById(R.id.artist).setOnClickListener(new View.OnClickListener() {
+                    holder.v.findViewById(R.id.artist).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             new Action<ArtistListData>() {
@@ -370,10 +359,10 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                     });
                 }
 
-                ((TextView) albumView.v.findViewById(R.id.name)).setText(albumData.albumName);
-                ((TextView) albumView.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");
+                ((TextView) holder.v.findViewById(R.id.name)).setText(albumData.albumName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");
 
-                albumView.v.setOnClickListener(new View.OnClickListener() {
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle args = new Bundle();
@@ -387,11 +376,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                 });
                 break;
             case 2:
-                PlaylistViewHolder playlistView = (PlaylistViewHolder) holder;
-                ((ImageView) playlistView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                playlistView.v.findViewById(R.id.bg).setBackground(art_preload);
-
-                playlistView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -491,10 +476,12 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 PlaylistListData playlistData = playlists.get(getRelPosition(holder.getAdapterPosition()));
 
-                ((TextView) playlistView.v.findViewById(R.id.name)).setText(playlistData.playlistName);
-                ((TextView) playlistView.v.findViewById(R.id.extra)).setText(playlistData.tracks + " tracks");
+                image = playlistData.playlistImage;
 
-                playlistView.v.setOnClickListener(new View.OnClickListener() {
+                ((TextView) holder.v.findViewById(R.id.name)).setText(playlistData.playlistName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(playlistData.tracks + " tracks");
+
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle args = new Bundle();
@@ -508,11 +495,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                 });
                 break;
             case 3:
-                ArtistViewHolder artistView = (ArtistViewHolder) holder;
-                ((ImageView) artistView.v.findViewById(R.id.image)).setImageDrawable(preload);
-                artistView.v.findViewById(R.id.bg).setBackground(art_preload);
-
-                artistView.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                holder.v.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -603,10 +586,12 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 ArtistListData artistData = artists.get(getRelPosition(holder.getAdapterPosition()));
 
-                ((TextView) artistView.v.findViewById(R.id.name)).setText(artistData.artistName);
-                ((TextView) artistView.v.findViewById(R.id.extra)).setText(String.valueOf(artistData.followers) + " followers");
+                image = artistData.artistImage;
 
-                artistView.v.setOnClickListener(new View.OnClickListener() {
+                ((TextView) holder.v.findViewById(R.id.name)).setText(artistData.artistName);
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(artistData.followers) + " followers");
+
+                holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle args = new Bundle();
@@ -619,97 +604,49 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
                 });
                 break;
+            case 4:
+                ((TextView) holder.v).setText(getSectionName(position));
+                return;
             default:
                 return;
         }
 
-        new Action<Bitmap[]>() {
-            @NonNull
-            @Override
-            public String id() {
-                return "bindVH";
-            }
+        ImageView imageView = (ImageView) holder.v.findViewById(R.id.image);
 
-            @Nullable
-            @Override
-            protected Bitmap[] run() throws InterruptedException {
-                if (!thumbnails) return null;
-                switch (getItemViewType(holder.getAdapterPosition())) {
-                    case 0:
-                        return new Bitmap[]{Downloader.downloadImage(activity, tracks.get(getRelPosition(holder.getAdapterPosition())).trackImage)};
-                    case 1:
-                        AlbumListData album = albums.get(getRelPosition(holder.getAdapterPosition()));
-                        return new Bitmap[]{Downloader.downloadImage(activity, album.albumImage), Downloader.downloadImage(activity, album.artistImage)};
-                    case 2:
-                        return new Bitmap[]{Downloader.downloadImage(activity, playlists.get(getRelPosition(holder.getAdapterPosition())).playlistImage)};
-                    case 3:
-                        return new Bitmap[]{Downloader.downloadImage(activity, artists.get(getRelPosition(holder.getAdapterPosition())).artistImage)};
-                    default:
-                        return null;
-                }
-            }
+        if (!thumbnails) imageView.setVisibility(View.GONE);
+        else {
+            Glide.with(activity).load(image).into(new GlideDrawableImageViewTarget(imageView) {
+                @Override
+                public void onResourceReady(GlideDrawable resource, final GlideAnimation<? super GlideDrawable> animation) {
+                    super.onResourceReady(resource, animation);
+                    if (!thumbnails) getView().setVisibility(View.GONE);
 
-            @Override
-            protected void done(@Nullable Bitmap[] result) {
-                final View holderView;
-                switch (getItemViewType(holder.getAdapterPosition())) {
-                    case 0:
-                        holderView = ((TrackViewHolder) holder).v;
-                        break;
-                    case 1:
-                        holderView = ((AlbumViewHolder) holder).v;
+                    View bg = holder.v.findViewById(R.id.bg);
+                    if (!thumbnails || !palette || bg == null) return;
+                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(Palette palette) {
+                            int defaultColor = dark ? Color.DKGRAY : Color.WHITE;
+                            int color = palette.getLightVibrantColor(defaultColor);
 
-                        ImageView artistImage = (ImageView) holderView.findViewById(R.id.artist_image);
-                        if (artistImage != null) {
-                            if (!thumbnails || result == null) {
-                                artistImage.setVisibility(View.GONE);
-                            } else if (artistImage instanceof CustomImageView) {
-                                ((CustomImageView) artistImage).transition(new BitmapDrawable(activity.getResources(), result[1]));
-                            } else {
-                                TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[1])});
-                                artistImage.setImageDrawable(td);
-                                td.startTransition(250);
-                            }
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
+                            animator.setDuration(250);
+                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    int color = (int) animation.getAnimatedValue();
+                                    holder.v.findViewById(R.id.bg).setBackgroundColor(color);
+
+                                    View artist = holder.v.findViewById(R.id.artist);
+                                    if (artist != null) artist.setBackgroundColor(Color.argb(255, Math.max(Color.red(color) - 10, 0), Math.max(Color.green(color) - 10, 0), Math.max(Color.blue(color) - 10, 0)));
+                                }
+                            });
+                            animator.start();
                         }
-                        break;
-                    case 2:
-                        holderView = ((PlaylistViewHolder) holder).v;
-                        break;
-                    case 3:
-                        holderView = ((ArtistViewHolder) holder).v;
-                        break;
-                    default:
-                        return;
+                    });
                 }
-
-                ImageView imageView = (ImageView) holderView.findViewById(R.id.image);
-                if (!thumbnails || result == null) {
-                    imageView.setVisibility(View.GONE);
-                } else if (imageView instanceof CustomImageView) {
-                    ((CustomImageView) imageView).transition(new BitmapDrawable(activity.getResources(), result[0]));
-                } else {
-                    TransitionDrawable td = new TransitionDrawable(new Drawable[]{preload, new BitmapDrawable(activity.getResources(), result[0])});
-                    imageView.setImageDrawable(td);
-                    td.startTransition(250);
-                }
-
-                if (!thumbnails || !palette || result == null || holderView.findViewById(R.id.bg) == null) return;
-                Palette.from(result[0]).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int color = palette.getLightVibrantColor(Color.WHITE);
-                        if (dark) color = palette.getDarkVibrantColor(Color.DKGRAY);
-
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{art_preload, new ColorDrawable(color)});
-                        holderView.findViewById(R.id.bg).setBackground(td);
-                        td.startTransition(250);
-
-                        View artist = holderView.findViewById(R.id.artist);
-                        if (artist != null) artist.setBackgroundColor(Color.argb(255, Math.max(Color.red(color) - 10, 0), Math.max(Color.green(color) - 10, 0), Math.max(Color.blue(color) - 10, 0)));
-                    }
-                });
-            }
-        }.execute();
+            });
+        }
     }
 
     public String getSectionName(int position) {
@@ -748,7 +685,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         return list.size() + sections;
     }
 
-    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
+    public static class HeaderViewHolder extends ViewHolder {
         public View v;
 
         public HeaderViewHolder(View v) {
@@ -757,7 +694,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public static class TrackViewHolder extends RecyclerView.ViewHolder {
+    public static class TrackViewHolder extends ViewHolder {
         public View v;
 
         public TrackViewHolder(View v) {
@@ -766,7 +703,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public static class AlbumViewHolder extends RecyclerView.ViewHolder {
+    public static class AlbumViewHolder extends ViewHolder {
         public View v;
 
         public AlbumViewHolder(View v) {
@@ -775,7 +712,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public static class PlaylistViewHolder extends RecyclerView.ViewHolder {
+    public static class PlaylistViewHolder extends ViewHolder {
         public View v;
 
         public PlaylistViewHolder(View v) {
@@ -784,10 +721,19 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public static class ArtistViewHolder extends RecyclerView.ViewHolder {
+    public static class ArtistViewHolder extends ViewHolder {
         public View v;
 
         public ArtistViewHolder(View v) {
+            super(v);
+            this.v = v;
+        }
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public View v;
+
+        public ViewHolder(View v) {
             super(v);
             this.v = v;
         }

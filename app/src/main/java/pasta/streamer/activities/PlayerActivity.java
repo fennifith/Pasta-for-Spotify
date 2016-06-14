@@ -1,6 +1,7 @@
 package pasta.streamer.activities;
 
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,9 +12,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -374,20 +373,34 @@ public class PlayerActivity extends AppCompatActivity {
                         Bitmap bitmap = StaticUtils.drawableToBitmap(resource);
                         if (backgroundImage != null) backgroundImage.transition(StaticUtils.blurBitmap(bitmap));
 
-                        if (!palette) return;
-                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                            @Override
-                            public void onGenerated(Palette palette) {
-                                int color = palette.getLightVibrantColor(Color.LTGRAY);
-                                if (Settings.isDarkTheme(PlayerActivity.this)) color = palette.getDarkVibrantColor(Color.DKGRAY);
+                        if (palette) {
+                            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                @Override
+                                public void onGenerated(Palette palette) {
+                                    final int color = palette.getLightVibrantColor(Settings.isDarkTheme(PlayerActivity.this) ? Color.DKGRAY : Color.LTGRAY);
 
-                                TransitionDrawable tb = new TransitionDrawable(new Drawable[]{bg.getBackground(), new ColorDrawable(color)});
-                                bg.setBackground(tb);
-                                tb.startTransition(250);
+                                    ValueAnimator animator = ValueAnimator.ofInt(-100, 100);
+                                    animator.setDuration(150);
+                                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTaskDescription(new ActivityManager.TaskDescription(data.trackName, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(PlayerActivity.this, R.mipmap.ic_launcher)), color));
-                            }
-                        });
+                                        boolean set;
+
+                                        @Override
+                                        public void onAnimationUpdate(ValueAnimator animation) {
+                                            int value = (int) animation.getAnimatedValue();
+                                            if (value >= 0 && !set) {
+                                                bg.setBackgroundColor(color);
+                                                set = true;
+                                            }
+                                            bg.getBackground().setAlpha(Math.abs(value));
+                                        }
+                                    });
+                                    animator.start();
+
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTaskDescription(new ActivityManager.TaskDescription(data.trackName, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(PlayerActivity.this, R.mipmap.ic_launcher)), color));
+                                }
+                            });
+                        }
                     }
 
                     @Override

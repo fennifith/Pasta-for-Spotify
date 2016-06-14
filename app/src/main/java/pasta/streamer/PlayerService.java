@@ -6,16 +6,18 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.afollestad.async.Action;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.PlayConfig;
@@ -30,7 +32,6 @@ import java.util.List;
 
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 
 public class PlayerService extends Service {
@@ -275,26 +276,23 @@ public class PlayerService extends Service {
     private void showNotification() {
         startForeground(NOTIFICATION_ID, getNotificationBuilder().build());
 
-        new Action<Object[]>() {
-            @NonNull
+        Glide.with(this).load(trackList.get(curPos).trackImage).asBitmap().into(new SimpleTarget<Bitmap>() {
             @Override
-            public String id() {
-                return "notification";
-            }
-
-            @Nullable
-            @Override
-            protected Object[] run() throws InterruptedException {
-                Bitmap b = Downloader.downloadImage(PlayerService.this, trackList.get(curPos).trackImage);
-                int color = Palette.from(b).generate().getVibrantColor(Color.GRAY);
-                return new Object[]{b, color};
+            public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        startForeground(NOTIFICATION_ID, getNotificationBuilder().setLargeIcon(resource).setColor(palette.getVibrantColor(Color.GRAY)).build());
+                    }
+                });
             }
 
             @Override
-            protected void done(@Nullable Object[] result) {
-                if (result != null) startForeground(NOTIFICATION_ID, getNotificationBuilder().setLargeIcon((Bitmap) result[0]).setColor((int) result[1]).build());
+            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                super.onLoadFailed(e, errorDrawable);
+                startForeground(NOTIFICATION_ID, getNotificationBuilder().build());
             }
-        }.execute();
+        });
     }
 
     @Nullable

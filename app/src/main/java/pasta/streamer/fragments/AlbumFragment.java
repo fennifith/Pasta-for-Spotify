@@ -165,22 +165,23 @@ public class AlbumFragment extends FullScreenFragment {
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.albumImageLarge).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.albumImageLarge).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                super.onResourceReady(resource, animation);
+                header.transition(resource);
 
-                if (!palette) return;
-                Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int primary = palette.getMutedColor(Color.GRAY);
-                        collapsingToolbarLayout.setContentScrimColor(primary);
-                        fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary))));
-                        bar.setBackgroundColor(primary);
-                        setData(data.albumName, primary, palette.getDarkVibrantColor(primary));
-                    }
-                });
+                if (palette) {
+                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(Palette palette) {
+                            int primary = palette.getMutedColor(Color.GRAY);
+                            collapsingToolbarLayout.setContentScrimColor(primary);
+                            fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary))));
+                            bar.setBackgroundColor(primary);
+                            setData(data.albumName, primary, palette.getDarkVibrantColor(primary));
+                        }
+                    });
+                }
             }
         });
 

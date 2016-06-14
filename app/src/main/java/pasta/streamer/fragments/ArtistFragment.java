@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -30,6 +29,10 @@ import android.widget.TextView;
 import com.afollestad.async.Action;
 import com.afollestad.async.Async;
 import com.afollestad.async.Pool;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +52,6 @@ import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Downloader;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
@@ -304,39 +306,28 @@ public class ArtistFragment extends FullScreenFragment {
                 if (result == null) pasta.onNetworkError(getContext());
                 else adapter.addData(result);
             }
-        }, new Action<Bitmap>() {
-            @NonNull
+        });
+
+        Glide.with(getContext()).load(data.artistImage).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(header) {
             @Override
-            public String id() {
-                return "getArtistHeader";
-            }
+            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                header.transition(resource);
 
-            @Nullable
-            @Override
-            protected Bitmap run() throws InterruptedException {
-                return Downloader.downloadImage(getContext(), data.artistImage);
-            }
-
-            @Override
-            protected void done(@Nullable Bitmap result) {
-                if (result == null) return;
-
-                header.transition(new BitmapDrawable(getResources(), result));
-
-                if (backgroundImage != null) backgroundImage.transition(new BitmapDrawable(getResources(), StaticUtils.blurBitmap(result)));
-
-                if (!palette) return;
-                Palette.from(result).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int primary = palette.getMutedColor(Color.GRAY);
-                        collapsingToolbarLayout.setContentScrimColor(primary);
-                        TransitionDrawable td = new TransitionDrawable(new Drawable[]{somethingbar.getBackground(), new ColorDrawable(primary)});
-                        somethingbar.setBackground(td);
-                        td.startTransition(250);
-                        setData(data.artistName, primary, palette.getDarkVibrantColor(primary));
-                    }
-                });
+                Bitmap bitmap = StaticUtils.drawableToBitmap(resource);
+                if (backgroundImage != null) backgroundImage.transition(StaticUtils.blurBitmap(bitmap));
+                if (palette) {
+                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(Palette palette) {
+                            int primary = palette.getMutedColor(Color.GRAY);
+                            collapsingToolbarLayout.setContentScrimColor(primary);
+                            TransitionDrawable td = new TransitionDrawable(new Drawable[]{somethingbar.getBackground(), new ColorDrawable(primary)});
+                            somethingbar.setBackground(td);
+                            td.startTransition(250);
+                            setData(data.artistName, primary, palette.getDarkVibrantColor(primary));
+                        }
+                    });
+                }
             }
         });
 
