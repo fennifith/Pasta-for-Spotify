@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
@@ -143,6 +144,21 @@ public class StaticUtils {
         return String.format(Locale.getDefault(), "%1$02d", minutes) + ":" + String.format(Locale.getDefault(), "%1$02d", seconds);
     }
 
+    public static Drawable getVectorDrawable(Context context, int resId) {
+        VectorDrawableCompat drawable;
+        try {
+            drawable = VectorDrawableCompat.create(context.getResources(), resId, context.getTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ColorDrawable(Color.TRANSPARENT);
+        }
+
+        if (drawable != null)
+            return drawable.getCurrent();
+        else
+            return new ColorDrawable(Color.TRANSPARENT);
+    }
+
     public static int darkColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
@@ -153,6 +169,8 @@ public class StaticUtils {
     public static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable == null) drawable = new ColorDrawable(Color.TRANSPARENT);
         if (drawable instanceof BitmapDrawable) return ((BitmapDrawable) drawable).getBitmap();
+        if (drawable instanceof VectorDrawableCompat)
+            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
 
         int width = drawable.getIntrinsicWidth();
         width = width > 0 ? width : 1;

@@ -43,7 +43,7 @@ public class Pasta extends Application {
 
     public void onNetworkError(final Context context) {
         if (errorDialog == null || !errorDialog.isShowing()) {
-            errorDialog = new AlertDialog.Builder(context).setIcon(R.drawable.ic_error).setTitle(R.string.error).setMessage(R.string.error_msg).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
+            errorDialog = new AlertDialog.Builder(context).setIcon(StaticUtils.getVectorDrawable(this, R.drawable.ic_error)).setTitle(R.string.error).setMessage(R.string.error_msg).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

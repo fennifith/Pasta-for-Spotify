@@ -55,7 +55,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_gravity="center_vertical|top"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/preload"/>
+                                app:srcCompat="@drawable/preload" />
 
                             <pasta.streamer.views.SecondSquareImageView
                                 android:layout_width="wrap_content"

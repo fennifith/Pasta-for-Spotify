@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,9 +32,8 @@ import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -754,15 +754,15 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(imageView) {
+            Glide.with(activity).load(image).asBitmap().placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget(imageView) {
                 @Override
-                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     ((CustomImageView) getView()).transition(resource);
                     if (!thumbnails) getView().setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);
                     if (!thumbnails || !palette || bg == null) return;
-                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                    Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
                             int defaultColor = dark ? Color.DKGRAY : Color.WHITE;

@@ -89,6 +89,7 @@ public class AlbumFragment extends FullScreenFragment {
         palette = Settings.isPalette(getContext());
 
         fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(getContext())));
+        fab.setImageDrawable(StaticUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
 
         setHasOptionsMenu(true);
         toolbar.setNavigationIcon(R.drawable.drawer_back);
@@ -162,7 +163,7 @@ public class AlbumFragment extends FullScreenFragment {
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.albumImageLarge).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.albumImageLarge).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 header.transition(resource);

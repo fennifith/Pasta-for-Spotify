@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|top"
                 android:scaleType="centerCrop"
-                android:src="@drawable/preload"
+                app:srcCompat="@drawable/preload"
                 android:background="#fafafa"
                 android:transitionName="image"/>
 
@@ -166,13 +166,13 @@
                     android:orientation="horizontal"
                     android:layout_weight="1">
 
-                    <android.support.v7.widget.AppCompatImageButton
+                    <pasta.streamer.views.CustomImageView
                         android:id="@+id/prevButton"
                         android:layout_width="0dp"
                         android:layout_height="42dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/ic_notify_prev"
+                        app:srcCompat="@drawable/ic_prev"
                         android:tint="?android:textColorSecondary"
                         android:tintMode="src_in"
                         android:layout_weight="1"
@@ -183,27 +183,27 @@
                         android:layout_gravity="center_vertical"
                         android:padding="8dp" />
 
-                    <android.support.v7.widget.AppCompatImageButton
+                    <pasta.streamer.views.CustomImageView
                         android:id="@+id/playButton"
                         android:layout_width="0dp"
                         android:layout_height="42dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/ic_notify_play"
+                        app:srcCompat="@drawable/ic_play"
                         android:tint="?android:textColorPrimary"
                         android:tintMode="src_in"
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:padding="8dp" />
 
-                    <android.support.v7.widget.AppCompatImageButton
+                    <pasta.streamer.views.CustomImageView
                         android:id="@+id/nextButton"
                         android:layout_width="0dp"
                         android:layout_height="42dp"
                         android:layout_gravity="center_vertical"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/ic_notify_next"
+                        app:srcCompat="@drawable/ic_next"
                         android:tint="?android:textColorSecondary"
                         android:tintMode="src_in"
                         android:layout_weight="1"

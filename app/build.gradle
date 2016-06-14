@@ -12,7 +12,9 @@ android {
         versionName "1.2"
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true
+        vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         release {
         }

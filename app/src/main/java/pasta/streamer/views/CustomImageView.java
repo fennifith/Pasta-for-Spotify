@@ -2,21 +2,20 @@ package pasta.streamer.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 
 import com.afollestad.async.Action;
 
 import pasta.streamer.utils.StaticUtils;
 
-public class CustomImageView extends ImageView {
+public class CustomImageView extends AppCompatImageView {
 
     public CustomImageView(Context context) {
         super(context);
@@ -30,12 +29,8 @@ public class CustomImageView extends ImageView {
         super(context, attrs, defStyle);
     }
 
-    public void transition(Bitmap second) {
-        transition(new BitmapDrawable(getResources(), second));
-    }
-
-    public void transition(final Drawable second) {
-        if (second == null) return;
+    public void transition(final Bitmap second) {
+        if (second == null || second.getWidth() < 1 || second.getHeight() < 1) return;
         final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
         new Action<Bitmap>() {
             @NonNull
@@ -47,24 +42,18 @@ public class CustomImageView extends ImageView {
             @Nullable
             @Override
             protected Bitmap run() throws InterruptedException {
-                Bitmap image2 = null;
-
                 try {
-                    image2 = StaticUtils.drawableToBitmap(second);
-                    if (image2 != null) {
-                        image2 = ThumbnailUtils.extractThumbnail(image2, size, size);
-                    }
+                    return ThumbnailUtils.extractThumbnail(second, size, size);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return null;
                 }
-
-                return image2;
             }
 
             @Override
             protected void done(@Nullable final Bitmap result) {
                 if (result == null) {
-                    setImageDrawable(second);
+                    setImageBitmap(second);
                     return;
                 }
 
@@ -89,5 +78,9 @@ public class CustomImageView extends ImageView {
                 startAnimation(exitAnim);
             }
         }.execute();
+    }
+
+    public void transition(Drawable second) {
+        transition(StaticUtils.drawableToBitmap(second));
     }
 }

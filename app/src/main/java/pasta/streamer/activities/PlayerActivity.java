@@ -30,7 +30,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -71,11 +70,11 @@ public class PlayerActivity extends AppCompatActivity {
     @Bind(R.id.finalDuration)
     TextView finalDuration;
     @Bind(R.id.prevButton)
-    ImageButton prevButton;
+    CustomImageView prevButton;
     @Bind(R.id.playButton)
-    ImageButton playButton;
+    CustomImageView playButton;
     @Bind(R.id.nextButton)
-    ImageButton nextButton;
+    CustomImageView nextButton;
     @Bind(R.id.bg)
     View bg;
     @Bind(R.id.seekBar)
@@ -130,8 +129,8 @@ public class PlayerActivity extends AppCompatActivity {
             });
         }
 
-        play = ContextCompat.getDrawable(this, R.drawable.ic_notify_play);
-        pause = ContextCompat.getDrawable(this, R.drawable.ic_notify_pause);
+        play = StaticUtils.getVectorDrawable(this, R.drawable.ic_play);
+        pause = StaticUtils.getVectorDrawable(this, R.drawable.ic_pause);
         playButton.setImageDrawable(play);
 
         if (backgroundImage != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -363,7 +362,7 @@ public class PlayerActivity extends AppCompatActivity {
                 if (!isLoading()) setLoading(true);
                 if (action != null && action.isExecuting()) action.cancel();
 
-                Glide.with(PlayerActivity.this).load(data.trackImageLarge).error(R.drawable.preload).into(new GlideDrawableImageViewTarget(art) {
+                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(StaticUtils.getVectorDrawable(PlayerActivity.this, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                         art.transition(resource);

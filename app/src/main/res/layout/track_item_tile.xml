@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="4dp">
 
     <FrameLayout
@@ -19,7 +20,7 @@
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/preload"
+            app:srcCompat="@drawable/preload"
             android:scaleType="centerCrop"
             android:transitionName="image" />
 
@@ -68,11 +69,11 @@
 
             </LinearLayout>
 
-            <ImageView
+            <pasta.streamer.views.CustomImageView
                 android:layout_width="56dp"
                 android:layout_height="68dp"
                 android:id="@+id/menu"
-                android:src="@drawable/menu"
+                app:srcCompat="@drawable/menu"
                 android:gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="16dp"

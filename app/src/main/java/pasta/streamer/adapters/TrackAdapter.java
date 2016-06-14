@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,9 +26,8 @@ import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -342,14 +342,14 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         View bg = holder.v.findViewById(R.id.bg);
         if (bg != null) bg.setBackgroundColor(dark ? Color.DKGRAY : Color.WHITE);
 
-        Glide.with(activity).load(list.get(position).trackImage).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget((ImageView) holder.v.findViewById(R.id.image)) {
+        Glide.with(activity).load(list.get(position).trackImage).asBitmap().placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget((ImageView) holder.v.findViewById(R.id.image)) {
             @Override
-            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                 ((CustomImageView) getView()).transition(resource);
 
                 View bg = holder.v.findViewById(R.id.bg);
                 if (!thumbnails || !palette || bg == null) return;
-                Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
                         int defaultColor = dark ? Color.DKGRAY : Color.WHITE;

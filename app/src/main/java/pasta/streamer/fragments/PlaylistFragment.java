@@ -95,6 +95,7 @@ public class PlaylistFragment extends FullScreenFragment {
         palette = Settings.isPalette(getContext());
 
         fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(getContext())));
+        fab.setImageDrawable(StaticUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
 
         collapsingToolbarLayout.setTitle(data.playlistName);
         tracksLength.setText(String.valueOf(data.tracks) + (data.tracks == 1 ? " track" : " tracks"));
@@ -148,7 +149,7 @@ public class PlaylistFragment extends FullScreenFragment {
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 header.transition(resource);

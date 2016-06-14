@@ -4,8 +4,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -153,16 +153,18 @@ public class PlayerService extends Service {
     }
 
     private void onError(String message) {
-        errorCount++;
-        if (errorCount < 5) {
-            if (spotifyPlayer.isShutdown()) {
-                Toast.makeText(getApplicationContext(), message + ", please restart the app.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
-                stopService(new Intent(this, PlayerService.class));
-                startService(new Intent(this, PlayerService.class));
-            }
-        } else Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        if (spotifyPlayer != null) {
+            errorCount++;
+            if (errorCount < 5) {
+                if (spotifyPlayer.isShutdown()) {
+                    Toast.makeText(getApplicationContext(), message + ", please restart the app.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
+                    stopService(new Intent(this, PlayerService.class));
+                    startService(new Intent(this, PlayerService.class));
+                }
+            } else Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -268,14 +270,15 @@ public class PlayerService extends Service {
     }
 
     private NotificationCompat.Builder getNotificationBuilder() {
+        boolean vectors = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+
         return new NotificationCompat.Builder(PlayerService.this)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.preload))
                 .setContentTitle(trackList.get(curPos).trackName)
                 .setContentText(trackList.get(curPos).artistName)
-                .addAction(R.drawable.ic_notify_prev, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(spotifyPlayerState.playing ? R.drawable.ic_notify_pause : R.drawable.ic_notify_play, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(R.drawable.ic_notify_next, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? R.drawable.ic_notify_prev : 0, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? (spotifyPlayerState.playing ? R.drawable.ic_notify_pause : R.drawable.ic_notify_play) : 0, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? R.drawable.ic_notify_next : 0, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(PendingIntent.getActivities(PlayerService.this, 0, new Intent[]{new Intent(PlayerService.this, PlayerActivity.class)}, 0));
     }
 

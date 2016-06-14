@@ -145,11 +145,11 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
 
         fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(this)));
 
-        Drawable home = ContextCompat.getDrawable(this, R.drawable.ic_home);
-        Drawable fav = ContextCompat.getDrawable(this, R.drawable.ic_fav);
-        Drawable bookmark = ContextCompat.getDrawable(this, R.drawable.ic_bookmark);
-        Drawable playing = ContextCompat.getDrawable(this, R.drawable.ic_now_playing);
-        Drawable settings = ContextCompat.getDrawable(this, R.drawable.ic_settings);
+        Drawable home = StaticUtils.getVectorDrawable(this, R.drawable.ic_home);
+        Drawable fav = StaticUtils.getVectorDrawable(this, R.drawable.ic_fav);
+        Drawable bookmark = StaticUtils.getVectorDrawable(this, R.drawable.ic_bookmark);
+        Drawable playing = StaticUtils.getVectorDrawable(this, R.drawable.ic_now_playing);
+        Drawable settings = StaticUtils.getVectorDrawable(this, R.drawable.ic_settings);
 
         int tint = ContextCompat.getColor(this, R.color.material_drawer_primary_icon);
         DrawableCompat.setTint(home, tint);
@@ -374,7 +374,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                     public void onDataReady(boolean visible, int iconRes, View.OnClickListener clickListener) {
                         if (visible) fab.show();
                         else fab.hide();
-                        fab.setImageResource(iconRes);
+                        fab.setImageDrawable(StaticUtils.getVectorDrawable(HomeActivity.this, iconRes));
                         fab.setOnClickListener(clickListener);
                     }
                 });

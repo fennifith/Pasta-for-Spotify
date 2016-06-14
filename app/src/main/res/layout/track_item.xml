@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="72dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?android:colorBackground"
     android:orientation="horizontal">
 
@@ -20,7 +21,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:scaleType="fitXY"
-            android:src="@drawable/preload"
+            app:srcCompat="@drawable/preload"
             android:transitionName="image" />
 
         <LinearLayout
@@ -65,14 +66,14 @@
             android:textColor="?android:textColorPrimary"
             android:textSize="14sp" />
 
-        <ImageView
+        <pasta.streamer.views.CustomImageView
             android:id="@+id/menu"
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:gravity="center"
             android:padding="16dp"
-            android:src="@drawable/menu"
+            app:srcCompat="@drawable/menu"
             android:tint="?android:textColorPrimary"
             android:visibility="gone" />
 

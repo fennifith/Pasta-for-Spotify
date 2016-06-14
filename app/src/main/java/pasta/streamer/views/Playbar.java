@@ -14,7 +14,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -103,8 +102,8 @@ public class Playbar {
         TypedValue tv = new TypedValue();
         activity.getTheme().resolveAttribute(android.R.attr.textColorPrimaryInverse, tv, true);
 
-        play = ContextCompat.getDrawable(activity, R.drawable.ic_notify_play);
-        pause = ContextCompat.getDrawable(activity, R.drawable.ic_notify_pause);
+        play = StaticUtils.getVectorDrawable(activity, R.drawable.ic_play);
+        pause = StaticUtils.getVectorDrawable(activity, R.drawable.ic_pause);
 
         bg.setClickable(false);
         toggle.setClickable(false);
@@ -187,7 +186,7 @@ public class Playbar {
                 }
 
                 if (thumbnails) {
-                    Glide.with(activity).load(data.trackImage).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(art) {
+                    Glide.with(activity).load(data.trackImage).placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                             art.transition(resource);

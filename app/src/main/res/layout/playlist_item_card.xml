@@ -68,17 +68,17 @@
                 android:id="@+id/image"
                 android:layout_width="136dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/preload"
+                app:srcCompat="@drawable/preload"
                 android:layout_margin="16dp"
                 android:scaleType="centerCrop"
                 android:layout_gravity="start" />
 
-            <ImageView
+            <pasta.streamer.views.CustomImageView
                 android:layout_width="56dp"
                 android:layout_height="68dp"
                 android:layout_gravity="bottom|end"
                 android:id="@+id/menu"
-                android:src="@drawable/menu"
+                app:srcCompat="@drawable/menu"
                 android:gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"

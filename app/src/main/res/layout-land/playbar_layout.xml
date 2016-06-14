@@ -31,8 +31,7 @@
             android:layout_width="@dimen/playbar_size"
             android:layout_height="@dimen/playbar_size"
             android:layout_gravity="left|top"
-            android:src="@drawable/preload"
-            android:transitionName="image"/>
+            app:srcCompat="@drawable/preload" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -83,7 +82,7 @@
                 android:tintMode="src_in"
                 android:soundEffectsEnabled="false"
                 android:padding="12dp"
-                android:src="@drawable/ic_notify_prev"/>
+                app:srcCompat="@drawable/ic_prev" />
 
             <pasta.streamer.views.SquareImageView
                 android:id="@+id/toggle"
@@ -94,7 +93,7 @@
                 android:tintMode="src_in"
                 android:soundEffectsEnabled="false"
                 android:padding="12dp"
-                android:src="@drawable/ic_notify_play"/>
+                app:srcCompat="@drawable/ic_play" />
 
             <pasta.streamer.views.SquareImageView
                 android:id="@+id/next"
@@ -105,7 +104,7 @@
                 android:tintMode="src_in"
                 android:soundEffectsEnabled="false"
                 android:padding="12dp"
-                android:src="@drawable/ic_notify_next"/>
+                app:srcCompat="@drawable/ic_next" />
         </LinearLayout>
 
     </FrameLayout>

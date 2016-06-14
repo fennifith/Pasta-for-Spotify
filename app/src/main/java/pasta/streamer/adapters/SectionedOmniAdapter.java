@@ -607,7 +607,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(imageView) {
+            Glide.with(activity).load(image).placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(imageView) {
                 @Override
                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                     ((CustomImageView) getView()).transition(resource);

@@ -308,7 +308,7 @@ public class ArtistFragment extends FullScreenFragment {
             }
         });
 
-        Glide.with(getContext()).load(data.artistImage).placeholder(R.drawable.preload).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.artistImage).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 header.transition(resource);

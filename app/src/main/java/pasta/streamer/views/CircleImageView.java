@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -54,11 +53,10 @@ public class CircleImageView extends CustomImageView {
     }
 
     @Override
-    public void transition(final Drawable second) {
-        if (second == null) return;
+    public void transition(final Bitmap second) {
+        if (second == null || second.getWidth() < 1 || second.getHeight() < 1) return;
         final int size = Math.min(getWidth(), getHeight());
         final Resources resources = getResources();
-        final Bitmap image2 = StaticUtils.drawableToBitmap(second);
         new Action<Bitmap>() {
             @NonNull
             @Override
@@ -71,9 +69,8 @@ public class CircleImageView extends CustomImageView {
             protected Bitmap run() throws InterruptedException {
                 RoundedBitmapDrawable rSecond;
 
-                if (image2 == null) return null;
                 try {
-                    rSecond = RoundedBitmapDrawableFactory.create(resources, ThumbnailUtils.extractThumbnail(image2, size, size));
+                    rSecond = RoundedBitmapDrawableFactory.create(resources, ThumbnailUtils.extractThumbnail(second, size, size));
                     rSecond.setCornerRadius(size / 2) ;
                     rSecond.setAntiAlias(true);
                 } catch (Exception e) {
@@ -87,7 +84,7 @@ public class CircleImageView extends CustomImageView {
             @Override
             protected void done(@Nullable final Bitmap result) {
                 if (result == null) {
-                    setImageDrawable(second);
+                    setImageBitmap(second);
                     return;
                 }
 
