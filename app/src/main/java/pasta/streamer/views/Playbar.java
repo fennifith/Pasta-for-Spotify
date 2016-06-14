@@ -2,7 +2,6 @@ package pasta.streamer.views;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +13,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
@@ -152,12 +152,8 @@ public class Playbar {
                     bg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent i = new Intent(activity, PlayerActivity.class);
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity, art, "image");
-                                activity.startActivity(i, options.toBundle());
-                            } else activity.startActivity(i);
+                            ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_up, R.anim.blank);
+                            activity.startActivity(new Intent(activity, PlayerActivity.class), options.toBundle());
                         }
                     });
 

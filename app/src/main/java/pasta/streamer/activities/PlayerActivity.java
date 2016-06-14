@@ -322,6 +322,12 @@ public class PlayerActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.slide_down);
+    }
+
     private void setClickable(boolean clickable) {
         playButton.setClickable(clickable);
         prevButton.setClickable(clickable);

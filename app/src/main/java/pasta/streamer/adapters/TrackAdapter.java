@@ -2,14 +2,13 @@ package pasta.streamer.adapters;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -335,11 +334,8 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                 trackList.addAll(list);
                 StaticUtils.play(holder.getAdapterPosition(), trackList, activity);
 
-                Intent i = new Intent(view.getContext(), PlayerActivity.class);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity, view.findViewById(R.id.image), "image");
-                    activity.startActivity(i, options.toBundle());
-                } else activity.startActivity(i);
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_up, R.anim.blank);
+                activity.startActivity(new Intent(activity, PlayerActivity.class), options.toBundle());
             }
         });
 
