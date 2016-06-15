@@ -273,9 +273,9 @@ public class PlayerService extends Service {
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(trackList.get(curPos).trackName)
                 .setContentText(trackList.get(curPos).artistName)
-                .addAction(vectors ? R.drawable.ic_notify_prev : 0, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(vectors ? (spotifyPlayerState.playing ? R.drawable.ic_notify_pause : R.drawable.ic_notify_play) : 0, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(vectors ? R.drawable.ic_notify_next : 0, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? R.drawable.ic_prev : 0, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? (spotifyPlayerState.playing ? R.drawable.ic_pause : R.drawable.ic_play) : 0, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? R.drawable.ic_next : 0, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(PendingIntent.getActivities(PlayerService.this, 0, new Intent[]{new Intent(PlayerService.this, PlayerActivity.class)}, 0));
     }
 

@@ -172,6 +172,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
     }
 
     @OnClick(R.id.prevButton)
