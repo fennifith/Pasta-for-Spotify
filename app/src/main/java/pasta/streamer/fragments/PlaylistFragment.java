@@ -139,7 +139,7 @@ public class PlaylistFragment extends FullScreenFragment {
             protected void done(@Nullable ArrayList<TrackListData> result) {
                 spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    pasta.onNetworkError(getContext());
+                    pasta.onNetworkError(getContext(), "playlist tracks action");
                     return;
                 }
                 adapter.swapData(result);
@@ -239,7 +239,7 @@ public class PlaylistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    pasta.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity(), "playlist favorite action");
                     return;
                 }
                 if (result) {
@@ -276,7 +276,7 @@ public class PlaylistFragment extends FullScreenFragment {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(getContext());
+                            pasta.onNetworkError(getContext(), "playlist favorite menu action");
                             return;
                         }
                         if (result) {
@@ -328,7 +328,7 @@ public class PlaylistFragment extends FullScreenFragment {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null || !result) {
-                                    pasta.onNetworkError(getContext());
+                                    pasta.onNetworkError(getContext(), "playlist edit action");
                                 } else {
                                     data.playlistName = (String) map.get("name");
                                     data.playlistPublic = (Boolean) map.get("public");

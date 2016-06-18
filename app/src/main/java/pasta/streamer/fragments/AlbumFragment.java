@@ -153,7 +153,7 @@ public class AlbumFragment extends FullScreenFragment {
             protected void done(@Nullable ArrayList<TrackListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    pasta.onNetworkError(getContext());
+                    pasta.onNetworkError(getContext(), "album tracks action");
                     return;
                 }
                 adapter.swapData(result);
@@ -231,7 +231,7 @@ public class AlbumFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    pasta.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity(), "favorite album action");
                     return;
                 }
                 if (result) {
@@ -268,7 +268,7 @@ public class AlbumFragment extends FullScreenFragment {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(getActivity());
+                            pasta.onNetworkError(getActivity(), "favorite album menu action");
                             return;
                         }
                         if (result) {

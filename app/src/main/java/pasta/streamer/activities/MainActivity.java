@@ -109,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void done(@Nullable Boolean result) {
-                            if (result == null || !result) pasta.onNetworkError(MainActivity.this);
+                            if (result == null || !result)
+                                pasta.onNetworkError(MainActivity.this, "user action");
                         }
                     }, new Action<Boolean>() {
                         @NonNull
@@ -145,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void done(@Nullable Boolean result) {
-                            if (result == null || !result) pasta.onNetworkError(MainActivity.this);
+                            if (result == null || !result)
+                                pasta.onNetworkError(MainActivity.this, "favorite album action");
                         }
                     }, new Action<Boolean>() {
                         @NonNull
@@ -176,7 +178,8 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void done(@Nullable Boolean result) {
-                            if (result == null || !result) pasta.onNetworkError(MainActivity.this);
+                            if (result == null || !result)
+                                pasta.onNetworkError(MainActivity.this, "favorite tracks action");
                         }
                     }).done(new Done() {
                         @Override
@@ -205,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     break;
                 case ERROR:
-                    pasta.onNetworkError(MainActivity.this);
+                    pasta.onNetworkError(MainActivity.this, "auth");
             }
         }
     }

@@ -167,7 +167,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 .build();
 
         if (pasta.me == null) {
-            pasta.onNetworkError(this);
+            pasta.onNetworkError(this, "null user");
         } else {
             ProfileDrawerItem profile;
             try {

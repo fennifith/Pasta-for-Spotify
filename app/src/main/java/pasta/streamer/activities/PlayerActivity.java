@@ -242,7 +242,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this, "favorite track menu action");
                             return;
                         }
                         if (result) {
@@ -274,7 +274,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable AlbumListData result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this, "album menu action");
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
@@ -301,7 +301,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable ArtistListData result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this, "artist menu action");
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
@@ -428,7 +428,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this);
+                            pasta.onNetworkError(PlayerActivity.this, "favorite action");
                             return;
                         }
 

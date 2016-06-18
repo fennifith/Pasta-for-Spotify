@@ -121,7 +121,7 @@ public class CategoryFragment extends FullScreenFragment {
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    pasta.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity(), "category playlists action");
                     return;
                 }
                 adapter.swapData(result);

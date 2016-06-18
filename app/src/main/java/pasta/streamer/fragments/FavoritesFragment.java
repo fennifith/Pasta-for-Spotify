@@ -108,7 +108,7 @@ public class FavoritesFragment extends FabFragment {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null || !result) {
-                                    pasta.onNetworkError(getActivity());
+                                    pasta.onNetworkError(getActivity(), "create playlist action");
                                 } else {
                                     adapter.load();
                                 }

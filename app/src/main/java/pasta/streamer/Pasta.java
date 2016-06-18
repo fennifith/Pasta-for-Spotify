@@ -41,9 +41,9 @@ public class Pasta extends Application {
 
     private AppCompatDialog errorDialog;
 
-    public void onNetworkError(final Context context) {
+    public void onNetworkError(final Context context, String message) {
         if (errorDialog == null || !errorDialog.isShowing()) {
-            errorDialog = new AlertDialog.Builder(context).setIcon(StaticUtils.getVectorDrawable(this, R.drawable.ic_error)).setTitle(R.string.error).setMessage(R.string.error_msg).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
+            errorDialog = new AlertDialog.Builder(context).setIcon(StaticUtils.getVectorDrawable(this, R.drawable.ic_error)).setTitle(R.string.error).setMessage(context.getString(R.string.error_msg) + "\n\nError: " + message + "\nLocation: " + context.getClass().getName()).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
@@ -65,7 +65,7 @@ public class Pasta extends Application {
 
     public ArrayList<AlbumListData> getFavoriteAlbums() {
         if (albums == null) {
-            onNetworkError(this);
+            onNetworkError(this, "null favorite albums");
             return null;
         }
         return (ArrayList<AlbumListData>) albums.clone();
@@ -73,7 +73,7 @@ public class Pasta extends Application {
 
     public ArrayList<TrackListData> getFavoriteTracks() {
         if (tracks == null) {
-            onNetworkError(this);
+            onNetworkError(this, "null favorite tracks");
             return null;
         }
         return (ArrayList<TrackListData>) tracks.clone();

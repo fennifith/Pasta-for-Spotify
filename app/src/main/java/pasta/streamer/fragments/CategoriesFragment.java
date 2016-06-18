@@ -88,7 +88,7 @@ public class CategoriesFragment extends Fragment {
             protected void done(@Nullable ArrayList<CategoryListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    pasta.onNetworkError(getActivity());
+                    pasta.onNetworkError(getActivity(), "categories action");
                     return;
                 }
                 adapter.swapData(result);
