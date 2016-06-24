@@ -77,6 +77,8 @@
     <string name="primary_color" translatable="true">Primary Color</string>
     <string name="accent_color" translatable="true">Accent Color</string>
 
+    <string name="clear_data_msg">You can clear the app data from this screen</string>
+
     <string name="limit" translatable="true">Set Search Result Limit</string>
     <string-array name="limits" translatable="true">
         <item>10</item>

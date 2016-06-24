@@ -75,6 +75,14 @@ public class SettingsFragment extends FabFragment {
         }
     }
 
+    @OnCheckedChanged(R.id.debug)
+    public void changeDebug(boolean debug) {
+        if (prefs != null && debug != Settings.isDebug(getContext())) {
+            prefs.edit().putBoolean(Settings.DEBUG, debug).apply();
+            onChange();
+        }
+    }
+
     @OnClick(R.id.limit)
     public void changeLimit() {
         new AlertDialog.Builder(getContext()).setTitle(R.string.limit).setSingleChoiceItems(R.array.limits, Settings.getLimit(getContext()), new DialogInterface.OnClickListener() {
@@ -126,7 +134,8 @@ public class SettingsFragment extends FabFragment {
                         Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
                         startActivity(intent);
                     }
-                    Toast.makeText(getContext(), "You can clear the app data from this screen", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(getContext(), R.string.clear_data_msg, Toast.LENGTH_SHORT).show();
                 }
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

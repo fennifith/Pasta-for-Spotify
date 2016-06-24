@@ -368,7 +368,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, "An error occured", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
                                                     return;
                                                 }
                                                 if (result) {

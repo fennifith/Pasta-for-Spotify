@@ -156,11 +156,13 @@ public class PlayerService extends Service {
         if (spotifyPlayer != null) {
             errorCount++;
             if (errorCount > 5 && errorCount < 20) {
-                Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
+                if (Settings.isDebug(this))
+                    Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
                 stopService(new Intent(this, PlayerService.class));
                 startService(new Intent(this, PlayerService.class));
                 errorCount = 20;
-            } else Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            } else if (Settings.isDebug(this))
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
         }
     }
 

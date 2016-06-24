@@ -118,7 +118,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     private Map<String, Object> limitMap;
     private Pool searchPool;
     private ArrayList searchDatas;
-    private boolean preload, isPlaybarHidden;
+    private boolean preload, isPlaybarHidden = true;
     private Pasta pasta;
 
     @Override
@@ -173,9 +173,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 .withSelectionListEnabledForSingleProfile(false)
                 .build();
 
-        if (pasta.me == null) {
-            pasta.onNetworkError(this, "null user");
-        } else {
+        if (pasta.me != null) {
             ProfileDrawerItem profile;
             try {
                 profile = new ProfileDrawerItem().withName(pasta.me.display_name.length() > 0 ? pasta.me.display_name : pasta.me.email.split("@")[0].toUpperCase()).withEmail(pasta.me.email);
