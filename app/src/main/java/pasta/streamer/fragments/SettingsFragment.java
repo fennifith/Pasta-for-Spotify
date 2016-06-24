@@ -13,9 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +36,7 @@ import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends FabFragment {
 
     @Bind(R.id.primary_color)
     CustomImageView primary;
@@ -287,17 +285,11 @@ public class SettingsFragment extends Fragment {
 
     private void onChange() {
         final Activity activity = getActivity();
-        snackbar = Snackbar.make(rootView, R.string.restart_msg, Snackbar.LENGTH_INDEFINITE).setAction(R.string.restart, new View.OnClickListener() {
+        snackbar = showSnackbar(getString(R.string.restart_msg), getString(R.string.restart), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 StaticUtils.restart(activity);
             }
         });
-
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbar.getView().getLayoutParams();
-        params.bottomMargin = getActivity().getResources().getDimensionPixelSize(R.dimen.playbar_size);
-        snackbar.getView().setLayoutParams(params);
-
-        snackbar.show();
     }
 }

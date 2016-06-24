@@ -16,4 +16,10 @@ public class FullScreenFragment extends Fragment {
     public void setData(String title, int statusColor, int windowColor) {
         if (listener != null) listener.onDataReady(title, statusColor, windowColor);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        listener = null;
+    }
 }

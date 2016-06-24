@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -117,7 +118,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     private Map<String, Object> limitMap;
     private Pool searchPool;
     private ArrayList searchDatas;
-    private boolean preload;
+    private boolean preload, isPlaybarHidden;
     private Pasta pasta;
 
     @Override
@@ -232,9 +233,11 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                                 if (!playbar.playing) {
                                     Snackbar snackbar = Snackbar.make(coordinatorLayout, "Nothing is playing...", Snackbar.LENGTH_SHORT);
 
-                                    CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbar.getView().getLayoutParams();
-                                    params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.playbar_size);
-                                    snackbar.getView().setLayoutParams(params);
+                                    if (!isPlaybarHidden) {
+                                        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbar.getView().getLayoutParams();
+                                        params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.playbar_size);
+                                        snackbar.getView().setLayoutParams(params);
+                                    }
 
                                     snackbar.show();
 
@@ -279,6 +282,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
                 layoutParams.bottomMargin = hidden ? (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()) : getResources().getDimensionPixelSize(R.dimen.bottom_playbar_padding);
                 fab.setLayoutParams(layoutParams);
+                isPlaybarHidden = hidden;
             }
         });
 
@@ -383,12 +387,31 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                         fab.setImageDrawable(StaticUtils.getVectorDrawable(HomeActivity.this, iconRes));
                         fab.setOnClickListener(clickListener);
                     }
+
+                    @Override
+                    public Snackbar showSnackbar(String text, @Nullable String button, @Nullable View.OnClickListener clickListener) {
+                        boolean hasButton = button != null && clickListener != null;
+
+                        Snackbar snackbar = Snackbar.make(coordinatorLayout, text, hasButton ? Snackbar.LENGTH_INDEFINITE : Snackbar.LENGTH_SHORT);
+                        if (hasButton) snackbar.setAction(button, clickListener);
+
+                        if (!isPlaybarHidden) {
+                            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbar.getView().getLayoutParams();
+                            params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.playbar_size);
+                            snackbar.getView().setLayoutParams(params);
+                        }
+
+                        snackbar.show();
+                        return snackbar;
+                    }
                 });
-            } else fab.hide();
+            }
+
+            fab.hide();
 
             if (f instanceof SearchFragment || f instanceof CategoriesFragment || f instanceof SettingsFragment || f instanceof AboutFragment) {
-                appbar.setTargetElevation(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
-            } else appbar.setTargetElevation(0f);
+                ViewCompat.setElevation(findViewById(R.id.collapsing_toolbar), TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
+            } else ViewCompat.setElevation(findViewById(R.id.collapsing_toolbar), 0);
 
             if (f instanceof SearchFragment && (searchPool == null || !searchPool.isExecuting()) && (searchDatas != null && searchDatas.size() > 0)) {
                 ((SearchFragment) f).swapData(searchDatas);
