@@ -45,7 +45,7 @@ public class IntroActivity extends TutorialActivity {
                 return new TutorialFragment.Builder()
                         .setTitle(getResources().getString(R.string.app_name))
                         .setDescription(getResources().getString(R.string.app_desc_long))
-                        .setImageResourceBackground(R.drawable.ic_launcher_web)
+                        .setImageResourceBackground(R.mipmap.ic_launcher_web)
                         .build();
             case 1:
                 return new TutorialFragment.Builder()

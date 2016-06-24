@@ -1,5 +1,6 @@
 package pasta.streamer.utils;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -51,13 +52,15 @@ public class StaticUtils {
         try {
             Intent i = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            int mPendingIntentId = 223344;
-            PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, i, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-            System.exit(0);
+            AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            manager.set(AlarmManager.RTC, System.currentTimeMillis() + 100, PendingIntent.getActivity(context, 196573, i, PendingIntent.FLAG_CANCEL_CURRENT));
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        if (context instanceof Activity) {
+            ((Activity) context).finish();
+        } else {
             System.exit(0);
         }
     }

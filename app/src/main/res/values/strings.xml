@@ -104,6 +104,10 @@
     </string-array>
 
     <!-- About -->
+    <string name="source">GitHub</string>
+    <string name="issues" translatable="true">Issues</string>
+    <string name="website">Website</string>
+
     <string name="contributors" translatable="true">Contributors:</string>
 
     <string-array name="people_names" translatable="false">

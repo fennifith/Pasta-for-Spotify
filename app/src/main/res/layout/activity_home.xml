@@ -43,7 +43,7 @@
                             android:layout_height="wrap_content"
                             android:background="@{Settings.getPrimaryColor(context.getApplicationContext())}"
                             app:contentScrim="@{Settings.getPrimaryColor(context.getApplicationContext())}"
-                            app:layout_scrollFlags="scroll|enterAlways"
+                            app:layout_scrollFlags="scroll|snap|enterAlways"
                             app:titleEnabled="false">
 
                             <android.support.v7.widget.Toolbar

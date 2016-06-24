@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pasta.streamer.R;
 import pasta.streamer.adapters.AboutAdapter;
 import pasta.streamer.data.TextListData;
@@ -29,14 +30,12 @@ public class AboutFragment extends FabFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_recycler, container, false);
-        ButterKnife.bind(this, rootView);
+        View v = inflater.inflate(R.layout.fragment_about, container, false);
+        ButterKnife.bind(this, v);
 
         progressBar.setVisibility(View.GONE);
 
         ArrayList<TextListData> textList = new ArrayList<>();
-
-        textList.add(new TextListData(null, getResources().getString(R.string.app_name), getResources().getString(R.string.app_desc_long), null));
 
         textList.add(new TextListData(null, getResources().getString(R.string.contributors), null, null));
 
@@ -59,7 +58,7 @@ public class AboutFragment extends FabFragment {
             textList.add(new TextListData(null, libNames[i], libDescs[i], Uri.parse(libPrimary[i])));
         }
 
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.setLayoutManager(new GridLayoutManager(getContext(), 1));
         rv.setAdapter(new AboutAdapter(getActivity(), textList));
 
         setFab(true, R.drawable.ic_star, new View.OnClickListener() {
@@ -69,7 +68,22 @@ public class AboutFragment extends FabFragment {
             }
         });
 
-        return rootView;
+        return v;
+    }
+
+    @OnClick(R.id.source)
+    public void showSource() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/TheAndroidMaster/Pasta-for-Spotify")));
+    }
+
+    @OnClick(R.id.issues)
+    public void showIssues() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/TheAndroidMaster/Pasta-for-Spotify/issues")));
+    }
+
+    @OnClick(R.id.website)
+    public void showWebsite() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://theandroidmaster.github.io/apps/pasta")));
     }
 
     @Override

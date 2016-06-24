@@ -133,6 +133,12 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         preload = Settings.isPreload(this);
         pasta = (Pasta) getApplicationContext();
 
+        if (pasta.me == null || pasta.token == null || pasta.spotifyApi == null || pasta.spotifyService == null) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer_toggle);

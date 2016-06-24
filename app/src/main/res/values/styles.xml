@@ -11,6 +11,8 @@
         <item name="android:textColorSecondaryInverse">#8A000000</item>
 
         <item name="colorButtonNormal">@color/colorAccent</item>
+
+        <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">

@@ -4,46 +4,46 @@
     android:background="?android:colorBackground">
 
     <FrameLayout
+        android:id="@+id/empty"
         android:layout_width="268dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:id="@+id/empty"
         android:layout_marginBottom="?attr/actionBarSize"
         android:visibility="gone">
 
         <pasta.streamer.views.SquareImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/empty"
-            android:scaleType="fitXY" />
+            android:scaleType="fitXY"
+            android:src="@drawable/empty" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/empty"
+            android:layout_gravity="center_horizontal|bottom"
             android:layout_margin="16dp"
-            android:textSize="20sp"
+            android:text="@string/empty"
             android:textColor="?android:textColorSecondary"
-            android:layout_gravity="center_horizontal|bottom" />
+            android:textSize="20sp" />
     </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            android:clipToPadding="false"
-            android:paddingLeft="4dp"
-            android:paddingTop="4dp"
-            android:paddingRight="4dp"
-            android:paddingBottom="@dimen/bottom_playbar_padding"/>
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/bottom_playbar_padding"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingTop="4dp"
+        android:scrollbars="vertical" />
 
     <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"/>
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true" />
 
 </FrameLayout>
