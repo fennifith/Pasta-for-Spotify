@@ -35,30 +35,34 @@ import pasta.streamer.utils.Settings;
 
 public class PlayerService extends Service {
 
-    public static final String ACTION_PLAY = "pasta.ACTION_PLAY";
-    public static final String ACTION_PLAY_EXTRA_START_POS = "pasta.ACTION_PLAY_EXTRA_START_POS";
-    public static final String ACTION_PLAY_EXTRA_TRACKS = "pasta.ACTION_PLAY_EXTRA_TRACKS";
-    public static final String ACTION_TOGGLE = "pasta.ACTION_TOGGLE";
-    public static final String ACTION_NEXT = "pasta.ACTION_NEXT";
-    public static final String ACTION_PREV = "pasta.ACTION_PREV";
-    public static final String ACTION_MOVE_TRACK = "pasta.ACTION_MOVE_TRACK";
-    public static final String ACTION_MOVE_TRACK_EXTRA_POS = "pasta.ACTION_MOVE_TRACK_EXTRA_POS";
-    public static final String ACTION_MOVE_POS = "pasta.ACTION_MOVE_POS";
-    public static final String ACTION_MOVE_POS_EXTRA_POS = "pasta.ACTION_MOVE_POS_EXTRA_POS";
-
-    public static final String STATE_UPDATE = "pasta.STATE_UPDATE";
-
-    public static final String EXTRA_PLAYING = "pasta.EXTRA_PLAYING";
-    public static final String EXTRA_CUR_POSITION = "pasta.EXTRA_CUR_POSITION";
-    public static final String EXTRA_CUR_TIME = "pasta.EXTRA_CUR_TIME";
-    public static final String EXTRA_MAX_TIME = "pasta.EXTRA_MAX_TIME";
-    public static final String EXTRA_CUR_TRACK = "pasta.EXTRA_SONG";
-    public static final String EXTRA_TRACK_LIST = "pasta.EXTRA_TRACK_LIST";
+    public static final String
+            ACTION_INIT = "pasta.ACTION_INIT",
+            ACTION_PLAY = "pasta.ACTION_PLAY",
+            ACTION_PLAY_EXTRA_START_POS = "pasta.ACTION_PLAY_EXTRA_START_POS",
+            ACTION_PLAY_EXTRA_TRACKS = "pasta.ACTION_PLAY_EXTRA_TRACKS",
+            ACTION_TOGGLE = "pasta.ACTION_TOGGLE",
+            ACTION_NEXT = "pasta.ACTION_NEXT",
+            ACTION_PREV = "pasta.ACTION_PREV",
+            ACTION_MOVE_TRACK = "pasta.ACTION_MOVE_TRACK",
+            ACTION_MOVE_TRACK_EXTRA_POS = "pasta.ACTION_MOVE_TRACK_EXTRA_POS",
+            ACTION_MOVE_POS = "pasta.ACTION_MOVE_POS",
+            ACTION_MOVE_POS_EXTRA_POS = "pasta.ACTION_MOVE_POS_EXTRA_POS",
+            STATE_UPDATE = "pasta.STATE_UPDATE",
+            EXTRA_TOKEN = "pasta.EXTRA_TOKEN",
+            EXTRA_CLIENT_ID = "pasta.EXTRA_CLIENT_ID",
+            EXTRA_PLAYING = "pasta.EXTRA_PLAYING",
+            EXTRA_CUR_POSITION = "pasta.EXTRA_CUR_POSITION",
+            EXTRA_CUR_TIME = "pasta.EXTRA_CUR_TIME",
+            EXTRA_MAX_TIME = "pasta.EXTRA_MAX_TIME",
+            EXTRA_CUR_TRACK = "pasta.EXTRA_SONG",
+            EXTRA_TRACK_LIST = "pasta.EXTRA_TRACK_LIST";
 
     public static final int UPDATE_INTERVAL = 500;
 
     private static final int NOTIFICATION_ID = 12345;
+
     private Player spotifyPlayer;
+    private Config playerConfig;
     private PlayConfig spotifyPlayConfig;
     private PlayerState spotifyPlayerState;
     private ArrayList<TrackListData> trackList;
@@ -66,23 +70,18 @@ public class PlayerService extends Service {
     private boolean debugPlaying;
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        initPlayer();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         spotifyPlayer.shutdownNow();
     }
 
-    private void initPlayer() {
+    private void initPlayer(String token, String clientId) {
         debugPlaying = false;
-        Pasta pasta = (Pasta) getApplicationContext();
 
-        Config playerConfig = new Config(this, pasta.token, pasta.CLIENT_ID);
-        playerConfig.useCache(false);
+        if (playerConfig == null) {
+            playerConfig = new Config(this, token, clientId);
+            playerConfig.useCache(false);
+        }
 
         spotifyPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
             @Override
@@ -158,8 +157,14 @@ public class PlayerService extends Service {
             if (errorCount > 5 && errorCount < 20) {
                 if (Settings.isDebug(this))
                     Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
+
                 stopService(new Intent(this, PlayerService.class));
-                startService(new Intent(this, PlayerService.class));
+
+                Intent intent = new Intent(PlayerService.ACTION_INIT);
+                intent.setClass(this, PlayerService.class);
+                intent.putExtra(PlayerService.EXTRA_TOKEN, playerConfig.oauthToken);
+                intent.putExtra(PlayerService.EXTRA_CLIENT_ID, playerConfig.clientId);
+                startService(intent);
                 errorCount = 20;
             } else if (Settings.isDebug(this))
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
@@ -168,10 +173,13 @@ public class PlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null || !spotifyPlayer.isInitialized()) return START_STICKY;
+        if (intent == null) return START_STICKY;
         String action = intent.getAction();
         if (action == null) return START_STICKY;
         switch (action) {
+            case ACTION_INIT:
+                initPlayer(intent.getStringExtra(EXTRA_TOKEN), intent.getStringExtra(EXTRA_CLIENT_ID));
+                break;
             case ACTION_PLAY:
                 spotifyPlayer.pause();
 

@@ -47,7 +47,8 @@
 
         <service
             android:name=".PlayerService"
-            android:stopWithTask="true"/>
+            android:stopWithTask="true"
+            android:process=":playerservice" />
     </application>
 
 </manifest>

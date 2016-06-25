@@ -200,7 +200,12 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }).create().show();
                             } else {
-                                startService(new Intent(MainActivity.this, PlayerService.class));
+                                Intent intent = new Intent(PlayerService.ACTION_INIT);
+                                intent.setClass(MainActivity.this, PlayerService.class);
+                                intent.putExtra(PlayerService.EXTRA_TOKEN, pasta.token);
+                                intent.putExtra(PlayerService.EXTRA_CLIENT_ID, pasta.CLIENT_ID);
+                                startService(intent);
+
                                 startActivity(new Intent(MainActivity.this, HomeActivity.class));
                                 finish();
                             }
