@@ -25,7 +25,7 @@ public class Settings {
     }
 
     public static boolean isDebug(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DEBUG, false);
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DEBUG, true);
     }
 
     public static boolean isThumbnails(Context context) {
