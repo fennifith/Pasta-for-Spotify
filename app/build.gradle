@@ -8,8 +8,8 @@ android {
         applicationId "pasta.streamer"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 6
-        versionName "1.5"
+        versionCode 7
+        versionName "1.6"
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true
         vectorDrawables.useSupportLibrary = true
