@@ -141,8 +141,10 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         }
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer_toggle);
+        if (drawer_layout != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer_toggle);
+        }
 
         if (content != null) {
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -330,6 +332,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         } else if (getIntent().getStringExtra("query") != null) {
             f = new SearchFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             setDrawerEnabled(false);
 
             search(getIntent().getStringExtra("query"), true);
@@ -360,7 +364,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         if (drawer_layout != null)
             drawer_layout.setDrawerLockMode(enabled ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         drawer_container.setVisibility(enabled ? View.VISIBLE : View.GONE);
-        getSupportActionBar().setHomeAsUpIndicator(enabled ? R.drawable.drawer_toggle : R.drawable.drawer_back);
+        if (drawer_layout != null || !enabled)
+            getSupportActionBar().setHomeAsUpIndicator(enabled ? R.drawable.drawer_toggle : R.drawable.drawer_back);
     }
 
     public void setListeners(Fragment f) {
@@ -669,8 +674,6 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
-
-        if (drawer_layout == null) menu.findItem(android.R.id.home).setVisible(false);
 
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
 
