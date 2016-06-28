@@ -317,17 +317,23 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             f = new ArtistFragment();
             f.setArguments(args);
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+
+            setDrawerEnabled(false);
         } else if (getIntent().getParcelableExtra("album") != null) {
             Bundle args = new Bundle();
             args.putParcelable("album", getIntent().getParcelableExtra("album"));
             f = new AlbumFragment();
             f.setArguments(args);
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+
+            setDrawerEnabled(false);
         } else if (getIntent().getStringExtra("query") != null) {
             f = new SearchFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+            setDrawerEnabled(false);
 
             search(getIntent().getStringExtra("query"), true);
+            setTitle(getIntent().getStringExtra("query").toUpperCase());
         } else {
             f = new HomeFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
@@ -346,6 +352,13 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     public void onPause() {
         super.onPause();
         if (playbar != null) playbar.unregisterPlaybar();
+    }
+
+    public void setDrawerEnabled(boolean enabled) {
+        if (drawer_layout != null)
+            drawer_layout.setDrawerLockMode(enabled ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        drawer_container.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        getSupportActionBar().setHomeAsUpIndicator(enabled ? R.drawable.drawer_toggle : R.drawable.drawer_back);
     }
 
     public void setListeners(Fragment f) {
@@ -655,6 +668,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
 
+        if (drawer_layout == null) menu.findItem(android.R.id.home).setVisible(false);
+
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -685,7 +700,9 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
          if (item.getItemId() == android.R.id.home) {
-             if (drawer_layout != null) drawer_layout.openDrawer(Gravity.LEFT);
+             if (drawer_layout != null && drawer_layout.getDrawerLockMode(Gravity.LEFT) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                 drawer_layout.openDrawer(Gravity.LEFT);
+             else onBackPressed();
          }
         return false;
     }

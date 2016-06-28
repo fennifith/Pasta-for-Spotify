@@ -124,27 +124,32 @@ public class ArtistFragment extends FullScreenFragment {
         title.setText(data.artistName);
         extra.setText(String.valueOf(data.followers) + " followers");
 
-        for (String genre : data.genres) {
-            View v = LayoutInflater.from(getContext()).inflate(R.layout.genre_item, null);
-            ((TextView) v.findViewById(R.id.title)).setText(genre);
-            v.setOnClickListener(new View.OnClickListener() {
+        if (data.genres.size() > 0) {
+            for (String genre : data.genres) {
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.genre_item, null);
+                ((TextView) v.findViewById(R.id.title)).setText(genre);
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(getActivity(), HomeActivity.class);
+                        i.putExtra("query", ((TextView) v.findViewById(R.id.title)).getText().toString());
+                        startActivity(i);
+                    }
+                });
+                genres.addView(v);
+            }
+
+            genres.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(getActivity(), HomeActivity.class);
-                    i.putExtra("query", ((TextView) v.findViewById(R.id.title)).getText().toString());
-                    startActivity(i);
+                public void onGlobalLayout() {
+                    if (recycler != null) recycler.setPadding(0, genres.getHeight(), 0, 0);
+                    if (genres != null)
+                        genres.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
-            genres.addView(v);
+        } else {
+            genres.setVisibility(View.GONE);
         }
-
-        genres.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (recycler != null) recycler.setPadding(0, genres.getHeight(), 0, 0);
-                if (genres != null) genres.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-        });
 
         spinner.setVisibility(View.VISIBLE);
 
