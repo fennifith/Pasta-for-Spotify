@@ -3,21 +3,31 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:background="@drawable/genre"
-        android:layout_margin="4dp">
+        android:layout_margin="4dp"
+        android:orientation="horizontal">
+
+        <pasta.streamer.views.CircleImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="#BDBDBD"
+            android:id="@+id/image" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingLeft="12dp"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingEnd="12dp"
             android:paddingRight="12dp"
             android:textColor="#8A000000"
             android:gravity="center"
-            android:id="@+id/title" />
+            android:id="@+id/title"
+            android:text="something" />
 
-    </FrameLayout>
+    </LinearLayout>
 
 </FrameLayout>

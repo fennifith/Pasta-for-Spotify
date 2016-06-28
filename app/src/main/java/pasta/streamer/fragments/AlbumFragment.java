@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
@@ -25,6 +26,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -33,6 +36,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
 
@@ -44,6 +48,7 @@ import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.adapters.TrackAdapter;
 import pasta.streamer.data.AlbumListData;
+import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
@@ -52,7 +57,7 @@ import pasta.streamer.views.CustomImageView;
 public class AlbumFragment extends FullScreenFragment {
 
     @Bind(R.id.topTenTrackListView)
-    RecyclerView topTenTrackView;
+    RecyclerView recycler;
     @Bind(R.id.progressBar2)
     ProgressBar spinner;
     @Bind(R.id.fab)
@@ -63,6 +68,8 @@ public class AlbumFragment extends FullScreenFragment {
     CustomImageView header;
     @Bind(R.id.bar)
     View bar;
+    @Bind(R.id.artists)
+    FlexboxLayout artists;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.appbar)
@@ -125,6 +132,43 @@ public class AlbumFragment extends FullScreenFragment {
             }
         });
 
+        if (data.artists.size() > 0) {
+            for (ArtistListData artist : data.artists) {
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.artist_item_chip, null);
+                ((TextView) v.findViewById(R.id.title)).setText(artist.artistName);
+                Glide.with(getContext()).load(artist.artistImage).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                        ((CustomImageView) getView()).transition(resource);
+                    }
+                });
+
+                v.setTag(artist);
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Bundle args = new Bundle();
+                        args.putParcelable("artist", (ArtistListData) v.getTag());
+
+                        Fragment f = new ArtistFragment();
+                        f.setArguments(args);
+
+                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                    }
+                });
+                artists.addView(v);
+            }
+
+            artists.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    if (recycler != null) recycler.setPadding(0, artists.getHeight(), 0, 0);
+                    if (artists != null)
+                        artists.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        } else artists.setVisibility(View.GONE);
+
         spinner.setVisibility(View.VISIBLE);
 
         DisplayMetrics metrics = new DisplayMetrics();
@@ -132,9 +176,9 @@ public class AlbumFragment extends FullScreenFragment {
 
         adapter = new TrackAdapter((AppCompatActivity) getActivity(), null);
         adapter.setAlbumBehavior();
-        topTenTrackView.setAdapter(adapter);
-        topTenTrackView.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
-        topTenTrackView.setHasFixedSize(true);
+        recycler.setAdapter(adapter);
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
+        recycler.setHasFixedSize(true);
 
         action = new Action<ArrayList<TrackListData>>() {
             @NonNull

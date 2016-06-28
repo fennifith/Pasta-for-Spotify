@@ -3,8 +3,10 @@ package pasta.streamer.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import kaaes.spotify.webapi.android.models.Album;
-import kaaes.spotify.webapi.android.models.ArtistSimple;
 
 public class AlbumListData implements Parcelable {
     public static final Creator<AlbumListData> CREATOR = new Creator<AlbumListData>() {
@@ -22,21 +24,16 @@ public class AlbumListData implements Parcelable {
     public String albumDate;
     public String albumImage;
     public String albumImageLarge;
-    public String artistName;
-    public String artistId;
-    public String artistImage;
+    public List<ArtistListData> artists;
     public int tracks;
 
-    public AlbumListData(Album album, String artistImage) {
+    public AlbumListData(Album album, List<ArtistListData> artists) {
         albumName = album.name;
         albumId = album.id;
         albumDate = album.release_date;
         albumImage = album.images.get(1).url;
         albumImageLarge = album.images.get(0).url;
-        ArtistSimple artist = album.artists.get(0);
-        artistName = artist.name;
-        artistId = artist.id;
-        this.artistImage = artistImage;
+        this.artists = artists;
         tracks = album.tracks.items.size();
     }
 
@@ -50,9 +47,8 @@ public class AlbumListData implements Parcelable {
         albumDate = in.readString();
         albumImage = in.readString();
         albumImageLarge = in.readString();
-        artistName = in.readString();
-        artistId = in.readString();
-        artistImage = in.readString();
+        artists = new ArrayList<>();
+        in.readList(artists, ArtistListData.class.getClassLoader());
         tracks = in.readInt();
     }
 
@@ -63,9 +59,7 @@ public class AlbumListData implements Parcelable {
         out.writeString(albumDate);
         out.writeString(albumImage);
         out.writeString(albumImageLarge);
-        out.writeString(artistName);
-        out.writeString(artistId);
-        out.writeString(artistImage);
+        out.writeList(artists);
         out.writeInt(tracks);
     }
 

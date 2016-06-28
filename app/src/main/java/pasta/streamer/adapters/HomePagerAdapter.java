@@ -12,9 +12,7 @@ import com.afollestad.async.Action;
 
 import java.util.ArrayList;
 
-import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.AlbumSimple;
-import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.FeaturedPlaylists;
 import kaaes.spotify.webapi.android.models.NewReleases;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
@@ -88,33 +86,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
                         @Nullable
                         @Override
                         protected AlbumListData run() throws InterruptedException {
-                            Album album = null;
-                            for (int i = 0; album == null && i < Settings.getRetryCount(activity); i++) {
-                                try {
-                                    album = pasta.spotifyService.getAlbum(id);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
-                                    else break;
-                                }
-                            }
-                            if (album == null) return null;
-
-                            Artist artist = null;
-                            for (int i = 0; artist == null && i < Settings.getRetryCount(activity); i++) {
-                                try {
-                                    artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
-                                    else break;
-                                }
-                            }
-
-                            String image = "";
-                            if (artist != null && artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
-
-                            return new AlbumListData(album, image);
+                            return pasta.getAlbum(id);
                         }
 
                         @Override

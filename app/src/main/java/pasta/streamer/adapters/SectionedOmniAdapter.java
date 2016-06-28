@@ -313,43 +313,29 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
                 image = albumData.albumImage;
 
-                ((TextView) holder.v.findViewById(R.id.artist_name)).setText(albumData.artistName);
-                ((TextView) holder.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
+                if (albumData.artists.size() > 0) {
+                    ((TextView) holder.v.findViewById(R.id.artist_name)).setText(albumData.artists.get(0).artistName);
+                    ((TextView) holder.v.findViewById(R.id.artist_extra)).setText(albumData.albumDate);
 
-                ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
-                if (artistImage != null) Glide.with(activity).load(albumData.artistImage).into(artistImage);
+                    ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
+                    if (artistImage != null)
+                        Glide.with(activity).load(albumData.artists.get(0).artistImage).into(artistImage);
 
-                if (!(activity.getSupportFragmentManager().findFragmentById(R.id.fragment) instanceof ArtistFragment)) {
-                    holder.v.findViewById(R.id.artist).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            new Action<ArtistListData>() {
-                                @NonNull
-                                @Override
-                                public String id() {
-                                    return "gotoArtist";
-                                }
+                    if (!(activity.getSupportFragmentManager().findFragmentById(R.id.fragment) instanceof ArtistFragment)) {
+                        holder.v.findViewById(R.id.artist).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Bundle args = new Bundle();
+                                args.putParcelable("artist", albums.get(getRelPosition(holder.getAdapterPosition())).artists.get(0));
 
-                                @Nullable
-                                @Override
-                                protected ArtistListData run() throws InterruptedException {
-                                    return pasta.getArtist(albums.get(getRelPosition(holder.getAdapterPosition())).artistId);
-                                }
+                                Fragment f = new ArtistFragment();
+                                f.setArguments(args);
 
-                                @Override
-                                protected void done(@Nullable ArtistListData result) {
-                                    Bundle args = new Bundle();
-                                    args.putParcelable("artist", result);
-
-                                    Fragment f = new ArtistFragment();
-                                    f.setArguments(args);
-
-                                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                                }
-                            }.execute();
-                        }
-                    });
-                }
+                                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                            }
+                        });
+                    }
+                } else holder.v.findViewById(R.id.artist).setVisibility(View.GONE);
 
                 ((TextView) holder.v.findViewById(R.id.name)).setText(albumData.albumName);
                 ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");

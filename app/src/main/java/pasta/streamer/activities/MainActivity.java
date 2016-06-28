@@ -25,7 +25,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.SavedAlbum;
 import kaaes.spotify.webapi.android.models.SavedTrack;
@@ -33,6 +33,7 @@ import pasta.streamer.Pasta;
 import pasta.streamer.PlayerService;
 import pasta.streamer.R;
 import pasta.streamer.data.AlbumListData;
+import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
 
 public class MainActivity extends AppCompatActivity {
@@ -132,12 +133,13 @@ public class MainActivity extends AppCompatActivity {
 
                             ArrayList<AlbumListData> albums = new ArrayList<>();
                             for (SavedAlbum album : albumPager.items) {
-                                Artist a = pasta.spotifyService.getArtist(album.album.artists.get(0).id);
+                                ArrayList<ArtistListData> artists = new ArrayList<>();
+                                for (ArtistSimple artist : album.album.artists) {
+                                    ArtistListData artistData = pasta.getArtist(artist.id);
+                                    if (artistData != null) artists.add(artistData);
+                                }
 
-                                String image = "";
-                                if (a.images.size() > 0) image = a.images.get(a.images.size() / 2).url;
-
-                                albums.add(new AlbumListData(album.album, image));
+                                albums.add(new AlbumListData(album.album, artists));
                             }
                             pasta.albums = albums;
 

@@ -248,20 +248,7 @@ public class ArtistFragment extends FullScreenFragment {
                         @Nullable
                         @Override
                         protected AlbumListData run() throws InterruptedException {
-                            Album album;
-                            Artist artist;
-                            try {
-                                album = pasta.spotifyService.getAlbum(id);
-                                artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-
-                            String image = "";
-                            if (artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
-
-                            return new AlbumListData(album, image);
+                            return pasta.getAlbum(id);
                         }
 
                         @Override

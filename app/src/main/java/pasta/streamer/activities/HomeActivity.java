@@ -60,7 +60,6 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import kaaes.spotify.webapi.android.SpotifyService;
-import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.AlbumSimple;
 import kaaes.spotify.webapi.android.models.AlbumsPager;
 import kaaes.spotify.webapi.android.models.Artist;
@@ -634,31 +633,13 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                             @Nullable
                             @Override
                             protected AlbumListData run() throws InterruptedException {
-                                Album album;
-                                try {
-                                    album = pasta.spotifyService.getAlbum(id);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    return null;
-                                }
-
-                                Artist artist;
-                                try {
-                                    artist = pasta.spotifyService.getArtist(album.artists.get(0).id);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    return null;
-                                }
-
-                                String image = "";
-                                if (artist.images.size() > 0) image = artist.images.get(album.images.size() / 2).url;
-
-                                return new AlbumListData(album, image);
+                                return pasta.getAlbum(id);
                             }
 
                             @Override
                             protected void done(@Nullable AlbumListData result) {
                                 if (result == null) return;
+
                                 searchDatas.add(result);
                                 ((SearchFragment) f).addData(result);
                             }
