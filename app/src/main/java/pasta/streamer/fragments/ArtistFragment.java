@@ -1,12 +1,11 @@
 package pasta.streamer.fragments;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -33,6 +33,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import kaaes.spotify.webapi.android.models.Artists;
 import kaaes.spotify.webapi.android.models.Pager;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
+import pasta.streamer.activities.HomeActivity;
 import pasta.streamer.adapters.SectionedOmniAdapter;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
@@ -68,10 +70,10 @@ public class ArtistFragment extends FullScreenFragment {
     CustomImageView header;
     @Bind(R.id.title)
     TextView title;
-    @Bind(R.id.subtitle)
-    TextView subtitle;
     @Bind(R.id.extra)
     TextView extra;
+    @Bind(R.id.genres)
+    FlexboxLayout genres;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.somethingbar)
@@ -120,8 +122,29 @@ public class ArtistFragment extends FullScreenFragment {
         });
 
         title.setText(data.artistName);
-        subtitle.setText(data.genres);
         extra.setText(String.valueOf(data.followers) + " followers");
+
+        for (String genre : data.genres) {
+            View v = LayoutInflater.from(getContext()).inflate(R.layout.genre_item, null);
+            ((TextView) v.findViewById(R.id.title)).setText(genre);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(getActivity(), HomeActivity.class);
+                    i.putExtra("query", ((TextView) v.findViewById(R.id.title)).getText().toString());
+                    startActivity(i);
+                }
+            });
+            genres.addView(v);
+        }
+
+        genres.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (recycler != null) recycler.setPadding(0, genres.getHeight(), 0, 0);
+                if (genres != null) genres.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
 
         spinner.setVisibility(View.VISIBLE);
 
@@ -312,7 +335,7 @@ public class ArtistFragment extends FullScreenFragment {
         Glide.with(getContext()).load(data.artistImage).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                header.transition(resource);
+                if (header != null) header.transition(resource);
 
                 Bitmap bitmap = StaticUtils.drawableToBitmap(resource);
                 if (backgroundImage != null) backgroundImage.transition(StaticUtils.blurBitmap(bitmap));
@@ -321,10 +344,20 @@ public class ArtistFragment extends FullScreenFragment {
                         @Override
                         public void onGenerated(Palette palette) {
                             int primary = palette.getMutedColor(Color.GRAY);
-                            collapsingToolbarLayout.setContentScrimColor(primary);
-                            TransitionDrawable td = new TransitionDrawable(new Drawable[]{somethingbar.getBackground(), new ColorDrawable(primary)});
-                            somethingbar.setBackground(td);
-                            td.startTransition(250);
+                            if (collapsingToolbarLayout != null)
+                                collapsingToolbarLayout.setContentScrimColor(primary);
+
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), Settings.getPrimaryColor(getContext()), primary);
+                            animator.setDuration(250);
+                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    if (somethingbar != null)
+                                        somethingbar.setBackgroundColor((int) animation.getAnimatedValue());
+                                }
+                            });
+                            animator.start();
+
                             setData(data.artistName, primary, palette.getDarkVibrantColor(primary));
                         }
                     });
@@ -351,8 +384,8 @@ public class ArtistFragment extends FullScreenFragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (pool != null && pool.isExecuting()) pool.cancel();
+        super.onDestroyView();
         ButterKnife.unbind(this);
     }
 

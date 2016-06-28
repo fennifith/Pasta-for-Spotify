@@ -84,7 +84,7 @@ public class CategoryFragment extends FullScreenFragment {
         }
 
         recycler.setLayoutManager(manager);
-        adapter = new OmniAdapter((AppCompatActivity) getActivity(), null);
+        adapter = new OmniAdapter((AppCompatActivity) getActivity(), null, false);
         recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);
 

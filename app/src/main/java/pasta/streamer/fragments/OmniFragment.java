@@ -48,7 +48,10 @@ public class OmniFragment extends Fragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        adapter = new OmniAdapter((AppCompatActivity) getActivity(), list);
+        Bundle args = getArguments();
+        if (args != null) isFavoriteBehavior = getArguments().getBoolean("favorite", false);
+
+        adapter = new OmniAdapter((AppCompatActivity) getActivity(), list, isFavoriteBehavior);
         manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels));
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -57,8 +60,6 @@ public class OmniFragment extends Fragment {
                 else return 1;
             }
         });
-
-        if (isFavoriteBehavior) adapter.setFavoriteBehavior();
 
         recycler.setLayoutManager(manager);
         recycler.setAdapter(adapter);
@@ -93,10 +94,5 @@ public class OmniFragment extends Fragment {
         if (list != null) list.clear();
         if (adapter != null) adapter.notifyDataSetChanged();
         if (empty != null) empty.setVisibility(View.VISIBLE);
-    }
-
-    public void setFavoriteBehavior() {
-        if (adapter != null) adapter.setFavoriteBehavior();
-        isFavoriteBehavior = true;
     }
 }

@@ -26,8 +26,10 @@
 
         <item name="android:textColorPrimary">#DE000000</item>
         <item name="android:textColorSecondary">#8A000000</item>
-        <item name="android:textColorPrimaryInverse">#ffffff</item>
-        <item name="android:textColorSecondaryInverse">#B3ffffff</item>
+        <item name="android:textColorTertiary">#61000000</item>
+        <item name="android:textColorPrimaryInverse">#FFFFFF</item>
+        <item name="android:textColorSecondaryInverse">#B3FFFFFF</item>
+        <item name="android:textColorTertiaryInverse">#80FFFFFF</item>
 
         <item name="colorButtonNormal">@color/colorPrimary</item>
     </style>
@@ -39,8 +41,10 @@
 
         <item name="android:textColorSecondary">#B3ffffff</item>
         <item name="android:textColorPrimary">#ffffff</item>
+        <item name="android:textColorTertiary">#80FFFFFF</item>
         <item name="android:textColorPrimaryInverse">#DE000000</item>
         <item name="android:textColorSecondaryInverse">#8A000000</item>
+        <item name="android:textColorTertiaryInverse">#26000000</item>
     </style>
 
     <style name="AppTheme.Transparent" parent="AppTheme" />

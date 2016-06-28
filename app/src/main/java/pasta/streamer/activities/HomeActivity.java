@@ -311,21 +311,26 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             }
         }
 
-        f = new HomeFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
-
         if (getIntent().getParcelableExtra("artist") != null) {
             Bundle args = new Bundle();
             args.putParcelable("artist", getIntent().getParcelableExtra("artist"));
             f = new ArtistFragment();
             f.setArguments(args);
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).addToBackStack(null).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
         } else if (getIntent().getParcelableExtra("album") != null) {
             Bundle args = new Bundle();
             args.putParcelable("album", getIntent().getParcelableExtra("album"));
             f = new AlbumFragment();
             f.setArguments(args);
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).addToBackStack(null).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+        } else if (getIntent().getStringExtra("query") != null) {
+            f = new SearchFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+
+            search(getIntent().getStringExtra("query"), true);
+        } else {
+            f = new HomeFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
         }
 
         setListeners(f);
@@ -416,7 +421,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             }
         }
 
-        if (searchPool != null && searchPool.isExecuting()) searchPool.cancel();
+        if (searchPool != null && searchPool.isExecuting() && !(f instanceof SearchFragment))
+            searchPool.cancel();
     }
 
     private void search(final String searchTerm, final boolean pre) {

@@ -278,7 +278,6 @@ public class PlayerActivity extends AppCompatActivity {
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         i.putExtra("album", result);
                         startActivity(i);
                     }
@@ -305,7 +304,6 @@ public class PlayerActivity extends AppCompatActivity {
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         i.putExtra("artist", result);
                         startActivity(i);
                     }

@@ -35,6 +35,7 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">
+
                         <pasta.streamer.views.SecondSquareImageView
                             android:id="@+id/header"
                             android:layout_width="wrap_content"
@@ -49,6 +50,7 @@
                             android:layout_gravity="center_vertical|top"
                             android:scaleType="centerCrop"
                             android:src="@drawable/image_gradient"/>
+
                     </FrameLayout>
 
                     <FrameLayout
@@ -68,21 +70,7 @@
                             android:textColor="?android:textColorPrimary"
                             android:paddingLeft="16dp"
                             android:paddingRight="16dp"
-                            android:layout_marginTop="56dp"/>
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/subtitle"
-                            android:textSize="14sp"
-                            android:singleLine="true"
-                            android:lines="1"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:textColor="?android:textColorPrimary"
-                            android:paddingLeft="16dp"
-                            android:paddingRight="16dp"
-                            android:layout_marginTop="88dp"/>
+                            android:layout_marginTop="?attr/actionBarSize" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -98,6 +86,7 @@
                             android:gravity="center_vertical"
                             android:padding="16dp"
                             android:layout_gravity="bottom"/>
+
                     </FrameLayout>
 
                 </LinearLayout>
@@ -113,18 +102,42 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/topTenTrackListView"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            android:fillViewport="true"
+            android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:clipToPadding="false"
             android:paddingLeft="4dp"
             android:paddingTop="4dp"
             android:paddingRight="4dp"
-            android:paddingBottom="@dimen/bottom_playbar_padding"/>
+            android:paddingBottom="@dimen/bottom_playbar_padding"
+            android:scrollbars="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/topTenTrackListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:id="@+id/genres"
+                    app:flexWrap="wrap"
+                    app:justifyContent="flex_start" />
+
+            </FrameLayout>
+
+        </android.support.v4.widget.NestedScrollView>
 
         <ProgressBar
             android:id="@+id/progressBar2"

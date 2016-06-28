@@ -169,6 +169,13 @@ public class StaticUtils {
         return Color.HSVToColor(hsv);
     }
 
+    public static int lightColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] /= 0.8f;
+        return Color.HSVToColor(hsv);
+    }
+
     public static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable == null) drawable = new ColorDrawable(Color.TRANSPARENT);
         if (drawable instanceof BitmapDrawable) return ((BitmapDrawable) drawable).getBitmap();

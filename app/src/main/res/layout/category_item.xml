@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:id="@+id/title"
-        android:textColor="#fff"
+        android:textColor="#B3FFFFFF"
         android:textSize="20sp"
         android:gravity="center_vertical"
         android:paddingLeft="16dp"

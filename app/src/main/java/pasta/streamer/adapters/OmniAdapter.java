@@ -62,7 +62,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
     private boolean thumbnails, cards, trackList, palette, dark;
     private boolean isFavoriteBehavior;
 
-    public OmniAdapter(AppCompatActivity activity, ArrayList list) {
+    public OmniAdapter(AppCompatActivity activity, ArrayList list, boolean isFavoriteBehavior) {
         original = list;
         if (list != null) {
             this.list = new ArrayList();
@@ -80,10 +80,8 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
         trackList = Settings.isListTracks(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
-    }
 
-    public void setFavoriteBehavior() {
-        isFavoriteBehavior = true;
+        this.isFavoriteBehavior = isFavoriteBehavior;
     }
 
     public void addData(Parcelable data) {

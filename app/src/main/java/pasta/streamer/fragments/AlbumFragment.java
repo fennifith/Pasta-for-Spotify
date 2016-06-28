@@ -166,16 +166,18 @@ public class AlbumFragment extends FullScreenFragment {
         Glide.with(getContext()).load(data.albumImageLarge).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                header.transition(resource);
+                if (header != null) header.transition(resource);
 
                 if (palette) {
                     Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
                             int primary = palette.getMutedColor(Color.GRAY);
-                            collapsingToolbarLayout.setContentScrimColor(primary);
-                            fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary))));
-                            bar.setBackgroundColor(primary);
+                            if (collapsingToolbarLayout != null)
+                                collapsingToolbarLayout.setContentScrimColor(primary);
+                            if (fab != null)
+                                fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary))));
+                            if (bar != null) bar.setBackgroundColor(primary);
                             setData(data.albumName, primary, palette.getDarkVibrantColor(primary));
                         }
                     });

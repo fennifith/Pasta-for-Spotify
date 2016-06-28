@@ -3,19 +3,21 @@
     android:layout_height="match_parent"
     android:background="?android:colorBackground">
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/empty"
         android:layout_width="268dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="?attr/actionBarSize"
+        android:orientation="vertical"
         android:visibility="gone">
 
-        <pasta.streamer.views.SquareImageView
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            android:src="@drawable/empty" />
+            android:text="ᕦ(눈눈)ᕗ"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="64sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,7 +27,8 @@
             android:text="@string/empty"
             android:textColor="?android:textColorSecondary"
             android:textSize="20sp" />
-    </FrameLayout>
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

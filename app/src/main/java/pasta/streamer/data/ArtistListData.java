@@ -3,6 +3,8 @@ package pasta.streamer.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 import kaaes.spotify.webapi.android.models.Artist;
 
 public class ArtistListData implements Parcelable {
@@ -20,7 +22,7 @@ public class ArtistListData implements Parcelable {
     public String artistId;
     public String artistImage;
     public String artistImageLarge;
-    public String genres;
+    public List<String> genres;
     public int followers;
 
     public ArtistListData(Artist artist) {
@@ -38,11 +40,7 @@ public class ArtistListData implements Parcelable {
         }
         followers = artist.followers.total;
 
-        genres = "";
-        for (String genre : artist.genres) {
-            genres += genre + ", ";
-        }
-        if (genres.length() > 2) genres = genres.substring(0, genres.length() - 2);
+        genres = artist.genres;
     }
 
     public ArtistListData(Parcel in) {
@@ -55,7 +53,7 @@ public class ArtistListData implements Parcelable {
         artistImage = in.readString();
         artistImageLarge = in.readString();
         followers = in.readInt();
-        genres = in.readString();
+        in.readStringList(genres);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class ArtistListData implements Parcelable {
         out.writeString(artistImage);
         out.writeString(artistImageLarge);
         out.writeInt(followers);
-        out.writeString(genres);
+        out.writeStringList(genres);
     }
 
     @Override

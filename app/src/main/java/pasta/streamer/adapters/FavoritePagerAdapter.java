@@ -1,6 +1,7 @@
 package pasta.streamer.adapters;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,15 +39,20 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
         this.activity = activity;
         pasta = (Pasta) activity.getApplicationContext();
 
-        playlistFragment = new OmniFragment();
-        albumFragment = new OmniFragment();
-        trackFragment = new OmniFragment();
-        artistFragment = new OmniFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("favorite", true);
 
-        playlistFragment.setFavoriteBehavior();
-        albumFragment.setFavoriteBehavior();
-        trackFragment.setFavoriteBehavior();
-        artistFragment.setFavoriteBehavior();
+        playlistFragment = new OmniFragment();
+        playlistFragment.setArguments(args);
+
+        albumFragment = new OmniFragment();
+        albumFragment.setArguments(args);
+
+        trackFragment = new OmniFragment();
+        trackFragment.setArguments(args);
+
+        artistFragment = new OmniFragment();
+        artistFragment.setArguments(args);
 
         load();
     }

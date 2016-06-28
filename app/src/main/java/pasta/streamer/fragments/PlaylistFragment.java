@@ -152,7 +152,7 @@ public class PlaylistFragment extends FullScreenFragment {
         Glide.with(getContext()).load(data.playlistImageLarge).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                header.transition(resource);
+                if (header != null) header.transition(resource);
 
                 if (palette) {
                     Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
@@ -160,9 +160,11 @@ public class PlaylistFragment extends FullScreenFragment {
                         public void onGenerated(Palette palette) {
                             int primary = palette.getMutedColor(Color.GRAY);
                             int accent = palette.getVibrantColor(StaticUtils.darkColor(primary));
-                            collapsingToolbarLayout.setContentScrimColor(primary);
-                            fab.setBackgroundTintList(ColorStateList.valueOf(accent));
-                            bar.setBackgroundColor(primary);
+                            if (collapsingToolbarLayout != null)
+                                collapsingToolbarLayout.setContentScrimColor(primary);
+                            if (fab != null)
+                                fab.setBackgroundTintList(ColorStateList.valueOf(accent));
+                            if (bar != null) bar.setBackgroundColor(primary);
                             setData(data.playlistName, primary, accent);
                         }
                     });
