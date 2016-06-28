@@ -114,7 +114,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
 
     private Fragment f;
     private long selected;
-    private int title = R.string.title_activity_home;
+    private String title;
     private Map<String, Object> limitMap;
     private Pool searchPool;
     private ArrayList searchDatas;
@@ -217,15 +217,15 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                         switch (((int) drawerItem.getIdentifier())) {
                             case 1:
                                 f = new HomeFragment();
-                                title = R.string.title_activity_home;
+                                title = getString(R.string.title_activity_home);
                                 break;
                             case 2:
                                 f = new FavoritesFragment();
-                                title = R.string.title_activity_favorites;
+                                title = getString(R.string.title_activity_favorites);
                                 break;
                             case 3:
                                 f = new CategoriesFragment();
-                                title = R.string.title_activity_categories;
+                                title = getString(R.string.title_activity_categories);
                                 break;
                             case 4:
                                 if (!playbar.playing) {
@@ -247,11 +247,11 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                                 return true;
                             case 5:
                                 f = new SettingsFragment();
-                                title = R.string.title_activity_settings;
+                                title = getString(R.string.title_activity_settings);
                                 break;
                             case 6:
                                 f = new AboutFragment();
-                                title = R.string.title_activity_about;
+                                title = getString(R.string.title_activity_about);
                                 break;
                             default:
                                 return false;
@@ -333,10 +333,12 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             setDrawerEnabled(false);
 
             search(getIntent().getStringExtra("query"), true);
-            setTitle(getIntent().getStringExtra("query").toUpperCase());
+            title = getIntent().getStringExtra("query");
         } else {
             f = new HomeFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, f).commit();
+
+            title = getString(R.string.title_activity_home);
         }
 
         setListeners(f);
@@ -390,7 +392,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             statusBackground.setBackgroundColor(StaticUtils.darkColor(Settings.getPrimaryColor(this)));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(getTitle().toString(), StaticUtils.drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)), Settings.getPrimaryColor(this));
+                ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(title, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)), Settings.getPrimaryColor(this));
                 setTaskDescription(desc);
             }
 
