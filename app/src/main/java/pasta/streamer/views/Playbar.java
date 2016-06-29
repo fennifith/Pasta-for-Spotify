@@ -15,8 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,12 +26,9 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
-import java.util.ArrayList;
-
 import pasta.streamer.PlayerService;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
-import pasta.streamer.adapters.NowPlayingAdapter;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.utils.Settings;
 import pasta.streamer.utils.StaticUtils;
@@ -41,7 +36,6 @@ import pasta.streamer.utils.StaticUtils;
 public class Playbar {
     public boolean registered, playing, first;
     private String lastUri;
-    private ArrayList<TrackListData> trackList = new ArrayList<>();
     private TrackListData data;
     private Activity activity;
 
@@ -50,10 +44,8 @@ public class Playbar {
     private ImageView prev, toggle, next;
     private TextView title, subtitle;
     private ProgressBar bar;
-    private RecyclerView nextPlaying;
     private BottomSheetBehavior behavior;
 
-    private NowPlayingAdapter adapter;
     private UpdateReceiver receiver;
     private PlaybarListener listener;
 
@@ -62,10 +54,6 @@ public class Playbar {
 
     public Playbar(Activity activity) {
         this.activity = activity;
-    }
-
-    public interface PlaybarListener {
-        void onHide(boolean hidden);
     }
 
     public void setPlaybarListener(PlaybarListener listener) {
@@ -109,11 +97,6 @@ public class Playbar {
         toggle.setClickable(false);
         next.setClickable(false);
 
-        nextPlaying = (RecyclerView) playbar.findViewById(R.id.nextPlaying);
-        nextPlaying.setLayoutManager(new GridLayoutManager(activity, 1));
-        adapter = new NowPlayingAdapter(activity, trackList, 0);
-        nextPlaying.setAdapter(adapter);
-
         first = true;
         registerPlaybar();
     }
@@ -134,17 +117,17 @@ public class Playbar {
         }
     }
 
+    public interface PlaybarListener {
+        void onHide(boolean hidden);
+    }
+
     private class UpdateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             boolean isPlaying = intent.getBooleanExtra(PlayerService.EXTRA_PLAYING, false);
             int progress = intent.getIntExtra(PlayerService.EXTRA_CUR_TIME, 0);
             int maxProgress = intent.getIntExtra(PlayerService.EXTRA_MAX_TIME, 0);
-            int songPos = intent.getIntExtra(PlayerService.EXTRA_CUR_POSITION, 0);
             data = intent.getParcelableExtra(PlayerService.EXTRA_CUR_TRACK);
-            ArrayList<TrackListData> list = intent.getParcelableArrayListExtra(PlayerService.EXTRA_TRACK_LIST);
-
-            if (trackList == null || !trackList.equals(list)) trackList = list;
 
             if (lastUri == null || !data.trackUri.matches(lastUri)) {
                 if (first) {
@@ -222,10 +205,6 @@ public class Playbar {
                 bg.setClickable(true);
                 toggle.setClickable(true);
                 next.setClickable(true);
-
-                adapter.swapData(trackList, songPos);
-                if (trackList != null && trackList.size() > 0) nextPlaying.setVisibility(View.VISIBLE);
-                else nextPlaying.setVisibility(View.GONE);
 
                 if (behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
                     behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);

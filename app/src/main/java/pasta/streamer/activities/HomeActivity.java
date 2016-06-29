@@ -94,8 +94,6 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     Toolbar toolbar;
     @Bind(R.id.appbar)
     AppBarLayout appbar;
-    @Bind(R.id.coordinator)
-    CoordinatorLayout coordinatorLayout;
     @Nullable @Bind(R.id.drawer_layout)
     DrawerLayout drawer_layout;
     @Bind(R.id.drawer)
