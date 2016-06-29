@@ -71,7 +71,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<String> result) {
                 if (result == null) {
-                    pasta.onNetworkError(activity, "new releases action");
+                    pasta.onCriticalError(activity, "new releases action");
                     return;
                 }
 
@@ -131,7 +131,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (result == null) {
-                    pasta.onNetworkError(activity, "featured playlists action");
+                    pasta.onCriticalError(activity, "featured playlists action");
                     return;
                 }
                 playlistFragment.swapData(result);

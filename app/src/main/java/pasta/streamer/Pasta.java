@@ -4,8 +4,15 @@ import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +22,7 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import kaaes.spotify.webapi.android.models.PlaylistTrack;
@@ -41,12 +49,12 @@ public class Pasta extends Application {
 
     private AppCompatDialog errorDialog;
 
-    public void onNetworkError(final Context context, String message) {
+    public void onCriticalError(final Context context, String message) {
         if (errorDialog == null || !errorDialog.isShowing()) {
-            String errorMessage = context.getString(R.string.error_msg);
+            String errorMessage = getString(R.string.error_msg);
             if (Settings.isDebug(this))
                 errorMessage += "\n\nError: " + message + "\nLocation: " + context.getClass().getName();
-            errorDialog = new AlertDialog.Builder(context).setIcon(StaticUtils.getVectorDrawable(this, R.drawable.ic_error)).setTitle(R.string.error).setMessage(errorMessage).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
+            errorDialog = new AlertDialog.Builder(context, R.style.AppTheme).setIcon(StaticUtils.getVectorDrawable(this, R.drawable.ic_error)).setTitle(R.string.error).setMessage(errorMessage).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
@@ -58,9 +66,31 @@ public class Pasta extends Application {
                     dialog.dismiss();
                     System.exit(0);
                 }
-            }).setCancelable(false).create();
+            }).create();
             errorDialog.show();
         }
+    }
+
+    public void onError(Context context, String message) {
+        String toastMessage = getString(R.string.error);
+        if (Settings.isDebug(this))
+            toastMessage += "\n\nError: " + message + "\nLocation: " + context.getClass().getName();
+
+        showToast(toastMessage);
+    }
+
+    public void showToast(String message) {
+        Toast toast = new Toast(this);
+
+        View snackbar = LayoutInflater.from(this).inflate(R.layout.snackbar_layout, null);
+        ((TextView) snackbar.findViewById(R.id.message)).setText(message);
+        ViewCompat.setElevation(snackbar, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
+
+        toast.setView(snackbar);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setMargin(0, 0);
+        toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
+        toast.show();
     }
 
     public ArrayList<AlbumListData> albums;
@@ -68,7 +98,7 @@ public class Pasta extends Application {
 
     public ArrayList<AlbumListData> getFavoriteAlbums() {
         if (albums == null) {
-            onNetworkError(this, "null favorite albums");
+            onCriticalError(this, "null favorite albums");
             return null;
         }
         return (ArrayList<AlbumListData>) albums.clone();
@@ -76,7 +106,7 @@ public class Pasta extends Application {
 
     public ArrayList<TrackListData> getFavoriteTracks() {
         if (tracks == null) {
-            onNetworkError(this, "null favorite tracks");
+            onCriticalError(this, "null favorite tracks");
             return null;
         }
         return (ArrayList<TrackListData>) tracks.clone();
@@ -224,13 +254,13 @@ public class Pasta extends Application {
         }
         if (album == null) return null;
 
-        String image = "";
-        if (album.artists.size() > 0) {
-            ArtistListData artist = getArtist(album.artists.get(0).id);
-            if (artist != null) image = artist.artistImageLarge;
+        ArrayList<ArtistListData> artists = new ArrayList<>();
+        for (ArtistSimple artist : album.artists) {
+            ArtistListData artistData = getArtist(artist.id);
+            if (artistData != null) artists.add(artistData);
         }
 
-        return new AlbumListData(album, image);
+        return new AlbumListData(album, artists);
     }
 
     @Nullable
@@ -253,7 +283,13 @@ public class Pasta extends Application {
             if (tracks == null) return null;
 
             for (PlaylistTrack track : tracks.items) {
-                trackList.add(new TrackListData(track.track));
+                ArrayList<ArtistListData> artists = new ArrayList<>();
+                for (ArtistSimple artist : track.track.artists) {
+                    ArtistListData artistData = getArtist(artist.id);
+                    if (artistData != null) artists.add(artistData);
+                }
+
+                trackList.add(new TrackListData(track.track, artists));
             }
         }
 
@@ -276,7 +312,13 @@ public class Pasta extends Application {
 
         ArrayList<TrackListData> trackList = new ArrayList<>();
         for (Track track : tracks.tracks) {
-            trackList.add(new TrackListData(track));
+            ArrayList<ArtistListData> artists = new ArrayList<>();
+            for (ArtistSimple artist : track.artists) {
+                ArtistListData artistData = getArtist(artist.id);
+                if (artistData != null) artists.add(artistData);
+            }
+
+            trackList.add(new TrackListData(track, artists));
         }
         return trackList;
     }
@@ -297,7 +339,13 @@ public class Pasta extends Application {
 
         ArrayList<TrackListData> trackList = new ArrayList<>();
         for (TrackSimple track : tracks.items) {
-            trackList.add(new TrackListData(track, data.albumName, data.albumId, data.albumImage, data.albumImageLarge));
+            ArrayList<ArtistListData> artists = new ArrayList<>();
+            for (ArtistSimple artist : track.artists) {
+                ArtistListData artistData = getArtist(artist.id);
+                if (artistData != null) artists.add(artistData);
+            }
+
+            trackList.add(new TrackListData(track, data.albumName, data.albumId, data.albumImage, data.albumImageLarge, artists));
         }
         return trackList;
     }

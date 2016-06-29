@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
@@ -209,7 +208,10 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                 image = trackData.trackImage;
 
                 ((TextView) holder.v.findViewById(R.id.name)).setText(trackData.trackName);
-                ((TextView) holder.v.findViewById(R.id.extra)).setText(trackData.artistName);
+                TextView extra = (TextView) holder.v.findViewById(R.id.extra);
+                if (trackData.artistName != null) extra.setText(trackData.artistName);
+                else if (trackData.artists.size() > 0)
+                    extra.setText(trackData.artists.get(0).artistName);
 
                 holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -264,7 +266,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                                             @NonNull
                                             @Override
                                             public String id() {
-                                                return "favArtist";
+                                                return "favAlbum";
                                             }
 
                                             @Nullable
@@ -277,7 +279,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite album menu action");
                                                     return;
                                                 }
                                                 if (result) {
@@ -385,7 +387,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite playlist menu action");
                                                     return;
                                                 }
                                                 if (result) {
@@ -530,7 +532,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite artist menu action");
                                                     return;
                                                 }
                                                 if (result) {

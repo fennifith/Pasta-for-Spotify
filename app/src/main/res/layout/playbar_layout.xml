@@ -100,8 +100,10 @@
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="288dp"
+        android:layout_height="match_parent"
         android:id="@+id/nextPlaying"
         android:background="?android:colorBackground"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:nestedScrollingEnabled="false"/>
+
 </LinearLayout>

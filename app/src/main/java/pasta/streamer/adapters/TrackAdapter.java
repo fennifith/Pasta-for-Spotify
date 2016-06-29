@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
@@ -124,7 +123,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             case Settings.ORDER_ARTIST:
                 Collections.sort(list, new Comparator<TrackListData>() {
                     public int compare(TrackListData first, TrackListData second) {
-                        return first.artistName.compareTo(second.artistName);
+                        if (first.artistName != null && second.artistName != null)
+                            return first.artistName.compareTo(second.artistName);
+                        else if (first.artists.size() > 0 && second.artists.size() > 0)
+                            return first.artists.get(0).artistName.compareTo(second.artists.get(0).artistName);
+                        else return 0;
                     }
                 });
                 break;
@@ -216,7 +219,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                     @Override
                                     protected void done(@Nullable Boolean result) {
                                         if (result == null) {
-                                            Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                            pasta.onError(activity, "favorite track menu action");
                                             return;
                                         }
                                         if (result) item.setTitle(R.string.unfav);
@@ -228,7 +231,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                 }.execute();
                                 break;
                             case R.id.action_add:
-                                StaticUtils.showAddToDialog(activity, list.get(holder.getAdapterPosition()));
+                                StaticUtils.showAddToDialog(pasta, list.get(holder.getAdapterPosition()));
                                 break;
                             case R.id.action_album:
                                 new Action<AlbumListData>() {
@@ -257,30 +260,46 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                 }.execute();
                                 break;
                             case R.id.action_artist:
-                                new Action<ArtistListData>() {
-                                    @NonNull
-                                    @Override
-                                    public String id() {
-                                        return "gotoArtist";
-                                    }
+                                TrackListData track = list.get(holder.getAdapterPosition());
+                                if (track.artists.size() > 0) {
+                                    Bundle args = new Bundle();
+                                    args.putParcelable("artist", track.artists.get(0));
 
-                                    @Nullable
-                                    @Override
-                                    protected ArtistListData run() throws InterruptedException {
-                                        return pasta.getArtist(list.get(holder.getAdapterPosition()).artistId);
-                                    }
+                                    Fragment f = new ArtistFragment();
+                                    f.setArguments(args);
 
-                                    @Override
-                                    protected void done(@Nullable ArtistListData result) {
-                                        Bundle args = new Bundle();
-                                        args.putParcelable("artist", result);
+                                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                                } else if (track.artistId != null) {
+                                    new Action<ArtistListData>() {
+                                        @NonNull
+                                        @Override
+                                        public String id() {
+                                            return "gotoArtist";
+                                        }
 
-                                        Fragment f = new ArtistFragment();
-                                        f.setArguments(args);
+                                        @Nullable
+                                        @Override
+                                        protected ArtistListData run() throws InterruptedException {
+                                            return pasta.getArtist(list.get(holder.getAdapterPosition()).artistId);
+                                        }
 
-                                        activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                                    }
-                                }.execute();
+                                        @Override
+                                        protected void done(@Nullable ArtistListData result) {
+                                            if (result == null) {
+                                                pasta.onError(activity, "artist menu action");
+                                                return;
+                                            }
+
+                                            Bundle args = new Bundle();
+                                            args.putParcelable("artist", result);
+
+                                            Fragment f = new ArtistFragment();
+                                            f.setArguments(args);
+
+                                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                                        }
+                                    }.execute();
+                                }
                                 break;
                             case R.id.action_playlist_remove:
                                 new Action<Boolean>() {
@@ -306,10 +325,10 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                     @Override
                                     protected void done(@Nullable Boolean result) {
                                         if (result == null || !result) {
-                                            Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                            pasta.onError(activity, "remove (from playlist) track action");
                                             return;
                                         }
-                                        Toast.makeText(activity, R.string.playlist_removed, Toast.LENGTH_SHORT).show();
+                                        pasta.showToast(activity.getString(R.string.playlist_removed));
                                         removeData(list.get(holder.getAdapterPosition()));
                                     }
                                 }.execute();
@@ -325,7 +344,9 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         TrackListData trackData = list.get(position);
 
         ((TextView) holder.v.findViewById(R.id.name)).setText(trackData.trackName);
-        ((TextView) holder.v.findViewById(R.id.extra)).setText(trackData.artistName);
+        TextView extra = (TextView) holder.v.findViewById(R.id.extra);
+        if (trackData.artistName != null) extra.setText(trackData.artistName);
+        if (trackData.artists.size() > 0) extra.setText(trackData.artists.get(0).artistName);
 
         holder.v.setOnClickListener(new View.OnClickListener() {
             @Override

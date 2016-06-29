@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -68,6 +67,14 @@ public class PlayerService extends Service {
     private ArrayList<TrackListData> trackList;
     private int curPos, errorCount;
     private boolean debugPlaying;
+
+    private Pasta pasta;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        pasta = (Pasta) getApplicationContext();
+    }
 
     @Override
     public void onDestroy() {
@@ -156,7 +163,7 @@ public class PlayerService extends Service {
             errorCount++;
             if (errorCount > 5 && errorCount < 20) {
                 if (Settings.isDebug(this))
-                    Toast.makeText(getApplicationContext(), message + ", attempting to restart...", Toast.LENGTH_SHORT).show();
+                    pasta.showToast(message + ", attempting to restart...");
 
                 stopService(new Intent(this, PlayerService.class));
 
@@ -167,7 +174,7 @@ public class PlayerService extends Service {
                 startService(intent);
                 errorCount = 20;
             } else if (Settings.isDebug(this))
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                pasta.showToast(message);
         }
     }
 
@@ -279,14 +286,18 @@ public class PlayerService extends Service {
     private NotificationCompat.Builder getNotificationBuilder() {
         boolean vectors = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
-        return new NotificationCompat.Builder(PlayerService.this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(PlayerService.this)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(trackList.get(curPos).trackName)
-                .setContentText(trackList.get(curPos).artistName)
                 .addAction(vectors ? R.drawable.ic_prev : 0, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(vectors ? (spotifyPlayerState.playing ? R.drawable.ic_pause : R.drawable.ic_play) : 0, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(vectors ? R.drawable.ic_next : 0, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(PendingIntent.getActivities(PlayerService.this, 0, new Intent[]{new Intent(PlayerService.this, PlayerActivity.class)}, 0));
+
+        if (trackList.get(curPos).artistName != null)
+            builder.setContentText(trackList.get(curPos).artistName);
+
+        return builder;
     }
 
     private void showNotification() {

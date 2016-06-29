@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
@@ -208,7 +207,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite track action");
                                                     return;
                                                 }
                                                 if (result) item.setTitle(R.string.unfav);
@@ -221,7 +220,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                         }.execute();
                                         break;
                                     case R.id.action_add:
-                                        StaticUtils.showAddToDialog(activity, ((TrackListData) list.get(holder.getAdapterPosition())));
+                                        StaticUtils.showAddToDialog(pasta, ((TrackListData) list.get(holder.getAdapterPosition())));
                                         break;
                                     case R.id.action_album:
                                         new Action<AlbumListData>() {
@@ -239,6 +238,11 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
                                             @Override
                                             protected void done(@Nullable AlbumListData result) {
+                                                if (result == null) {
+                                                    pasta.onError(activity, "album menu action");
+                                                    return;
+                                                }
+
                                                 Bundle args = new Bundle();
                                                 args.putParcelable("album", result);
 
@@ -250,30 +254,46 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                         }.execute();
                                         break;
                                     case R.id.action_artist:
-                                        new Action<ArtistListData>() {
-                                            @NonNull
-                                            @Override
-                                            public String id() {
-                                                return "gotoArtist";
-                                            }
+                                        TrackListData track = (TrackListData) list.get(holder.getAdapterPosition());
+                                        if (track.artists.size() > 0) {
+                                            Bundle args = new Bundle();
+                                            args.putParcelable("artist", track.artists.get(0));
 
-                                            @Nullable
-                                            @Override
-                                            protected ArtistListData run() throws InterruptedException {
-                                                return pasta.getArtist(((TrackListData) list.get(holder.getAdapterPosition())).artistId);
-                                            }
+                                            Fragment f = new ArtistFragment();
+                                            f.setArguments(args);
 
-                                            @Override
-                                            protected void done(@Nullable ArtistListData result) {
-                                                Bundle args = new Bundle();
-                                                args.putParcelable("artist", result);
+                                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                                        } else if (track.artistId != null) {
+                                            new Action<ArtistListData>() {
+                                                @NonNull
+                                                @Override
+                                                public String id() {
+                                                    return "gotoArtist";
+                                                }
 
-                                                Fragment f = new ArtistFragment();
-                                                f.setArguments(args);
+                                                @Nullable
+                                                @Override
+                                                protected ArtistListData run() throws InterruptedException {
+                                                    return pasta.getArtist(((TrackListData) list.get(holder.getAdapterPosition())).artistId);
+                                                }
 
-                                                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                                            }
-                                        }.execute();
+                                                @Override
+                                                protected void done(@Nullable ArtistListData result) {
+                                                    if (result == null) {
+                                                        pasta.onError(activity, "artist menu action");
+                                                        return;
+                                                    }
+
+                                                    Bundle args = new Bundle();
+                                                    args.putParcelable("artist", result);
+
+                                                    Fragment f = new ArtistFragment();
+                                                    f.setArguments(args);
+
+                                                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                                                }
+                                            }.execute();
+                                        }
                                         break;
                                 }
                                 return false;
@@ -288,7 +308,11 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                 image = trackData.trackImage;
 
                 ((TextView) holder.v.findViewById(R.id.name)).setText(trackData.trackName);
-                ((TextView) holder.v.findViewById(R.id.extra)).setText(trackData.artistName);
+                TextView extra = (TextView) holder.v.findViewById(R.id.extra);
+                if (trackData.artistName != null) extra.setText(trackData.artistName);
+                else if (trackData.artists.size() > 0)
+                    extra.setText(trackData.artists.get(0).artistName);
+                else extra.setText("");
 
                 holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -366,7 +390,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite album menu action");
                                                     return;
                                                 }
                                                 if (result) {
@@ -503,7 +527,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite playlist menu action");
                                                     return;
                                                 }
                                                 if (result) {
@@ -527,7 +551,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                             @Override
                                             public void onClick(final DialogInterface dialog, int which) {
                                                 if (((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString().length() < 1) {
-                                                    Toast.makeText(activity, R.string.no_playlist_text, Toast.LENGTH_SHORT).show();
+                                                    pasta.showToast(activity.getString(R.string.no_playlist_text));
                                                     return;
                                                 }
 
@@ -559,7 +583,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                                     @Override
                                                     protected void done(@Nullable Boolean result) {
                                                         if (result == null || !result) {
-                                                            Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                            pasta.onError(activity, "modify playlist action");
                                                         } else notifyItemChanged(holder.getAdapterPosition());
                                                     }
                                                 }.execute();
@@ -677,7 +701,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                             @Override
                                             protected void done(@Nullable Boolean result) {
                                                 if (result == null) {
-                                                    Toast.makeText(activity, R.string.error, Toast.LENGTH_SHORT).show();
+                                                    pasta.onError(activity, "favorite artist menu action");
                                                     return;
                                                 }
                                                 if (result) {

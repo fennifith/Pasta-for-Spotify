@@ -192,7 +192,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable ArrayList<TrackListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
-                if (result == null) pasta.onNetworkError(getActivity(), "artist tracks action");
+                if (result == null) pasta.onError(getActivity(), "artist tracks action");
                 else adapter.addData(result);
             }
         }, new Action<ArrayList<String>>() {
@@ -234,7 +234,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable ArrayList<String> result) {
                 if (result == null) {
-                    pasta.onNetworkError(getActivity(), "artist albums action");
+                    pasta.onError(getActivity(), "artist albums action");
                     return;
                 }
                 for (final String id : result) {
@@ -275,7 +275,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
-                if (result == null) pasta.onNetworkError(getContext(), "artist playlists action");
+                if (result == null) pasta.onError(getContext(), "artist playlists action");
                 else adapter.addData(result);
             }
         }, new Action<ArrayList<ArtistListData>>() {
@@ -319,7 +319,7 @@ public class ArtistFragment extends FullScreenFragment {
             protected void done(@Nullable ArrayList<ArtistListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null)
-                    pasta.onNetworkError(getContext(), "artist related artists action");
+                    pasta.onError(getContext(), "artist related artists action");
                 else adapter.addData(result);
             }
         });
@@ -403,7 +403,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    pasta.onNetworkError(getActivity(), "artist favorite action");
+                    pasta.onError(getActivity(), "artist favorite action");
                     return;
                 }
                 if (result) {
@@ -440,7 +440,7 @@ public class ArtistFragment extends FullScreenFragment {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(getActivity(), "artist favorite menu action");
+                            pasta.onError(getActivity(), "artist favorite menu action");
                             return;
                         }
                         if (result) {

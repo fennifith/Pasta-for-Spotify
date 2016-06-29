@@ -18,7 +18,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
 
 import com.afollestad.async.Action;
 
@@ -65,7 +64,7 @@ public class StaticUtils {
         }
     }
 
-    public static void showAddToDialog(final Context context, final TrackListData data) {
+    public static void showAddToDialog(final Pasta pasta, final TrackListData data) {
         new Action<ArrayList<PlaylistListData>>() {
             @NonNull
             @Override
@@ -76,7 +75,6 @@ public class StaticUtils {
             @Nullable
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
-                Pasta pasta = (Pasta) context.getApplicationContext();
                 Pager<PlaylistSimple> pager;
                 try {
                     pager = pasta.spotifyService.getMyPlaylists();
@@ -100,7 +98,7 @@ public class StaticUtils {
                 for (int i = 0; i < result.size(); i++) {
                     names[i] = result.get(i).playlistName;
                 }
-                new AlertDialog.Builder(context).setTitle(R.string.add).setItems(names, new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(pasta, R.style.AppTheme).setTitle(R.string.add).setItems(names, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, final int which) {
                         dialog.dismiss();
@@ -118,7 +116,7 @@ public class StaticUtils {
                                     PlaylistListData playlist = result.get(which);
                                     Map<String, Object> tracks = new HashMap<>();
                                     tracks.put("uris", "spotify:track:" + data.trackId);
-                                    ((Pasta) context.getApplicationContext()).spotifyService.addTracksToPlaylist(playlist.playlistOwnerId, playlist.playlistId, tracks, tracks);
+                                    pasta.spotifyService.addTracksToPlaylist(playlist.playlistOwnerId, playlist.playlistId, tracks, tracks);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     return false;
@@ -129,7 +127,7 @@ public class StaticUtils {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null) result = false;
-                                Toast.makeText(context, result ? R.string.added : R.string.error, Toast.LENGTH_SHORT).show();
+                                pasta.showToast(pasta.getString(result ? R.string.added : R.string.error));
                             }
                         }.execute();
                     }

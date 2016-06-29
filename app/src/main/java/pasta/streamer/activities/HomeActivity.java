@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -63,6 +62,7 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.AlbumSimple;
 import kaaes.spotify.webapi.android.models.AlbumsPager;
 import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.TracksPager;
@@ -230,15 +230,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                                 break;
                             case 4:
                                 if (!playbar.playing) {
-                                    Snackbar snackbar = Snackbar.make(coordinatorLayout, "Nothing is playing...", Snackbar.LENGTH_SHORT);
-
-                                    if (!isPlaybarHidden) {
-                                        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbar.getView().getLayoutParams();
-                                        params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.playbar_size);
-                                        snackbar.getView().setLayoutParams(params);
-                                    }
-
-                                    snackbar.show();
+                                    pasta.showToast(getString(R.string.nothing_playing));
 
                                     if (drawer_layout != null) drawer_layout.closeDrawer(Gravity.LEFT);
                                     return false;
@@ -409,23 +401,6 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                         fab.setImageDrawable(StaticUtils.getVectorDrawable(HomeActivity.this, iconRes));
                         fab.setOnClickListener(clickListener);
                     }
-
-                    @Override
-                    public Snackbar showSnackbar(String text, @Nullable String button, @Nullable View.OnClickListener clickListener) {
-                        boolean hasButton = button != null && clickListener != null;
-
-                        Snackbar snackbar = Snackbar.make(coordinatorLayout, text, hasButton ? Snackbar.LENGTH_INDEFINITE : Snackbar.LENGTH_SHORT);
-                        if (hasButton) snackbar.setAction(button, clickListener);
-
-                        if (!isPlaybarHidden) {
-                            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbar.getView().getLayoutParams();
-                            params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.playbar_size);
-                            snackbar.getView().setLayoutParams(params);
-                        }
-
-                        snackbar.show();
-                        return snackbar;
-                    }
                 });
             }
 
@@ -479,8 +454,13 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 if (tracksPager == null) return null;
 
                 for (Track track : tracksPager.tracks.items) {
-                    TrackListData trackData = new TrackListData(track);
-                    list.add(trackData);
+                    ArrayList<ArtistListData> artists = new ArrayList<>();
+                    for (ArtistSimple artist : track.artists) {
+                        ArtistListData artistData = pasta.getArtist(artist.id);
+                        if (artistData != null) artists.add(artistData);
+                    }
+
+                    list.add(new TrackListData(track, artists));
                 }
 
                 return list;

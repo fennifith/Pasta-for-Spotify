@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
@@ -139,7 +138,7 @@ public class PlaylistFragment extends FullScreenFragment {
             protected void done(@Nullable ArrayList<TrackListData> result) {
                 spinner.setVisibility(View.GONE);
                 if (result == null) {
-                    pasta.onNetworkError(getContext(), "playlist tracks action");
+                    pasta.onCriticalError(getContext(), "playlist tracks action");
                     return;
                 }
                 adapter.swapData(result);
@@ -241,7 +240,7 @@ public class PlaylistFragment extends FullScreenFragment {
             @Override
             protected void done(@Nullable Boolean result) {
                 if (result == null) {
-                    pasta.onNetworkError(getActivity(), "playlist favorite action");
+                    pasta.onError(getActivity(), "playlist favorite action");
                     return;
                 }
                 if (result) {
@@ -278,7 +277,7 @@ public class PlaylistFragment extends FullScreenFragment {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(getContext(), "playlist favorite menu action");
+                            pasta.onError(getContext(), "playlist favorite menu action");
                             return;
                         }
                         if (result) {
@@ -300,7 +299,7 @@ public class PlaylistFragment extends FullScreenFragment {
                     @Override
                     public void onClick(final DialogInterface dialog, int which) {
                         if (((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString().length() < 1) {
-                            Toast.makeText(getContext(), R.string.no_playlist_text, Toast.LENGTH_SHORT).show();
+                            pasta.showToast(getString(R.string.no_playlist_text));
                             return;
                         }
 
@@ -330,7 +329,7 @@ public class PlaylistFragment extends FullScreenFragment {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null || !result) {
-                                    pasta.onNetworkError(getContext(), "playlist edit action");
+                                    pasta.onError(getContext(), "playlist edit action");
                                 } else {
                                     data.playlistName = (String) map.get("name");
                                     data.playlistPublic = (Boolean) map.get("public");

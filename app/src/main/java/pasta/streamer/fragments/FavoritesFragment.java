@@ -15,7 +15,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.afollestad.async.Action;
 
@@ -82,7 +81,7 @@ public class FavoritesFragment extends FabFragment {
                     @Override
                     public void onClick(final DialogInterface dialog, int which) {
                         if (((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString().length() < 1) {
-                            Toast.makeText(getContext(), R.string.no_playlist_text, Toast.LENGTH_SHORT).show();
+                            pasta.showToast(getString(R.string.no_playlist_text));
                             return;
                         }
 
@@ -112,7 +111,7 @@ public class FavoritesFragment extends FabFragment {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null || !result) {
-                                    pasta.onNetworkError(getActivity(), "create playlist action");
+                                    pasta.onError(getActivity(), "create playlist action");
                                 } else {
                                     adapter.load();
                                 }

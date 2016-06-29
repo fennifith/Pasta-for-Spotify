@@ -1,6 +1,5 @@
 package pasta.streamer.fragments;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,12 +12,10 @@ import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
@@ -30,10 +27,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.HomeActivity;
 import pasta.streamer.utils.Settings;
-import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
 public class SettingsFragment extends FabFragment {
@@ -44,10 +41,10 @@ public class SettingsFragment extends FabFragment {
     CustomImageView accent;
 
     private View rootView;
-    private Snackbar snackbar;
 
     private int selectedLimit, selectedQuality, selectedOrder;
     private SharedPreferences prefs;
+    private Pasta pasta;
 
     @Nullable
     @Override
@@ -55,6 +52,7 @@ public class SettingsFragment extends FabFragment {
         rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false).getRoot();
         ButterKnife.bind(this, rootView);
 
+        pasta = (Pasta) getContext().getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         return rootView;
@@ -63,7 +61,6 @@ public class SettingsFragment extends FabFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (snackbar != null) snackbar.dismiss();
         ButterKnife.unbind(this);
     }
 
@@ -71,7 +68,6 @@ public class SettingsFragment extends FabFragment {
     public void changePreload(boolean preload) {
         if (prefs != null && preload != Settings.isPreload(getContext())) {
             prefs.edit().putBoolean(Settings.PRELOAD, preload).apply();
-            onChange();
         }
     }
 
@@ -79,7 +75,6 @@ public class SettingsFragment extends FabFragment {
     public void changeDebug(boolean debug) {
         if (prefs != null && debug != Settings.isDebug(getContext())) {
             prefs.edit().putBoolean(Settings.DEBUG, debug).apply();
-            onChange();
         }
     }
 
@@ -94,7 +89,7 @@ public class SettingsFragment extends FabFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 prefs.edit().putInt(Settings.LIMIT, selectedLimit).apply();
-                onChange();
+                pasta.showToast(getString(R.string.restart_msg));
                 dialog.dismiss();
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -135,7 +130,7 @@ public class SettingsFragment extends FabFragment {
                         startActivity(intent);
                     }
 
-                    Toast.makeText(getContext(), R.string.clear_data_msg, Toast.LENGTH_SHORT).show();
+                    pasta.showToast(pasta.getString(R.string.clear_data_msg));
                 }
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -164,7 +159,7 @@ public class SettingsFragment extends FabFragment {
     public void changeDarkMode(boolean dark) {
         if (prefs != null && dark != Settings.isDarkTheme(getContext())) {
             prefs.edit().putBoolean(Settings.DARK_THEME, dark).apply();
-            onChange();
+            pasta.showToast(getString(R.string.restart_msg));
         }
     }
 
@@ -172,7 +167,7 @@ public class SettingsFragment extends FabFragment {
     public void changeThumbnails(boolean thumbnails) {
         if (prefs != null && thumbnails != Settings.isThumbnails(getContext())) {
             prefs.edit().putBoolean(Settings.THUMBNAILS, thumbnails).apply();
-            onChange();
+            pasta.showToast(getString(R.string.restart_msg));
         }
     }
 
@@ -180,7 +175,6 @@ public class SettingsFragment extends FabFragment {
     public void changeCards(boolean cards) {
         if (prefs != null && cards != Settings.isCards(getContext())) {
             prefs.edit().putBoolean(Settings.CARDS, cards).apply();
-            onChange();
         }
     }
 
@@ -188,7 +182,6 @@ public class SettingsFragment extends FabFragment {
     public void changeListTracks(boolean listTracks) {
         if (prefs != null && listTracks != Settings.isListTracks(getContext())) {
             prefs.edit().putBoolean(Settings.LIST_TRACKS, listTracks).apply();
-            onChange();
         }
     }
 
@@ -196,7 +189,7 @@ public class SettingsFragment extends FabFragment {
     public void changePalette(boolean palette) {
         if (prefs != null && palette != Settings.isPalette(getContext())) {
             prefs.edit().putBoolean(Settings.PALETTE, palette).apply();
-            onChange();
+            pasta.showToast(getString(R.string.restart_msg));
         }
     }
 
@@ -238,7 +231,7 @@ public class SettingsFragment extends FabFragment {
             default:
                 return;
         }
-        onChange();
+        pasta.showToast(getString(R.string.restart_msg));
     }
 
     @OnClick(R.id.quality)
@@ -264,7 +257,7 @@ public class SettingsFragment extends FabFragment {
                         prefs.edit().putString(Settings.QUALITY, PlaybackBitrate.BITRATE_HIGH.toString()).apply();
                         break;
                 }
-                onChange();
+                pasta.showToast(getString(R.string.restart_msg));
                 d.dismiss();
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -286,19 +279,8 @@ public class SettingsFragment extends FabFragment {
             @Override
             public void onClick(DialogInterface d, int which) {
                 PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(Settings.ORDER, selectedOrder).apply();
-                onChange();
                 d.dismiss();
             }
         }).show();
-    }
-
-    private void onChange() {
-        final Activity activity = getActivity();
-        snackbar = showSnackbar(getString(R.string.restart_msg), getString(R.string.restart), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StaticUtils.restart(activity);
-            }
-        });
     }
 }

@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         protected void done(@Nullable Boolean result) {
                             if (result == null || !result)
-                                pasta.onNetworkError(MainActivity.this, "user action");
+                                pasta.onCriticalError(MainActivity.this, "user action");
                         }
                     }, new Action<Boolean>() {
                         @NonNull
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         protected void done(@Nullable Boolean result) {
                             if (result == null || !result)
-                                pasta.onNetworkError(MainActivity.this, "favorite album action");
+                                pasta.onCriticalError(MainActivity.this, "favorite album action");
                         }
                     }, new Action<Boolean>() {
                         @NonNull
@@ -171,7 +171,13 @@ public class MainActivity extends AppCompatActivity {
 
                             ArrayList<TrackListData> tracks = new ArrayList<>();
                             for (SavedTrack track : trackPager.items) {
-                                tracks.add(new TrackListData(track.track));
+                                ArrayList<ArtistListData> artists = new ArrayList<>();
+                                for (ArtistSimple artist : track.track.artists) {
+                                    ArtistListData artistData = pasta.getArtist(artist.id);
+                                    if (artistData != null) artists.add(artistData);
+                                }
+
+                                tracks.add(new TrackListData(track.track, artists));
                             }
                             pasta.tracks = tracks;
 
@@ -181,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         protected void done(@Nullable Boolean result) {
                             if (result == null || !result)
-                                pasta.onNetworkError(MainActivity.this, "favorite tracks action");
+                                pasta.onCriticalError(MainActivity.this, "favorite tracks action");
                         }
                     }).done(new Done() {
                         @Override
@@ -215,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     break;
                 case ERROR:
-                    pasta.onNetworkError(MainActivity.this, "auth");
+                    pasta.onCriticalError(MainActivity.this, "auth");
             }
         }
     }

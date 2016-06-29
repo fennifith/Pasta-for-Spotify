@@ -62,7 +62,10 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ButterKnife.findById(holder.v, R.id.image).setVisibility(View.GONE);
 
         ((TextView) ButterKnife.findById(holder.v, R.id.name)).setText(track.trackName);
-        ((TextView) ButterKnife.findById(holder.v, R.id.extra)).setText(track.artistName);
+        TextView extra = ButterKnife.findById(holder.v, R.id.extra);
+        if (track.artistName != null) extra.setText(track.artistName);
+        else if (track.artists.size() > 0) extra.setText(track.artists.get(0).artistName);
+        else extra.setText("");
 
         String duration = String.valueOf(track.trackDuration);
         ((TextView) ButterKnife.findById(holder.v, R.id.time)).setText(StaticUtils.timeToString((Integer.parseInt(duration) / 1000) / 60, (Integer.parseInt(duration) / 1000) % 60));

@@ -215,7 +215,9 @@ public class Playbar {
                 }
 
                 title.setText(data.trackName);
-                subtitle.setText(data.artistName);
+                if (data.artistName != null) subtitle.setText(data.artistName);
+                else if (data.artists.size() > 0) subtitle.setText(data.artists.get(0).artistName);
+                else subtitle.setText("");
 
                 bg.setClickable(true);
                 toggle.setClickable(true);

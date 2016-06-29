@@ -242,7 +242,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this, "favorite track menu action");
+                            pasta.onError(PlayerActivity.this, "favorite track menu action");
                             return;
                         }
                         if (result) {
@@ -255,7 +255,7 @@ public class PlayerActivity extends AppCompatActivity {
                 }.execute();
                 break;
             case R.id.action_add:
-                StaticUtils.showAddToDialog(PlayerActivity.this, trackList.get(curPosition));
+                StaticUtils.showAddToDialog(pasta, trackList.get(curPosition));
                 break;
             case R.id.action_album:
                 new Action<AlbumListData>() {
@@ -274,7 +274,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable AlbumListData result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this, "album menu action");
+                            pasta.onError(PlayerActivity.this, "album menu action");
                             return;
                         }
                         Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
@@ -284,30 +284,37 @@ public class PlayerActivity extends AppCompatActivity {
                 }.execute();
                 break;
             case R.id.action_artist:
-                new Action<ArtistListData>() {
-                    @NonNull
-                    @Override
-                    public String id() {
-                        return "gotoAlbum";
-                    }
-
-                    @Nullable
-                    @Override
-                    protected ArtistListData run() throws InterruptedException {
-                        return pasta.getArtist(trackList.get(curPosition).artistId);
-                    }
-
-                    @Override
-                    protected void done(@Nullable ArtistListData result) {
-                        if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this, "artist menu action");
-                            return;
+                TrackListData track = trackList.get(curPosition);
+                if (track.artists.size() > 0) {
+                    Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
+                    i.putExtra("artist", track.artists.get(0));
+                    startActivity(i);
+                } else if (track.artistId != null) {
+                    new Action<ArtistListData>() {
+                        @NonNull
+                        @Override
+                        public String id() {
+                            return "gotoArtist";
                         }
-                        Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
-                        i.putExtra("artist", result);
-                        startActivity(i);
-                    }
-                }.execute();
+
+                        @Nullable
+                        @Override
+                        protected ArtistListData run() throws InterruptedException {
+                            return pasta.getArtist(trackList.get(curPosition).artistId);
+                        }
+
+                        @Override
+                        protected void done(@Nullable ArtistListData result) {
+                            if (result == null) {
+                                pasta.onError(PlayerActivity.this, "artist menu action");
+                                return;
+                            }
+                            Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
+                            i.putExtra("artist", result);
+                            startActivity(i);
+                        }
+                    }.execute();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -426,7 +433,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     protected void done(@Nullable Boolean result) {
                         if (result == null) {
-                            pasta.onNetworkError(PlayerActivity.this, "favorite action");
+                            pasta.onError(PlayerActivity.this, "favorite action");
                             return;
                         }
 
@@ -440,7 +447,9 @@ public class PlayerActivity extends AppCompatActivity {
                 };
 
                 title.setText(data.trackName);
-                subtitle.setText(data.artistName);
+                if (data.artistName != null) subtitle.setText(data.artistName);
+                else if (data.artists.size() > 0) subtitle.setText(data.artists.get(0).artistName);
+                else subtitle.setText("");
                 if (subtitle2 != null) subtitle2.setText(data.albumName);
 
                 adapter.swapData(trackList, curPosition);

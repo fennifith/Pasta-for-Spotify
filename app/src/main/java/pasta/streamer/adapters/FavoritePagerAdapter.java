@@ -87,7 +87,7 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<PlaylistListData> result) {
                 if (result == null) {
-                    pasta.onNetworkError(activity, "favorite playlist action");
+                    pasta.onError(activity, "favorite playlist action");
                     return;
                 }
                 playlistFragment.swapData(result);
@@ -130,7 +130,7 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected void done(@Nullable ArrayList<ArtistListData> result) {
                 if (result == null) {
-                    pasta.onNetworkError(activity, "favorite artist action");
+                    pasta.onError(activity, "favorite artist action");
                     return;
                 }
                 artistFragment.swapData(result);
