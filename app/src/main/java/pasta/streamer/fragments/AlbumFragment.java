@@ -133,40 +133,63 @@ public class AlbumFragment extends FullScreenFragment {
         });
 
         if (data.artists.size() > 0) {
-            for (ArtistListData artist : data.artists) {
-                View v = LayoutInflater.from(getContext()).inflate(R.layout.artist_item_chip, null);
-                ((TextView) v.findViewById(R.id.title)).setText(artist.artistName);
-                Glide.with(getContext()).load(artist.artistImage).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
-                    @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                        ((CustomImageView) getView()).transition(resource);
-                    }
-                });
-
-                v.setTag(artist);
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle args = new Bundle();
-                        args.putParcelable("artist", (ArtistListData) v.getTag());
-
-                        Fragment f = new ArtistFragment();
-                        f.setArguments(args);
-
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                    }
-                });
-                artists.addView(v);
-            }
-
-            artists.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            new Action<ArrayList<ArtistListData>>() {
+                @NonNull
                 @Override
-                public void onGlobalLayout() {
-                    if (recycler != null) recycler.setPadding(0, artists.getHeight(), 0, 0);
-                    if (artists != null)
-                        artists.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                public String id() {
+                    return "getArtists";
                 }
-            });
+
+                @Nullable
+                @Override
+                protected ArrayList<ArtistListData> run() throws InterruptedException {
+                    ArrayList<ArtistListData> artists = new ArrayList<>();
+                    for (ArtistListData artist : data.artists) {
+                        ArtistListData artist2 = pasta.getArtist(artist.artistId);
+                        if (artist2 != null) artists.add(artist2);
+                    }
+                    return artists;
+                }
+
+                @Override
+                protected void done(@Nullable ArrayList<ArtistListData> result) {
+                    if (result == null) return;
+                    for (ArtistListData artist : result) {
+                        View v = LayoutInflater.from(getContext()).inflate(R.layout.artist_item_chip, null);
+                        ((TextView) v.findViewById(R.id.title)).setText(artist.artistName);
+                        Glide.with(getContext()).load(artist.artistImage).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
+                            @Override
+                            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
+                                ((CustomImageView) getView()).transition(resource);
+                            }
+                        });
+
+                        v.setTag(artist);
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Bundle args = new Bundle();
+                                args.putParcelable("artist", (ArtistListData) v.getTag());
+
+                                Fragment f = new ArtistFragment();
+                                f.setArguments(args);
+
+                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
+                            }
+                        });
+                        artists.addView(v);
+                    }
+
+                    artists.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            if (recycler != null) recycler.setPadding(0, artists.getHeight(), 0, 0);
+                            if (artists != null)
+                                artists.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        }
+                    });
+                }
+            }.execute();
         } else artists.setVisibility(View.GONE);
 
         spinner.setVisibility(View.VISIBLE);

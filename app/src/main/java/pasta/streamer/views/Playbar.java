@@ -14,6 +14,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.util.TypedValue;
 import android.view.View;
@@ -39,7 +40,7 @@ public class Playbar {
     private TrackListData data;
     private Activity activity;
 
-    private View bg;
+    private View playbar;
     private CustomImageView art;
     private ImageView prev, toggle, next;
     private TextView title, subtitle;
@@ -61,6 +62,9 @@ public class Playbar {
     }
 
     public void initPlayBar(View playbar) {
+        this.playbar = playbar;
+        ViewCompat.setElevation(playbar, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics()));
+
         thumbnails = Settings.isThumbnails(activity);
         palette = Settings.isPalette(activity);
         dark = Settings.isDarkTheme(activity);
@@ -72,7 +76,6 @@ public class Playbar {
         bar = (ProgressBar) playbar.findViewById(R.id.progress);
         title = (TextView) playbar.findViewById(R.id.title);
         subtitle = (TextView) playbar.findViewById(R.id.subtitle);
-        bg = playbar.findViewById(R.id.bg);
 
         behavior = BottomSheetBehavior.from(playbar);
         behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -93,7 +96,7 @@ public class Playbar {
         play = StaticUtils.getVectorDrawable(activity, R.drawable.ic_play);
         pause = StaticUtils.getVectorDrawable(activity, R.drawable.ic_pause);
 
-        bg.setClickable(false);
+        playbar.setClickable(false);
         toggle.setClickable(false);
         next.setClickable(false);
 
@@ -131,7 +134,7 @@ public class Playbar {
 
             if (lastUri == null || !data.trackUri.matches(lastUri)) {
                 if (first) {
-                    bg.setOnClickListener(new View.OnClickListener() {
+                    playbar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_up, R.anim.blank);
@@ -181,11 +184,11 @@ public class Playbar {
                                     int color = palette.getDarkVibrantColor(Color.DKGRAY);
                                     if (dark) color = palette.getLightVibrantColor(Color.LTGRAY);
 
-                                    Drawable prev = bg.getBackground();
+                                    Drawable prev = playbar.getBackground();
                                     if (prev instanceof TransitionDrawable) prev = ((TransitionDrawable) prev).getDrawable(1);
 
                                     TransitionDrawable td = new TransitionDrawable(new Drawable[]{prev, new ColorDrawable(color)});
-                                    bg.setBackground(td);
+                                    playbar.setBackground(td);
                                     td.startTransition(250);
 
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -198,11 +201,10 @@ public class Playbar {
                 }
 
                 title.setText(data.trackName);
-                if (data.artistName != null) subtitle.setText(data.artistName);
-                else if (data.artists.size() > 0) subtitle.setText(data.artists.get(0).artistName);
+                if (data.artists.size() > 0) subtitle.setText(data.artists.get(0).artistName);
                 else subtitle.setText("");
 
-                bg.setClickable(true);
+                playbar.setClickable(true);
                 toggle.setClickable(true);
                 next.setClickable(true);
 

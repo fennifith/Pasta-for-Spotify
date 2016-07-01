@@ -123,9 +123,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             case Settings.ORDER_ARTIST:
                 Collections.sort(list, new Comparator<TrackListData>() {
                     public int compare(TrackListData first, TrackListData second) {
-                        if (first.artistName != null && second.artistName != null)
-                            return first.artistName.compareTo(second.artistName);
-                        else if (first.artists.size() > 0 && second.artists.size() > 0)
+                        if (first.artists.size() > 0 && second.artists.size() > 0)
                             return first.artists.get(0).artistName.compareTo(second.artists.get(0).artistName);
                         else return 0;
                     }
@@ -262,14 +260,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                             case R.id.action_artist:
                                 TrackListData track = list.get(holder.getAdapterPosition());
                                 if (track.artists.size() > 0) {
-                                    Bundle args = new Bundle();
-                                    args.putParcelable("artist", track.artists.get(0));
-
-                                    Fragment f = new ArtistFragment();
-                                    f.setArguments(args);
-
-                                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                                } else if (track.artistId != null) {
                                     new Action<ArtistListData>() {
                                         @NonNull
                                         @Override
@@ -280,7 +270,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                         @Nullable
                                         @Override
                                         protected ArtistListData run() throws InterruptedException {
-                                            return pasta.getArtist(list.get(holder.getAdapterPosition()).artistId);
+                                            return pasta.getArtist(list.get(holder.getAdapterPosition()).artists.get(0).artistId);
                                         }
 
                                         @Override
@@ -345,7 +335,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
         ((TextView) holder.v.findViewById(R.id.name)).setText(trackData.trackName);
         TextView extra = (TextView) holder.v.findViewById(R.id.extra);
-        if (trackData.artistName != null) extra.setText(trackData.artistName);
         if (trackData.artists.size() > 0) extra.setText(trackData.artists.get(0).artistName);
 
         holder.v.setOnClickListener(new View.OnClickListener() {

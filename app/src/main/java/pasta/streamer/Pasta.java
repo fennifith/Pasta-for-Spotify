@@ -16,13 +16,13 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import kaaes.spotify.webapi.android.models.PlaylistTrack;
@@ -253,14 +253,7 @@ public class Pasta extends Application {
             }
         }
         if (album == null) return null;
-
-        ArrayList<ArtistListData> artists = new ArrayList<>();
-        for (ArtistSimple artist : album.artists) {
-            ArtistListData artistData = getArtist(artist.id);
-            if (artistData != null) artists.add(artistData);
-        }
-
-        return new AlbumListData(album, artists);
+        else return new AlbumListData(album);
     }
 
     @Nullable
@@ -283,13 +276,7 @@ public class Pasta extends Application {
             if (tracks == null) return null;
 
             for (PlaylistTrack track : tracks.items) {
-                ArrayList<ArtistListData> artists = new ArrayList<>();
-                for (ArtistSimple artist : track.track.artists) {
-                    ArtistListData artistData = getArtist(artist.id);
-                    if (artistData != null) artists.add(artistData);
-                }
-
-                trackList.add(new TrackListData(track.track, artists));
+                trackList.add(new TrackListData(track.track));
             }
         }
 
@@ -301,7 +288,7 @@ public class Pasta extends Application {
         Tracks tracks = null;
         for (int i = 0; tracks == null && i < Settings.getRetryCount(this); i++) {
             try {
-                tracks = spotifyService.getArtistTopTrack(data.artistId, "US");
+                tracks = spotifyService.getArtistTopTrack(data.artistId, Locale.getDefault().getCountry());
             } catch (Exception e) {
                 e.printStackTrace();
                 if (StaticUtils.shouldResendRequest(e)) Thread.sleep(200);
@@ -312,13 +299,7 @@ public class Pasta extends Application {
 
         ArrayList<TrackListData> trackList = new ArrayList<>();
         for (Track track : tracks.tracks) {
-            ArrayList<ArtistListData> artists = new ArrayList<>();
-            for (ArtistSimple artist : track.artists) {
-                ArtistListData artistData = getArtist(artist.id);
-                if (artistData != null) artists.add(artistData);
-            }
-
-            trackList.add(new TrackListData(track, artists));
+            trackList.add(new TrackListData(track));
         }
         return trackList;
     }
@@ -339,13 +320,7 @@ public class Pasta extends Application {
 
         ArrayList<TrackListData> trackList = new ArrayList<>();
         for (TrackSimple track : tracks.items) {
-            ArrayList<ArtistListData> artists = new ArrayList<>();
-            for (ArtistSimple artist : track.artists) {
-                ArtistListData artistData = getArtist(artist.id);
-                if (artistData != null) artists.add(artistData);
-            }
-
-            trackList.add(new TrackListData(track, data.albumName, data.albumId, data.albumImage, data.albumImageLarge, artists));
+            trackList.add(new TrackListData(track, data.albumName, data.albumId, data.albumImage, data.albumImageLarge));
         }
         return trackList;
     }

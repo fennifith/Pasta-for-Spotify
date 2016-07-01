@@ -63,8 +63,7 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         ((TextView) ButterKnife.findById(holder.v, R.id.name)).setText(track.trackName);
         TextView extra = ButterKnife.findById(holder.v, R.id.extra);
-        if (track.artistName != null) extra.setText(track.artistName);
-        else if (track.artists.size() > 0) extra.setText(track.artists.get(0).artistName);
+        if (track.artists.size() > 0) extra.setText(track.artists.get(0).artistName);
         else extra.setText("");
 
         String duration = String.valueOf(track.trackDuration);

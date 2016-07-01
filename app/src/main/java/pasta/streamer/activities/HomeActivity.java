@@ -62,7 +62,6 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.AlbumSimple;
 import kaaes.spotify.webapi.android.models.AlbumsPager;
 import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.TracksPager;
@@ -115,7 +114,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     private Map<String, Object> limitMap;
     private Pool searchPool;
     private ArrayList searchDatas;
-    private boolean preload, isPlaybarHidden = true;
+    private boolean preload;
     private Pasta pasta;
 
     @Override
@@ -271,7 +270,6 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
                 layoutParams.bottomMargin = hidden ? (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()) : getResources().getDimensionPixelSize(R.dimen.bottom_playbar_padding);
                 fab.setLayoutParams(layoutParams);
-                isPlaybarHidden = hidden;
             }
         });
 
@@ -378,7 +376,8 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             appbar.setExpanded(true, false);
 
             setTitle(title);
-            if (f instanceof FavoritesFragment) materialDrawer.setSelection(2, false);
+            if (f instanceof HomeFragment) materialDrawer.setSelection(1, false);
+            else if (f instanceof FavoritesFragment) materialDrawer.setSelection(2, false);
             else if (f instanceof CategoriesFragment) materialDrawer.setSelection(3, false);
             else if (f instanceof SettingsFragment) materialDrawer.setSelection(5, false);
             else if (f instanceof AboutFragment) materialDrawer.setSelection(6, false);
@@ -452,13 +451,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 if (tracksPager == null) return null;
 
                 for (Track track : tracksPager.tracks.items) {
-                    ArrayList<ArtistListData> artists = new ArrayList<>();
-                    for (ArtistSimple artist : track.artists) {
-                        ArtistListData artistData = pasta.getArtist(artist.id);
-                        if (artistData != null) artists.add(artistData);
-                    }
-
-                    list.add(new TrackListData(track, artists));
+                    list.add(new TrackListData(track));
                 }
 
                 return list;

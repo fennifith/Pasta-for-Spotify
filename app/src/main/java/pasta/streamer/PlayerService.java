@@ -79,7 +79,7 @@ public class PlayerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        spotifyPlayer.shutdownNow();
+        if (spotifyPlayer != null) spotifyPlayer.shutdownNow();
     }
 
     private void initPlayer(String token, String clientId) {
@@ -294,8 +294,8 @@ public class PlayerService extends Service {
                 .addAction(vectors ? R.drawable.ic_next : 0, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(PendingIntent.getActivities(PlayerService.this, 0, new Intent[]{new Intent(PlayerService.this, PlayerActivity.class)}, 0));
 
-        if (trackList.get(curPos).artistName != null)
-            builder.setContentText(trackList.get(curPos).artistName);
+        if (trackList.get(curPos).artists.size() > 0)
+            builder.setContentText(trackList.get(curPos).artists.get(0).artistName);
 
         return builder;
     }

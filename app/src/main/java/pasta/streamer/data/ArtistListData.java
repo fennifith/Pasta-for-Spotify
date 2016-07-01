@@ -2,11 +2,13 @@ package pasta.streamer.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
 
 public class ArtistListData implements Parcelable {
     public static final Parcelable.Creator<ArtistListData> CREATOR = new Parcelable.Creator<ArtistListData>() {
@@ -21,14 +23,18 @@ public class ArtistListData implements Parcelable {
 
     public String artistName;
     public String artistId;
-    public String artistImage;
-    public String artistImageLarge;
+    public int followers = -1;
+
+    @Nullable
+    public String artistImage, artistImageLarge;
+
+    @Nullable
     public List<String> genres;
-    public int followers;
 
     public ArtistListData(Artist artist) {
         artistName = artist.name;
         artistId = artist.id;
+
         if (artist.images.size() > 1) {
             artistImage = artist.images.get(1).url;
             artistImageLarge = artist.images.get(0).url;
@@ -39,9 +45,14 @@ public class ArtistListData implements Parcelable {
             artistImage = "";
             artistImageLarge = "";
         }
-        followers = artist.followers.total;
 
+        followers = artist.followers.total;
         genres = artist.genres;
+    }
+
+    public ArtistListData(ArtistSimple artist) {
+        artistName = artist.name;
+        artistId = artist.id;
     }
 
     public ArtistListData(Parcel in) {

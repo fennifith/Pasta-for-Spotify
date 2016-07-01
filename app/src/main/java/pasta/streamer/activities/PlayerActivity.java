@@ -286,10 +286,6 @@ public class PlayerActivity extends AppCompatActivity {
             case R.id.action_artist:
                 TrackListData track = trackList.get(curPosition);
                 if (track.artists.size() > 0) {
-                    Intent i = new Intent(PlayerActivity.this, HomeActivity.class);
-                    i.putExtra("artist", track.artists.get(0));
-                    startActivity(i);
-                } else if (track.artistId != null) {
                     new Action<ArtistListData>() {
                         @NonNull
                         @Override
@@ -300,7 +296,7 @@ public class PlayerActivity extends AppCompatActivity {
                         @Nullable
                         @Override
                         protected ArtistListData run() throws InterruptedException {
-                            return pasta.getArtist(trackList.get(curPosition).artistId);
+                            return pasta.getArtist(trackList.get(curPosition).artists.get(0).artistId);
                         }
 
                         @Override
@@ -447,8 +443,7 @@ public class PlayerActivity extends AppCompatActivity {
                 };
 
                 title.setText(data.trackName);
-                if (data.artistName != null) subtitle.setText(data.artistName);
-                else if (data.artists.size() > 0) subtitle.setText(data.artists.get(0).artistName);
+                if (data.artists.size() > 0) subtitle.setText(data.artists.get(0).artistName);
                 else subtitle.setText("");
                 if (subtitle2 != null) subtitle2.setText(data.albumName);
 
