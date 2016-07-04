@@ -220,7 +220,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                         }.execute();
                                         break;
                                     case R.id.action_add:
-                                        StaticUtils.showAddToDialog(pasta, ((TrackListData) list.get(holder.getAdapterPosition())));
+                                        StaticUtils.showAddToDialog(activity, ((TrackListData) list.get(holder.getAdapterPosition())));
                                         break;
                                     case R.id.action_album:
                                         new Action<AlbumListData>() {

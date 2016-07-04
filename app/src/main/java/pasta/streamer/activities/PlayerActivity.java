@@ -255,7 +255,7 @@ public class PlayerActivity extends AppCompatActivity {
                 }.execute();
                 break;
             case R.id.action_add:
-                StaticUtils.showAddToDialog(pasta, trackList.get(curPosition));
+                StaticUtils.showAddToDialog(this, trackList.get(curPosition));
                 break;
             case R.id.action_album:
                 new Action<AlbumListData>() {

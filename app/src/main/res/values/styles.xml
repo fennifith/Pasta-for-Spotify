@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="StartTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="StartTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">#303030</item>
         <item name="colorPrimaryDark">#212121</item>
         <item name="colorAccent">@color/colorAccent</item>

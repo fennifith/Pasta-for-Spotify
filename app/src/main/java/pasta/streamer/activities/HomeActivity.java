@@ -588,7 +588,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
 
                 ((SearchFragment) f).swapData(searchDatas);
 
-                if (albumsResult != null && albumsResult.getResult() != null) {
+                if (albumsResult != null && !albumsResult.isCancelled() && albumsResult.getResult() != null) {
                     ArrayList<String> results = (ArrayList<String>) albumsResult.getResult();
                     Action[] varargs = new Action[results.size()];
 

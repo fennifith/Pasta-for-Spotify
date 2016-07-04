@@ -229,7 +229,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                 }.execute();
                                 break;
                             case R.id.action_add:
-                                StaticUtils.showAddToDialog(pasta, list.get(holder.getAdapterPosition()));
+                                StaticUtils.showAddToDialog(activity, list.get(holder.getAdapterPosition()));
                                 break;
                             case R.id.action_album:
                                 new Action<AlbumListData>() {

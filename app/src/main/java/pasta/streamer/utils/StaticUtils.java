@@ -64,7 +64,7 @@ public class StaticUtils {
         }
     }
 
-    public static void showAddToDialog(final Pasta pasta, final TrackListData data) {
+    public static void showAddToDialog(final Context context, final TrackListData data) {
         new Action<ArrayList<PlaylistListData>>() {
             @NonNull
             @Override
@@ -75,6 +75,8 @@ public class StaticUtils {
             @Nullable
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
+                Pasta pasta = (Pasta) context.getApplicationContext();
+
                 Pager<PlaylistSimple> pager;
                 try {
                     pager = pasta.spotifyService.getMyPlaylists();
@@ -98,7 +100,7 @@ public class StaticUtils {
                 for (int i = 0; i < result.size(); i++) {
                     names[i] = result.get(i).playlistName;
                 }
-                new AlertDialog.Builder(pasta, R.style.AppTheme).setTitle(R.string.add).setItems(names, new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(context, R.style.AppTheme).setTitle(R.string.add).setItems(names, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, final int which) {
                         dialog.dismiss();
@@ -112,6 +114,8 @@ public class StaticUtils {
                             @Nullable
                             @Override
                             protected Boolean run() throws InterruptedException {
+                                Pasta pasta = (Pasta) context.getApplicationContext();
+
                                 try {
                                     PlaylistListData playlist = result.get(which);
                                     Map<String, Object> tracks = new HashMap<>();
@@ -127,6 +131,7 @@ public class StaticUtils {
                             @Override
                             protected void done(@Nullable Boolean result) {
                                 if (result == null) result = false;
+                                Pasta pasta = (Pasta) context.getApplicationContext();
                                 pasta.showToast(pasta.getString(result ? R.string.added : R.string.error));
                             }
                         }.execute();
