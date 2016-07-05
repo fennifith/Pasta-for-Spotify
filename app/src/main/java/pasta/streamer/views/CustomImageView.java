@@ -13,7 +13,7 @@ import android.view.animation.AnimationUtils;
 
 import com.afollestad.async.Action;
 
-import pasta.streamer.utils.StaticUtils;
+import pasta.streamer.utils.ImageUtils;
 
 public class CustomImageView extends AppCompatImageView {
 
@@ -81,6 +81,6 @@ public class CustomImageView extends AppCompatImageView {
     }
 
     public void transition(Drawable second) {
-        transition(StaticUtils.drawableToBitmap(second));
+        transition(ImageUtils.drawableToBitmap(second));
     }
 }

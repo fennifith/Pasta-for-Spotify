@@ -14,11 +14,8 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.AppCompatCheckBox;
-import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -58,7 +55,9 @@ import pasta.streamer.adapters.TrackAdapter;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.dialogs.NewPlaylistDialog;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -101,10 +100,10 @@ public class PlaylistFragment extends FullScreenFragment {
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("playlist");
 
-        palette = Settings.isPalette(getContext());
+        palette = PreferenceUtils.isPalette(getContext());
 
-        fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(getContext())));
-        fab.setImageDrawable(StaticUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
+        fab.setBackgroundTintList(ColorStateList.valueOf(PreferenceUtils.getAccentColor(getContext())));
+        fab.setImageDrawable(ImageUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
 
         collapsingToolbarLayout.setTitle(data.playlistName);
         tracksLength.setText(String.valueOf(data.tracks) + (data.tracks == 1 ? " track" : " tracks"));
@@ -128,7 +127,7 @@ public class PlaylistFragment extends FullScreenFragment {
         adapter = new TrackAdapter((AppCompatActivity) getActivity(), null);
         if (data.editable) adapter.setPlaylistBehavior(data);
         recycler.setAdapter(adapter);
-        recycler.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.isListTracks(getContext()) ? 1 : PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         recycler.setHasFixedSize(true);
 
         action = new Action<ArrayList<TrackListData>>() {
@@ -152,7 +151,7 @@ public class PlaylistFragment extends FullScreenFragment {
                     return;
                 }
                 adapter.swapData(result);
-                adapter.sort(Settings.getTrackOrder(getContext()));
+                adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
                 trackList = result;
 
                 new Action<ArrayList<ArtistListData>>() {
@@ -243,17 +242,17 @@ public class PlaylistFragment extends FullScreenFragment {
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);
 
                 if (palette) {
-                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                    Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
                             int primary = palette.getMutedColor(Color.GRAY);
-                            int accent = palette.getVibrantColor(StaticUtils.darkColor(primary));
+                            int accent = palette.getVibrantColor(ImageUtils.darkColor(primary));
                             if (collapsingToolbarLayout != null)
                                 collapsingToolbarLayout.setContentScrimColor(primary);
                             if (fab != null)
@@ -267,7 +266,7 @@ public class PlaylistFragment extends FullScreenFragment {
         });
 
         setHasOptionsMenu(true);
-        toolbar.setNavigationIcon(R.drawable.drawer_back);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -385,62 +384,12 @@ public class PlaylistFragment extends FullScreenFragment {
                 }.execute();
                 break;
             case R.id.action_edit:
-                final View layout = LayoutInflater.from(getContext()).inflate(R.layout.dialog_layout, null);
-
-                ((AppCompatEditText) layout.findViewById(R.id.title)).setText(data.playlistName);
-                ((AppCompatCheckBox) layout.findViewById(R.id.pub)).setChecked(data.playlistPublic);
-
-                new AlertDialog.Builder(getContext()).setTitle(R.string.playlist_modify).setView(layout).setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                new NewPlaylistDialog(getContext()).setPlaylist(data).setOnCreateListener(new NewPlaylistDialog.OnCreateListener() {
                     @Override
-                    public void onClick(final DialogInterface dialog, int which) {
-                        if (((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString().length() < 1) {
-                            pasta.showToast(getString(R.string.no_playlist_text));
-                            return;
-                        }
-
-                        final Map<String, Object> map = new HashMap<>();
-                        map.put("name", ((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString());
-                        map.put("public", ((AppCompatCheckBox) layout.findViewById(R.id.pub)).isChecked());
-
-                        new Action<Boolean>() {
-                            @NonNull
-                            @Override
-                            public String id() {
-                                return "modifyPlaylist";
-                            }
-
-                            @Nullable
-                            @Override
-                            protected Boolean run() throws InterruptedException {
-                                try {
-                                    pasta.spotifyService.changePlaylistDetails(pasta.me.id, data.playlistId, map);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    return false;
-                                }
-                                return true;
-                            }
-
-                            @Override
-                            protected void done(@Nullable Boolean result) {
-                                if (result == null || !result) {
-                                    pasta.onError(getContext(), "playlist edit action");
-                                } else {
-                                    data.playlistName = (String) map.get("name");
-                                    data.playlistPublic = (Boolean) map.get("public");
-                                    toolbar.setTitle(data.playlistName);
-                                }
-                            }
-                        }.execute();
-
-                        dialog.dismiss();
+                    public void onCreate() {
+                        toolbar.setTitle(data.playlistName);
                     }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
+                }).show();
                 break;
             case R.id.action_share:
                 Intent s = new Intent(android.content.Intent.ACTION_SEND);
@@ -453,15 +402,15 @@ public class PlaylistFragment extends FullScreenFragment {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(StaticUtils.getPlaylistUrl(data.playlistOwnerId, data.playlistId))));
                 break;
             case R.id.action_order:
-                Settings.getOrderingDialog(getContext(), new DialogInterface.OnClickListener() {
+                PreferenceUtils.getOrderingDialog(getContext(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         selectedOrder = which;
                     }
                 }, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface d, int which) {
-                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(Settings.ORDER, selectedOrder).apply();
-                        adapter.sort(Settings.getTrackOrder(getContext()));
+                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(PreferenceUtils.ORDER, selectedOrder).apply();
+                        adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
                         d.dismiss();
                     }
                 }).show();

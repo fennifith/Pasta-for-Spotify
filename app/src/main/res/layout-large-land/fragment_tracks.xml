@@ -1,7 +1,9 @@
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings" />
-        <import type="pasta.streamer.utils.StaticUtils" />
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
+
+        <import type="pasta.streamer.utils.ImageUtils" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,7 +24,7 @@
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:contentScrim="@{Settings.getPrimaryColor(context)}"
+                app:contentScrim="@{PreferenceUtils.getPrimaryColor(context)}"
                 app:statusBarScrim="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:expandedTitleMarginBottom="42dp"
@@ -53,7 +55,7 @@
                     android:orientation="vertical"
                     android:layout_marginLeft="288dp"
                     android:layout_marginStart="288dp"
-                    android:background="@{StaticUtils.darkColor(Settings.getPrimaryColor(context))}"
+                    android:background="@{ImageUtils.darkColor(PreferenceUtils.getPrimaryColor(context))}"
                     android:layout_gravity="bottom|end"
                     android:id="@+id/bar"
                     android:gravity="bottom"

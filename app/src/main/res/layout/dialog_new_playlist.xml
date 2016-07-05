@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/toolbar"
+            app:title="@string/playlist_create" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
+
+            <EditText
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/playlistTitle"
+                android:hint="@string/playlist_text"
+                android:textColor="?android:textColorPrimary"
+                android:textColorHint="?android:textColorSecondary"
+                android:textSize="26sp" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/pub"
+            android:layout_margin="16dp"
+            android:text="@string/pub"
+            android:textColor="#8A000000" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom|end"
+        android:gravity="end"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:text="@string/cancel"
+            android:textColor="?android:textColorPrimary"
+            android:background="?attr/selectableItemBackground"
+            android:id="@+id/cancel"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:text="@string/save"
+            android:textColor="?android:textColorPrimary"
+            android:background="?attr/selectableItemBackground"
+            android:id="@+id/confirm"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</FrameLayout>

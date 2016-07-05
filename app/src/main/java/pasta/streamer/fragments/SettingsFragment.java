@@ -30,7 +30,7 @@ import butterknife.OnClick;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.HomeActivity;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.views.CustomImageView;
 
 public class SettingsFragment extends FabFragment {
@@ -66,21 +66,21 @@ public class SettingsFragment extends FabFragment {
 
     @OnCheckedChanged(R.id.preload)
     public void changePreload(boolean preload) {
-        if (prefs != null && preload != Settings.isPreload(getContext())) {
-            prefs.edit().putBoolean(Settings.PRELOAD, preload).apply();
+        if (prefs != null && preload != PreferenceUtils.isPreload(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.PRELOAD, preload).apply();
         }
     }
 
     @OnCheckedChanged(R.id.debug)
     public void changeDebug(boolean debug) {
-        if (prefs != null && debug != Settings.isDebug(getContext())) {
-            prefs.edit().putBoolean(Settings.DEBUG, debug).apply();
+        if (prefs != null && debug != PreferenceUtils.isDebug(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.DEBUG, debug).apply();
         }
     }
 
     @OnClick(R.id.limit)
     public void changeLimit() {
-        new AlertDialog.Builder(getContext()).setTitle(R.string.limit).setSingleChoiceItems(R.array.limits, Settings.getLimit(getContext()), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(getContext()).setTitle(R.string.limit).setSingleChoiceItems(R.array.limits, PreferenceUtils.getLimit(getContext()), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 selectedLimit = which;
@@ -88,7 +88,7 @@ public class SettingsFragment extends FabFragment {
         }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                prefs.edit().putInt(Settings.LIMIT, selectedLimit).apply();
+                prefs.edit().putInt(PreferenceUtils.LIMIT, selectedLimit).apply();
                 pasta.showToast(getString(R.string.restart_msg));
                 dialog.dismiss();
             }
@@ -157,38 +157,38 @@ public class SettingsFragment extends FabFragment {
 
     @OnCheckedChanged(R.id.darkmode)
     public void changeDarkMode(boolean dark) {
-        if (prefs != null && dark != Settings.isDarkTheme(getContext())) {
-            prefs.edit().putBoolean(Settings.DARK_THEME, dark).apply();
+        if (prefs != null && dark != PreferenceUtils.isDarkTheme(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.DARK_THEME, dark).apply();
             pasta.showToast(getString(R.string.restart_msg));
         }
     }
 
     @OnCheckedChanged(R.id.thumbnails)
     public void changeThumbnails(boolean thumbnails) {
-        if (prefs != null && thumbnails != Settings.isThumbnails(getContext())) {
-            prefs.edit().putBoolean(Settings.THUMBNAILS, thumbnails).apply();
+        if (prefs != null && thumbnails != PreferenceUtils.isThumbnails(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.THUMBNAILS, thumbnails).apply();
             pasta.showToast(getString(R.string.restart_msg));
         }
     }
 
     @OnCheckedChanged(R.id.cards)
     public void changeCards(boolean cards) {
-        if (prefs != null && cards != Settings.isCards(getContext())) {
-            prefs.edit().putBoolean(Settings.CARDS, cards).apply();
+        if (prefs != null && cards != PreferenceUtils.isCards(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.CARDS, cards).apply();
         }
     }
 
     @OnCheckedChanged(R.id.lists)
     public void changeListTracks(boolean listTracks) {
-        if (prefs != null && listTracks != Settings.isListTracks(getContext())) {
-            prefs.edit().putBoolean(Settings.LIST_TRACKS, listTracks).apply();
+        if (prefs != null && listTracks != PreferenceUtils.isListTracks(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.LIST_TRACKS, listTracks).apply();
         }
     }
 
     @OnCheckedChanged(R.id.palette)
     public void changePalette(boolean palette) {
-        if (prefs != null && palette != Settings.isPalette(getContext())) {
-            prefs.edit().putBoolean(Settings.PALETTE, palette).apply();
+        if (prefs != null && palette != PreferenceUtils.isPalette(getContext())) {
+            prefs.edit().putBoolean(PreferenceUtils.PALETTE, palette).apply();
             pasta.showToast(getString(R.string.restart_msg));
         }
     }
@@ -200,7 +200,7 @@ public class SettingsFragment extends FabFragment {
                 .doneButton(R.string.save)
                 .cancelButton(R.string.cancel)
                 .backButton(R.string.md_back_label)
-                .preselect(Settings.getPrimaryColor(getContext()))
+                .preselect(PreferenceUtils.getPrimaryColor(getContext()))
                 .show();
     }
 
@@ -212,20 +212,20 @@ public class SettingsFragment extends FabFragment {
                 .cancelButton(R.string.cancel)
                 .backButton(R.string.md_back_label)
                 .accentMode(true)
-                .preselect(Settings.getAccentColor(getContext()))
+                .preselect(PreferenceUtils.getAccentColor(getContext()))
                 .show();
     }
 
     public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
         switch (dialog.getTitle()) {
             case R.string.primary_color:
-                if (Settings.getPrimaryColor(getContext()) == selectedColor) return;
-                prefs.edit().putInt(Settings.PRIMARY, selectedColor).apply();
+                if (PreferenceUtils.getPrimaryColor(getContext()) == selectedColor) return;
+                prefs.edit().putInt(PreferenceUtils.PRIMARY, selectedColor).apply();
                 primary.transition(new ColorDrawable(selectedColor));
                 break;
             case R.string.accent_color:
-                if (Settings.getAccentColor(getContext()) == selectedColor) return;
-                prefs.edit().putInt(Settings.ACCENT, selectedColor).apply();
+                if (PreferenceUtils.getAccentColor(getContext()) == selectedColor) return;
+                prefs.edit().putInt(PreferenceUtils.ACCENT, selectedColor).apply();
                 accent.transition(new ColorDrawable(selectedColor));
                 break;
             default:
@@ -238,7 +238,7 @@ public class SettingsFragment extends FabFragment {
     public void setQuality() {
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.quality)
-                .setSingleChoiceItems(R.array.qualities, Settings.getSelectedQuality(getContext()), new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(R.array.qualities, PreferenceUtils.getSelectedQuality(getContext()), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         selectedQuality = which;
@@ -248,13 +248,13 @@ public class SettingsFragment extends FabFragment {
             public void onClick(DialogInterface d, int id) {
                 switch (selectedQuality) {
                     case 0:
-                        prefs.edit().putString(Settings.QUALITY, PlaybackBitrate.BITRATE_LOW.toString()).apply();
+                        prefs.edit().putString(PreferenceUtils.QUALITY, PlaybackBitrate.BITRATE_LOW.toString()).apply();
                         break;
                     case 1:
-                        prefs.edit().putString(Settings.QUALITY, PlaybackBitrate.BITRATE_NORMAL.toString()).apply();
+                        prefs.edit().putString(PreferenceUtils.QUALITY, PlaybackBitrate.BITRATE_NORMAL.toString()).apply();
                         break;
                     case 2:
-                        prefs.edit().putString(Settings.QUALITY, PlaybackBitrate.BITRATE_HIGH.toString()).apply();
+                        prefs.edit().putString(PreferenceUtils.QUALITY, PlaybackBitrate.BITRATE_HIGH.toString()).apply();
                         break;
                 }
                 pasta.showToast(getString(R.string.restart_msg));
@@ -270,7 +270,7 @@ public class SettingsFragment extends FabFragment {
 
     @OnClick(R.id.organize)
     public void setOrganization() {
-        Settings.getOrderingDialog(getContext(), new DialogInterface.OnClickListener() {
+        PreferenceUtils.getOrderingDialog(getContext(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 selectedOrder = which;
@@ -278,7 +278,7 @@ public class SettingsFragment extends FabFragment {
         }, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface d, int which) {
-                PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(Settings.ORDER, selectedOrder).apply();
+                PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(PreferenceUtils.ORDER, selectedOrder).apply();
                 d.dismiss();
             }
         }).show();

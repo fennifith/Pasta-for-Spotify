@@ -25,7 +25,7 @@ import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.adapters.CategoryAdapter;
 import pasta.streamer.data.CategoryListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
 public class CategoriesFragment extends Fragment {
@@ -50,7 +50,7 @@ public class CategoriesFragment extends Fragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        recycler.setLayoutManager(new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         adapter = new CategoryAdapter((AppCompatActivity) getActivity(), null);
         recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);
@@ -66,7 +66,7 @@ public class CategoriesFragment extends Fragment {
             @Override
             protected ArrayList<CategoryListData> run() throws InterruptedException {
                 CategoriesPager categories = null;
-                for (int i = 0; categories == null && i < Settings.getRetryCount(getContext()); i++) {
+                for (int i = 0; categories == null && i < PreferenceUtils.getRetryCount(getContext()); i++) {
                     try {
                         categories = pasta.spotifyService.getCategories(null);
                     } catch (Exception e) {

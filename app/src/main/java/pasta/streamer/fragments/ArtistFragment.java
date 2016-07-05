@@ -54,7 +54,8 @@ import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -97,13 +98,13 @@ public class ArtistFragment extends FullScreenFragment {
 
         data = getArguments().getParcelable("artist");
 
-        palette = Settings.isPalette(getContext());
+        palette = PreferenceUtils.isPalette(getContext());
         pasta = (Pasta) getContext().getApplicationContext();
         limitMap = new HashMap<>();
-        limitMap.put(SpotifyService.LIMIT, (Settings.getLimit(getContext()) + 1) * 10);
+        limitMap.put(SpotifyService.LIMIT, (PreferenceUtils.getLimit(getContext()) + 1) * 10);
 
         setHasOptionsMenu(true);
-        toolbar.setNavigationIcon(R.drawable.drawer_back);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,8 +154,8 @@ public class ArtistFragment extends FullScreenFragment {
 
         spinner.setVisibility(View.VISIBLE);
 
-        manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false));
-        if (Settings.isCards(getContext())) {
+        manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), false));
+        if (PreferenceUtils.isCards(getContext())) {
             manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
@@ -219,7 +220,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Nullable
             private Pager<Album> getAlbums() throws InterruptedException {
                 Pager<Album> albums = null;
-                for (int i = 0; albums == null && i < Settings.getRetryCount(getContext()); i++) {
+                for (int i = 0; albums == null && i < PreferenceUtils.getRetryCount(getContext()); i++) {
                     try {
                         albums = pasta.spotifyService.getArtistAlbums(data.artistId);
                     } catch (Exception e) {
@@ -303,7 +304,7 @@ public class ArtistFragment extends FullScreenFragment {
             @Nullable
             private Artists getArtists() throws InterruptedException {
                 Artists artists = null;
-                for (int i = 0; artists == null && i < Settings.getRetryCount(getContext()); i++) {
+                for (int i = 0; artists == null && i < PreferenceUtils.getRetryCount(getContext()); i++) {
                     try {
                         artists = pasta.spotifyService.getRelatedArtists(data.artistId);
                     } catch (Exception e) {
@@ -324,13 +325,14 @@ public class ArtistFragment extends FullScreenFragment {
             }
         });
 
-        Glide.with(getContext()).load(data.artistImage).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.artistImage).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);
 
-                Bitmap bitmap = StaticUtils.drawableToBitmap(resource);
-                if (backgroundImage != null) backgroundImage.transition(StaticUtils.blurBitmap(bitmap));
+                Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
+                if (backgroundImage != null)
+                    backgroundImage.transition(ImageUtils.blurBitmap(bitmap));
                 if (palette) {
                     Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                         @Override
@@ -339,7 +341,7 @@ public class ArtistFragment extends FullScreenFragment {
                             if (collapsingToolbarLayout != null)
                                 collapsingToolbarLayout.setContentScrimColor(primary);
 
-                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), Settings.getPrimaryColor(getContext()), primary);
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), PreferenceUtils.getPrimaryColor(getContext()), primary);
                             animator.setDuration(250);
                             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override

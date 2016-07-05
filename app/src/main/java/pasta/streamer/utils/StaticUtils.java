@@ -4,34 +4,13 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v7.app.AlertDialog;
-
-import com.afollestad.async.Action;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import kaaes.spotify.webapi.android.models.Pager;
-import kaaes.spotify.webapi.android.models.PlaylistSimple;
-import pasta.streamer.Pasta;
 import pasta.streamer.PlayerService;
-import pasta.streamer.R;
-import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -64,158 +43,8 @@ public class StaticUtils {
         }
     }
 
-    public static void showAddToDialog(final Context context, final TrackListData data) {
-        new Action<ArrayList<PlaylistListData>>() {
-            @NonNull
-            @Override
-            public String id() {
-                return "showAddToDialog";
-            }
-
-            @Nullable
-            @Override
-            protected ArrayList<PlaylistListData> run() throws InterruptedException {
-                Pasta pasta = (Pasta) context.getApplicationContext();
-
-                Pager<PlaylistSimple> pager;
-                try {
-                    pager = pasta.spotifyService.getMyPlaylists();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-                ArrayList<PlaylistListData> playlists = new ArrayList<PlaylistListData>();
-                for (PlaylistSimple playlist : pager.items) {
-                    PlaylistListData data = new PlaylistListData(playlist, pasta.me);
-                    if (data.editable) playlists.add(data);
-                }
-                return playlists;
-            }
-
-            @Override
-            protected void done(@Nullable final ArrayList<PlaylistListData> result) {
-                if (result == null) return;
-                String[] names = new String[result.size()];
-                for (int i = 0; i < result.size(); i++) {
-                    names[i] = result.get(i).playlistName;
-                }
-                new AlertDialog.Builder(context, R.style.AppTheme).setTitle(R.string.add).setItems(names, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, final int which) {
-                        dialog.dismiss();
-                        new Action<Boolean>() {
-                            @NonNull
-                            @Override
-                            public String id() {
-                                return "addToPlaylist";
-                            }
-
-                            @Nullable
-                            @Override
-                            protected Boolean run() throws InterruptedException {
-                                Pasta pasta = (Pasta) context.getApplicationContext();
-
-                                try {
-                                    PlaylistListData playlist = result.get(which);
-                                    Map<String, Object> tracks = new HashMap<>();
-                                    tracks.put("uris", "spotify:track:" + data.trackId);
-                                    pasta.spotifyService.addTracksToPlaylist(playlist.playlistOwnerId, playlist.playlistId, tracks, tracks);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    return false;
-                                }
-                                return true;
-                            }
-
-                            @Override
-                            protected void done(@Nullable Boolean result) {
-                                if (result == null) result = false;
-                                Pasta pasta = (Pasta) context.getApplicationContext();
-                                pasta.showToast(pasta.getString(result ? R.string.added : R.string.error));
-                            }
-                        }.execute();
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
-            }
-        }.execute();
-    }
-
     public static String timeToString(int minutes, int seconds) {
         return String.format(Locale.getDefault(), "%1$02d", minutes) + ":" + String.format(Locale.getDefault(), "%1$02d", seconds);
-    }
-
-    public static Drawable getVectorDrawable(Context context, int resId) {
-        VectorDrawableCompat drawable;
-        try {
-            drawable = VectorDrawableCompat.create(context.getResources(), resId, context.getTheme());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ColorDrawable(Color.TRANSPARENT);
-        }
-
-        if (drawable != null)
-            return drawable.getCurrent();
-        else
-            return new ColorDrawable(Color.TRANSPARENT);
-    }
-
-    public static int darkColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f;
-        return Color.HSVToColor(hsv);
-    }
-
-    public static int lightColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] /= 0.8f;
-        return Color.HSVToColor(hsv);
-    }
-
-    public static Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable == null) drawable = new ColorDrawable(Color.TRANSPARENT);
-        if (drawable instanceof BitmapDrawable) return ((BitmapDrawable) drawable).getBitmap();
-        if (drawable instanceof VectorDrawableCompat)
-            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-
-        int width = drawable.getIntrinsicWidth();
-        width = width > 0 ? width : 1;
-        int height = drawable.getIntrinsicHeight();
-        height = height > 0 ? height : 1;
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
-    }
-
-    public static Bitmap blurBitmap(Bitmap bitmap) {
-        Paint paint = new Paint();
-        paint.setAlpha(180);
-
-        Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(resultBitmap);
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-        int blurRadius = Math.max(bitmap.getWidth(), bitmap.getHeight()) / 10;
-        for (int row = -blurRadius; row < blurRadius; row += 2) {
-            for (int column = -blurRadius; column < blurRadius; column += 2) {
-                if (column * column + row * row <= blurRadius * blurRadius) {
-                    paint.setAlpha((blurRadius * blurRadius) / ((column * column + row * row) + 1) * 2);
-                    canvas.drawBitmap(bitmap, row, column, paint);
-                }
-            }
-        }
-
-        return resultBitmap;
     }
 
     public static String getAlbumUrl(String id) {

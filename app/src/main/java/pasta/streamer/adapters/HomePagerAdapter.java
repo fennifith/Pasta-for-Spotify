@@ -20,7 +20,7 @@ import pasta.streamer.Pasta;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.fragments.OmniFragment;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
 public class HomePagerAdapter extends FragmentStatePagerAdapter {
@@ -51,7 +51,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             protected ArrayList<String> run() throws InterruptedException {
                 ArrayList<String> albums = new ArrayList<>();
                 NewReleases releases = null;
-                for (int i = 0; releases == null && i < Settings.getRetryCount(activity); i++) {
+                for (int i = 0; releases == null && i < PreferenceUtils.getRetryCount(activity); i++) {
                     try {
                         releases = pasta.spotifyService.getNewReleases();
                     } catch (Exception e) {
@@ -110,7 +110,7 @@ public class HomePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
                 FeaturedPlaylists featured = null;
-                for (int i = 0; featured == null && i < Settings.getRetryCount(activity); i++) {
+                for (int i = 0; featured == null && i < PreferenceUtils.getRetryCount(activity); i++) {
                     try {
                         featured = pasta.spotifyService.getFeaturedPlaylists();
                     } catch (Exception e) {

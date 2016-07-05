@@ -53,7 +53,9 @@ import pasta.streamer.adapters.NowPlayingAdapter;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.dialogs.AddToPlaylistDialog;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -90,8 +92,8 @@ public class PlayerActivity extends AppCompatActivity {
     @Bind(R.id.rv)
     RecyclerView rv;
 
-    ArrayList<TrackListData> trackList;
-    MenuItem fav;
+    private ArrayList<TrackListData> trackList;
+    private MenuItem fav;
 
     private boolean playing, playbarDragging;
     private int curPosition = -1;
@@ -107,30 +109,37 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Settings.isDarkTheme(this)) setTheme(R.style.AppTheme_Transparent_Dark);
+        if (PreferenceUtils.isDarkTheme(this)) setTheme(R.style.AppTheme_Transparent_Dark);
         DataBindingUtil.setContentView(this, R.layout.activity_player);
         ButterKnife.bind(this);
 
         pasta = (Pasta) getApplicationContext();
+        pasta.setScreen(this);
 
-        palette = Settings.isPalette(this);
+        palette = PreferenceUtils.isPalette(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && subtitle2 == null) {
             BottomSheetBehavior.from(rv).setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                int scroll = 0;
+
                 @Override
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) rv.scrollToPosition(0);
+                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) scroll = 0;
                 }
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    rv.setPadding(0, (int) (StaticUtils.getStatusBarMargin(PlayerActivity.this) * (slideOffset < 0 ? slideOffset + 1 : slideOffset)), 0, 0);
+                    int padding = (int) (StaticUtils.getStatusBarMargin(PlayerActivity.this) * (slideOffset < 0 ? slideOffset + 1 : slideOffset));
+                    rv.setPadding(0, padding, 0, 0);
+
+                    rv.scrollBy(0, scroll - padding);
+                    scroll = padding;
                 }
             });
         }
 
-        play = StaticUtils.getVectorDrawable(this, R.drawable.ic_play);
-        pause = StaticUtils.getVectorDrawable(this, R.drawable.ic_pause);
+        play = ImageUtils.getVectorDrawable(this, R.drawable.ic_play);
+        pause = ImageUtils.getVectorDrawable(this, R.drawable.ic_pause);
         playButton.setImageDrawable(play);
 
         if (backgroundImage != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -152,8 +161,7 @@ public class PlayerActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser)
-                    StaticUtils.jumpToPositionInTrack(progress, seekBar.getContext());
+                if (fromUser) StaticUtils.jumpToPositionInTrack(progress, seekBar.getContext());
             }
 
             @Override
@@ -255,7 +263,7 @@ public class PlayerActivity extends AppCompatActivity {
                 }.execute();
                 break;
             case R.id.action_add:
-                StaticUtils.showAddToDialog(this, trackList.get(curPosition));
+                new AddToPlaylistDialog(this, trackList.get(curPosition)).show();
                 break;
             case R.id.action_album:
                 new Action<AlbumListData>() {
@@ -364,21 +372,23 @@ public class PlayerActivity extends AppCompatActivity {
                 if (!isLoading()) setLoading(true);
                 if (action != null && action.isExecuting()) action.cancel();
 
-                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(StaticUtils.getVectorDrawable(PlayerActivity.this, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
+                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(ImageUtils.getVectorDrawable(PlayerActivity.this, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                         art.transition(resource);
                         if (isLoading()) setLoading(false);
 
-                        Bitmap bitmap = StaticUtils.drawableToBitmap(resource);
-                        if (backgroundImage != null) backgroundImage.transition(StaticUtils.blurBitmap(bitmap));
+                        Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
+                        if (backgroundImage != null)
+                            backgroundImage.transition(ImageUtils.blurBitmap(bitmap));
 
                         if (palette) {
                             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                                 @Override
                                 public void onGenerated(Palette palette) {
                                     final int color;
-                                    if (Settings.isDarkTheme(PlayerActivity.this)) color = palette.getDarkVibrantColor(Color.DKGRAY);
+                                    if (PreferenceUtils.isDarkTheme(PlayerActivity.this))
+                                        color = palette.getDarkVibrantColor(Color.DKGRAY);
                                     else color = palette.getLightVibrantColor(Color.LTGRAY);
 
                                     ValueAnimator animator = ValueAnimator.ofInt(-100, 100);
@@ -399,7 +409,8 @@ public class PlayerActivity extends AppCompatActivity {
                                     });
                                     animator.start();
 
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTaskDescription(new ActivityManager.TaskDescription(data.trackName, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(PlayerActivity.this, R.mipmap.ic_launcher)), color));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                        setTaskDescription(new ActivityManager.TaskDescription(data.trackName, ImageUtils.drawableToBitmap(ContextCompat.getDrawable(PlayerActivity.this, R.mipmap.ic_launcher)), color));
                                 }
                             });
                         }

@@ -18,7 +18,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import pasta.streamer.R;
 import pasta.streamer.adapters.OmniAdapter;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 
 public class OmniFragment extends Fragment {
 
@@ -52,11 +52,12 @@ public class OmniFragment extends Fragment {
         if (args != null) isFavoriteBehavior = getArguments().getBoolean("favorite", false);
 
         adapter = new OmniAdapter((AppCompatActivity) getActivity(), list, isFavoriteBehavior);
-        manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels));
+        manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels));
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if ((adapter.getItemViewType(position) == 0 && Settings.isListTracks(getContext())) || (adapter.getItemViewType(position) != 0 && Settings.isCards(getContext()))) return manager.getSpanCount();
+                if ((adapter.getItemViewType(position) == 0 && PreferenceUtils.isListTracks(getContext())) || (adapter.getItemViewType(position) != 0 && PreferenceUtils.isCards(getContext())))
+                    return manager.getSpanCount();
                 else return 1;
             }
         });

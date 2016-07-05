@@ -1,25 +1,15 @@
 package pasta.streamer.fragments;
 
-import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatCheckBox;
-import android.support.v7.widget.AppCompatEditText;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.afollestad.async.Action;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,7 +17,8 @@ import butterknife.OnPageChange;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.adapters.FavoritePagerAdapter;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.dialogs.NewPlaylistDialog;
+import pasta.streamer.utils.PreferenceUtils;
 
 public class FavoritesFragment extends FabFragment {
 
@@ -52,7 +43,7 @@ public class FavoritesFragment extends FabFragment {
         adapter = new FavoritePagerAdapter(getActivity(), getActivity().getSupportFragmentManager());
         vp.setAdapter(adapter);
         tl.setupWithViewPager(vp);
-        tl.setSelectedTabIndicatorColor(Settings.getAccentColor(getContext()));
+        tl.setSelectedTabIndicatorColor(PreferenceUtils.getAccentColor(getContext()));
 
         setFab(true, R.drawable.ic_add, getFabClickListener());
 
@@ -75,57 +66,12 @@ public class FavoritesFragment extends FabFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final View layout = getActivity().getLayoutInflater().inflate(R.layout.dialog_layout, null);
-
-                new AlertDialog.Builder(getContext()).setTitle(R.string.playlist_create).setView(layout).setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                new NewPlaylistDialog(getContext()).setOnCreateListener(new NewPlaylistDialog.OnCreateListener() {
                     @Override
-                    public void onClick(final DialogInterface dialog, int which) {
-                        if (((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString().length() < 1) {
-                            pasta.showToast(getString(R.string.no_playlist_text));
-                            return;
-                        }
-
-                        final Map<String, Object> map = new HashMap<>();
-                        map.put("name", ((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString());
-                        map.put("public", ((AppCompatCheckBox) layout.findViewById(R.id.pub)).isChecked());
-
-                        new Action<Boolean>() {
-                            @NonNull
-                            @Override
-                            public String id() {
-                                return "makePlaylist";
-                            }
-
-                            @Nullable
-                            @Override
-                            protected Boolean run() throws InterruptedException {
-                                try {
-                                    pasta.spotifyService.createPlaylist(pasta.me.id, map);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    return false;
-                                }
-                                return true;
-                            }
-
-                            @Override
-                            protected void done(@Nullable Boolean result) {
-                                if (result == null || !result) {
-                                    pasta.onError(getActivity(), "create playlist action");
-                                } else {
-                                    adapter.load();
-                                }
-                            }
-                        }.execute();
-
-                        dialog.dismiss();
+                    public void onCreate() {
+                        adapter.load();
                     }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
+                }).show();
             }
         };
     }

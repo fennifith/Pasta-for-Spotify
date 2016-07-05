@@ -1,6 +1,7 @@
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings"/>
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
     </data>
 
     <FrameLayout
@@ -41,7 +42,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="396dp"
                         android:fitsSystemWindows="true"
-                        android:background="@{Settings.getPrimaryColor(context)}">
+                        android:background="@{PreferenceUtils.getPrimaryColor(context)}">
 
                         <FrameLayout
                             android:layout_width="wrap_content"

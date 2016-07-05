@@ -21,7 +21,7 @@ import pasta.streamer.Pasta;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.fragments.OmniFragment;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
 public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
@@ -108,7 +108,7 @@ public class FavoritePagerAdapter extends FragmentStatePagerAdapter {
             @Override
             protected ArrayList<ArtistListData> run() throws InterruptedException {
                 ArtistsCursorPager followed = null;
-                for (int i = 0; followed == null && i < Settings.getRetryCount(activity); i++) {
+                for (int i = 0; followed == null && i < PreferenceUtils.getRetryCount(activity); i++) {
                     try {
                         followed = pasta.spotifyService.getFollowedArtists();
                     } catch (Exception e) {

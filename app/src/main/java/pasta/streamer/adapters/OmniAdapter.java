@@ -3,7 +3,6 @@ package pasta.streamer.adapters;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,11 +13,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.AppCompatCheckBox;
-import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,8 +31,6 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
@@ -45,10 +39,13 @@ import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
+import pasta.streamer.dialogs.AddToPlaylistDialog;
+import pasta.streamer.dialogs.NewPlaylistDialog;
 import pasta.streamer.fragments.AlbumFragment;
 import pasta.streamer.fragments.ArtistFragment;
 import pasta.streamer.fragments.PlaylistFragment;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -74,11 +71,11 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
         this.activity = activity;
         pasta = (Pasta) activity.getApplicationContext();
 
-        thumbnails = Settings.isThumbnails(activity);
-        cards = Settings.isCards(activity);
-        trackList = Settings.isListTracks(activity);
-        palette = Settings.isPalette(activity);
-        dark = Settings.isDarkTheme(activity);
+        thumbnails = PreferenceUtils.isThumbnails(activity);
+        cards = PreferenceUtils.isCards(activity);
+        trackList = PreferenceUtils.isListTracks(activity);
+        palette = PreferenceUtils.isPalette(activity);
+        dark = PreferenceUtils.isDarkTheme(activity);
 
         this.isFavoriteBehavior = isFavoriteBehavior;
     }
@@ -220,7 +217,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                         }.execute();
                                         break;
                                     case R.id.action_add:
-                                        StaticUtils.showAddToDialog(activity, ((TrackListData) list.get(holder.getAdapterPosition())));
+                                        new AddToPlaylistDialog(activity, ((TrackListData) list.get(holder.getAdapterPosition()))).show();
                                         break;
                                     case R.id.action_album:
                                         new Action<AlbumListData>() {
@@ -589,61 +586,12 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                                         }.execute();
                                         break;
                                     case R.id.action_edit:
-                                        final PlaylistListData editData = (PlaylistListData) list.get(holder.getAdapterPosition());
-                                        final View layout = activity.getLayoutInflater().inflate(R.layout.dialog_layout, null);
-
-                                        ((AppCompatEditText) layout.findViewById(R.id.title)).setText(editData.playlistName);
-                                        ((AppCompatCheckBox) layout.findViewById(R.id.pub)).setChecked(editData.playlistPublic);
-
-                                        new AlertDialog.Builder(activity).setTitle(R.string.playlist_modify).setView(layout).setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                                        new NewPlaylistDialog(activity).setPlaylist((PlaylistListData) list.get(holder.getAdapterPosition())).setOnCreateListener(new NewPlaylistDialog.OnCreateListener() {
                                             @Override
-                                            public void onClick(final DialogInterface dialog, int which) {
-                                                if (((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString().length() < 1) {
-                                                    pasta.showToast(activity.getString(R.string.no_playlist_text));
-                                                    return;
-                                                }
-
-                                                final Map<String, Object> map = new HashMap<>();
-                                                map.put("name", ((AppCompatEditText) layout.findViewById(R.id.title)).getText().toString());
-                                                map.put("public", ((AppCompatCheckBox) layout.findViewById(R.id.pub)).isChecked());
-
-                                                new Action<Boolean>() {
-                                                    @NonNull
-                                                    @Override
-                                                    public String id() {
-                                                        return "modifyPlaylist";
-                                                    }
-
-                                                    @Nullable
-                                                    @Override
-                                                    protected Boolean run() throws InterruptedException {
-                                                        try {
-                                                            pasta.spotifyService.changePlaylistDetails(pasta.me.id, editData.playlistId, map);
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                            return false;
-                                                        }
-                                                        editData.playlistName = (String) map.get("name");
-                                                        editData.playlistPublic = (Boolean) map.get("public");
-                                                        return true;
-                                                    }
-
-                                                    @Override
-                                                    protected void done(@Nullable Boolean result) {
-                                                        if (result == null || !result) {
-                                                            pasta.onError(activity, "modify playlist action");
-                                                        } else notifyItemChanged(holder.getAdapterPosition());
-                                                    }
-                                                }.execute();
-
-                                                dialog.dismiss();
+                                            public void onCreate() {
+                                                notifyItemChanged(holder.getAdapterPosition());
                                             }
-                                        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).create().show();
+                                        }).show();
                                         break;
                                     case R.id.action_web:
                                         PlaylistListData data = (PlaylistListData) list.get(holder.getAdapterPosition());
@@ -810,7 +758,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).asBitmap().placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget(imageView) {
+            Glide.with(activity).load(image).asBitmap().placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget(imageView) {
                 @Override
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     ((CustomImageView) getView()).transition(resource);

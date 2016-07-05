@@ -50,7 +50,8 @@ import pasta.streamer.adapters.TrackAdapter;
 import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -93,13 +94,13 @@ public class AlbumFragment extends FullScreenFragment {
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("album");
 
-        palette = Settings.isPalette(getContext());
+        palette = PreferenceUtils.isPalette(getContext());
 
-        fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(getContext())));
-        fab.setImageDrawable(StaticUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
+        fab.setBackgroundTintList(ColorStateList.valueOf(PreferenceUtils.getAccentColor(getContext())));
+        fab.setImageDrawable(ImageUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
 
         setHasOptionsMenu(true);
-        toolbar.setNavigationIcon(R.drawable.drawer_back);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,7 +201,7 @@ public class AlbumFragment extends FullScreenFragment {
         adapter = new TrackAdapter((AppCompatActivity) getActivity(), null);
         adapter.setAlbumBehavior();
         recycler.setAdapter(adapter);
-        recycler.setLayoutManager(new GridLayoutManager(getContext(), Settings.isListTracks(getContext()) ? 1 : Settings.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.isListTracks(getContext()) ? 1 : PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         recycler.setHasFixedSize(true);
 
         action = new Action<ArrayList<TrackListData>>() {
@@ -224,26 +225,26 @@ public class AlbumFragment extends FullScreenFragment {
                     return;
                 }
                 adapter.swapData(result);
-                adapter.sort(Settings.getTrackOrder(getContext()));
+                adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
                 trackList = result;
             }
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.albumImageLarge).placeholder(StaticUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.albumImageLarge).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);
 
                 if (palette) {
-                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                    Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
                             int primary = palette.getMutedColor(Color.GRAY);
                             if (collapsingToolbarLayout != null)
                                 collapsingToolbarLayout.setContentScrimColor(primary);
                             if (fab != null)
-                                fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(StaticUtils.darkColor(primary))));
+                                fab.setBackgroundTintList(ColorStateList.valueOf(palette.getVibrantColor(ImageUtils.darkColor(primary))));
                             if (bar != null) bar.setBackgroundColor(primary);
                             setData(data.albumName, primary, palette.getDarkVibrantColor(primary));
                         }
@@ -360,15 +361,15 @@ public class AlbumFragment extends FullScreenFragment {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(StaticUtils.getAlbumUrl(data.albumId))));
                 break;
             case R.id.action_order:
-                Settings.getOrderingDialog(getContext(), new DialogInterface.OnClickListener() {
+                PreferenceUtils.getOrderingDialog(getContext(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         selectedOrder = which;
                     }
                 }, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface d, int which) {
-                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(Settings.ORDER, selectedOrder).apply();
-                        adapter.sort(Settings.getTrackOrder(getContext()));
+                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(PreferenceUtils.ORDER, selectedOrder).apply();
+                        adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
                         d.dismiss();
                     }
                 }).show();

@@ -2,17 +2,19 @@ package pasta.streamer;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDialog;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.analytics.ExceptionReporter;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +37,8 @@ import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.dialogs.ErrorDialog;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
 public class Pasta extends Application {
@@ -46,37 +49,52 @@ public class Pasta extends Application {
     public SpotifyApi spotifyApi;
     public SpotifyService spotifyService;
     public UserPrivate me;
+    private Tracker tracker;
 
-    private AppCompatDialog errorDialog;
+    private ErrorDialog errorDialog;
+
+    synchronized public Tracker getDefaultTracker() {
+        if (tracker == null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            tracker = analytics.newTracker(R.xml.global_tracker);
+        }
+        return tracker;
+    }
+
+    public void setScreen(Context context) {
+        Tracker tracker = getDefaultTracker();
+
+        tracker.setScreenName(context.getClass().getName());
+        tracker.send(new HitBuilders.ScreenViewBuilder()
+                .setNewSession()
+                .build());
+
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionReporter(tracker, Thread.getDefaultUncaughtExceptionHandler(), context));
+    }
 
     public void onCriticalError(final Context context, String message) {
         if (errorDialog == null || !errorDialog.isShowing()) {
             String errorMessage = getString(R.string.error_msg);
-            if (Settings.isDebug(this))
+            if (PreferenceUtils.isDebug(this))
                 errorMessage += "\n\nError: " + message + "\nLocation: " + context.getClass().getName();
-            errorDialog = new AlertDialog.Builder(context, R.style.AppTheme).setIcon(StaticUtils.getVectorDrawable(this, R.drawable.ic_error)).setTitle(R.string.error).setMessage(errorMessage).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    StaticUtils.restart(context);
-                }
-            }).setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    System.exit(0);
-                }
-            }).create();
+
+            errorDialog = new ErrorDialog(context).setMessage(errorMessage);
             errorDialog.show();
         }
+
+        getDefaultTracker().send(new HitBuilders.EventBuilder(context.getClass().getName(), message).build());
+        GoogleAnalytics.getInstance(context).dispatchLocalHits();
     }
 
     public void onError(Context context, String message) {
         String toastMessage = getString(R.string.error);
-        if (Settings.isDebug(this))
+        if (PreferenceUtils.isDebug(this))
             toastMessage += "\n\nError: " + message + "\nLocation: " + context.getClass().getName();
 
         showToast(toastMessage);
+
+        getDefaultTracker().send(new HitBuilders.EventBuilder(context.getClass().getName(), message).build());
+        GoogleAnalytics.getInstance(context).dispatchLocalHits();
     }
 
     public void showToast(String message) {
@@ -179,7 +197,7 @@ public class Pasta extends Application {
     @Nullable
     public Boolean isFavorite(PlaylistListData data) throws InterruptedException {
         Boolean favorite = null;
-        for (int i = 0; favorite == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; favorite == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 favorite = spotifyService.areFollowingPlaylist(data.playlistOwnerId, data.playlistId, me.id)[0];
             } catch (Exception e) {
@@ -212,7 +230,7 @@ public class Pasta extends Application {
     @Nullable
     public Boolean isFavorite(ArtistListData data) throws InterruptedException {
         Boolean favorite = null;
-        for (int i = 0; favorite == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; favorite == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 favorite = spotifyService.isFollowingArtists(data.artistId)[0];
             } catch (Exception e) {
@@ -227,7 +245,7 @@ public class Pasta extends Application {
     @Nullable
     public ArtistListData getArtist(String id) throws InterruptedException {
         Artist a = null;
-        for (int i = 0; a == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; a == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 a = spotifyService.getArtist(id);
             } catch (Exception e) {
@@ -243,7 +261,7 @@ public class Pasta extends Application {
     @Nullable
     public AlbumListData getAlbum(String id) throws InterruptedException {
         Album album = null;
-        for (int i = 0; album == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; album == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 album = spotifyService.getAlbum(id);
             } catch (Exception e) {
@@ -264,7 +282,7 @@ public class Pasta extends Application {
         for (int i = 0; i < data.tracks; i += 100) {
             Pager<PlaylistTrack> tracks = null;
             options.put(SpotifyService.OFFSET, i);
-            for (int l = 0; tracks == null && l < Settings.getRetryCount(this); l++) {
+            for (int l = 0; tracks == null && l < PreferenceUtils.getRetryCount(this); l++) {
                 try {
                     tracks = spotifyService.getPlaylistTracks(data.playlistOwnerId, data.playlistId, options);
                 } catch (Exception e) {
@@ -286,7 +304,7 @@ public class Pasta extends Application {
     @Nullable
     public ArrayList<TrackListData> getTracks(ArtistListData data) throws InterruptedException {
         Tracks tracks = null;
-        for (int i = 0; tracks == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; tracks == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 tracks = spotifyService.getArtistTopTrack(data.artistId, Locale.getDefault().getCountry());
             } catch (Exception e) {
@@ -307,7 +325,7 @@ public class Pasta extends Application {
     @Nullable
     public ArrayList<TrackListData> getTracks(AlbumListData data) throws InterruptedException {
         Pager<TrackSimple> tracks = null;
-        for (int i = 0; tracks == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; tracks == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 tracks = spotifyService.getAlbum(data.albumId).tracks;
             } catch (Exception e) {
@@ -328,7 +346,7 @@ public class Pasta extends Application {
     @Nullable
     public Pager<PlaylistSimple> getMyPlaylists() throws InterruptedException {
         Pager<PlaylistSimple> playlists = null;
-        for (int i = 0; playlists == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; playlists == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 playlists = spotifyService.getMyPlaylists();
             } catch (Exception e) {
@@ -343,7 +361,7 @@ public class Pasta extends Application {
     @Nullable
     public ArrayList<PlaylistListData> searchPlaylists(String query, Map<String, Object> limitMap) throws InterruptedException {
         PlaylistsPager playlists = null;
-        for (int i = 0; playlists == null && i < Settings.getRetryCount(this); i++) {
+        for (int i = 0; playlists == null && i < PreferenceUtils.getRetryCount(this); i++) {
             try {
                 playlists = spotifyService.searchPlaylists(query, limitMap);
             } catch (Exception e) {

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings"/>
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
     </data>
 
     <android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
@@ -46,7 +47,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isPreload(context)}"/>
+                    android:checked="@{PreferenceUtils.isPreload(context)}" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -70,7 +71,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isDebug(context)}" />
+                    android:checked="@{PreferenceUtils.isDebug(context)}" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -113,7 +114,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isDarkTheme(context)}"/>
+                    android:checked="@{PreferenceUtils.isDarkTheme(context)}" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
@@ -126,7 +127,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isThumbnails(context)}" />
+                    android:checked="@{PreferenceUtils.isThumbnails(context)}" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
@@ -139,7 +140,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isCards(context)}" />
+                    android:checked="@{PreferenceUtils.isCards(context)}" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
@@ -152,7 +153,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isListTracks(context)}" />
+                    android:checked="@{PreferenceUtils.isListTracks(context)}" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
@@ -165,7 +166,7 @@
                     android:paddingRight="8dp"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:checked="@{Settings.isPalette(context)}"/>
+                    android:checked="@{PreferenceUtils.isPalette(context)}" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -186,7 +187,7 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:id="@+id/primary_color"
-                        android:src="@{Settings.getPrimaryColor(context)}"
+                        android:src="@{PreferenceUtils.getPrimaryColor(context)}"
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginLeft="12dp"
                         android:layout_marginRight="12dp" />
@@ -212,7 +213,7 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:id="@+id/accent_color"
-                        android:src="@{Settings.getAccentColor(context)}"
+                        android:src="@{PreferenceUtils.getAccentColor(context)}"
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginLeft="12dp"
                         android:layout_marginRight="12dp" />

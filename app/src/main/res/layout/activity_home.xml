@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings"/>
-        <import type="pasta.streamer.utils.StaticUtils"/>
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
+
+        <import type="pasta.streamer.utils.ImageUtils" />
     </data>
 
     <android.support.v4.widget.DrawerLayout
@@ -15,7 +17,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@{StaticUtils.darkColor(Settings.getPrimaryColor(context.getApplicationContext()))}"
+            android:background="@{ImageUtils.darkColor(PreferenceUtils.getPrimaryColor(context.getApplicationContext()))}"
             android:id="@+id/status_background">
 
             <FrameLayout
@@ -41,14 +43,14 @@
                             android:id="@+id/collapsing_toolbar"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@{Settings.getPrimaryColor(context.getApplicationContext())}"
-                            app:contentScrim="@{Settings.getPrimaryColor(context.getApplicationContext())}"
+                            android:background="@{PreferenceUtils.getPrimaryColor(context.getApplicationContext())}"
+                            app:contentScrim="@{PreferenceUtils.getPrimaryColor(context.getApplicationContext())}"
                             app:layout_scrollFlags="scroll|snap|enterAlways"
                             app:titleEnabled="false">
 
                             <android.support.v7.widget.Toolbar
                                 android:id="@+id/toolbar"
-                                android:background="@{Settings.getPrimaryColor(context.getApplicationContext())}"
+                                android:background="@{PreferenceUtils.getPrimaryColor(context.getApplicationContext())}"
                                 android:layout_width="match_parent"
                                 android:layout_height="?attr/actionBarSize"
                                 app:layout_scrollFlags="scroll"/>

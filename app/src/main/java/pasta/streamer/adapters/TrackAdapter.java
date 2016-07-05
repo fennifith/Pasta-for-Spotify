@@ -41,9 +41,11 @@ import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
+import pasta.streamer.dialogs.AddToPlaylistDialog;
 import pasta.streamer.fragments.AlbumFragment;
 import pasta.streamer.fragments.ArtistFragment;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -53,7 +55,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     private ArrayList<TrackListData> list;
     private AppCompatActivity activity;
     private Pasta pasta;
-    private int menures = R.menu.menu_track;
+    private int menuRes = R.menu.menu_track;
     private PlaylistListData playlistdata;
     private boolean thumbnails, cards, trackList, palette, dark;
 
@@ -70,20 +72,20 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         this.activity = activity;
         pasta = (Pasta) activity.getApplicationContext();
 
-        thumbnails = Settings.isThumbnails(activity);
-        cards = Settings.isCards(activity);
-        trackList = Settings.isListTracks(activity);
-        palette = Settings.isPalette(activity);
-        dark = Settings.isDarkTheme(activity);
+        thumbnails = PreferenceUtils.isThumbnails(activity);
+        cards = PreferenceUtils.isCards(activity);
+        trackList = PreferenceUtils.isListTracks(activity);
+        palette = PreferenceUtils.isPalette(activity);
+        dark = PreferenceUtils.isDarkTheme(activity);
     }
 
     public void setPlaylistBehavior(PlaylistListData data) {
-        menures = R.menu.menu_playlist_track;
+        menuRes = R.menu.menu_playlist_track;
         playlistdata = data;
     }
 
     public void setAlbumBehavior() {
-        menures = R.menu.menu_album_track;
+        menuRes = R.menu.menu_album_track;
     }
 
     public void swapData(ArrayList<TrackListData> list) {
@@ -109,18 +111,18 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
     public void sort(int order) {
         switch (order) {
-            case Settings.ORDER_ADDED:
+            case PreferenceUtils.ORDER_ADDED:
                 list = new ArrayList<>();
                 list.addAll(original);
                 break;
-            case Settings.ORDER_NAME:
+            case PreferenceUtils.ORDER_NAME:
                 Collections.sort(list, new Comparator<TrackListData>() {
                     public int compare(TrackListData first, TrackListData second) {
                         return first.trackName.compareTo(second.trackName);
                     }
                 });
                 break;
-            case Settings.ORDER_ARTIST:
+            case PreferenceUtils.ORDER_ARTIST:
                 Collections.sort(list, new Comparator<TrackListData>() {
                     public int compare(TrackListData first, TrackListData second) {
                         if (first.artists.size() > 0 && second.artists.size() > 0)
@@ -129,21 +131,21 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                     }
                 });
                 break;
-            case Settings.ORDER_ALBUM:
+            case PreferenceUtils.ORDER_ALBUM:
                 Collections.sort(list, new Comparator<TrackListData>() {
                     public int compare(TrackListData first, TrackListData second) {
                         return first.albumName.compareTo(second.albumName);
                     }
                 });
                 break;
-            case Settings.ORDER_LENGTH:
+            case PreferenceUtils.ORDER_LENGTH:
                 Collections.sort(list, new Comparator<TrackListData>() {
                     public int compare(TrackListData first, TrackListData second) {
                         return first.trackDuration.compareTo(second.trackDuration);
                     }
                 });
                 break;
-            case Settings.ORDER_RANDOM:
+            case PreferenceUtils.ORDER_RANDOM:
                 Collections.shuffle(list);
                 break;
         }
@@ -166,7 +168,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             public void onClick(View v) {
                 PopupMenu popup = new PopupMenu(v.getContext(), v);
                 MenuInflater inflater = popup.getMenuInflater();
-                inflater.inflate(menures, popup.getMenu());
+                inflater.inflate(menuRes, popup.getMenu());
 
                 final MenuItem fav = popup.getMenu().findItem(R.id.action_fav);
                 new Action<Boolean>() {
@@ -229,7 +231,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                                 }.execute();
                                 break;
                             case R.id.action_add:
-                                StaticUtils.showAddToDialog(activity, list.get(holder.getAdapterPosition()));
+                                new AddToPlaylistDialog(activity, list.get(holder.getAdapterPosition())).show();
                                 break;
                             case R.id.action_album:
                                 new Action<AlbumListData>() {
@@ -352,7 +354,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         View bg = holder.v.findViewById(R.id.bg);
         if (bg != null) bg.setBackgroundColor(dark ? Color.DKGRAY : Color.WHITE);
 
-        Glide.with(activity).load(list.get(position).trackImage).asBitmap().placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget((ImageView) holder.v.findViewById(R.id.image)) {
+        Glide.with(activity).load(list.get(position).trackImage).asBitmap().placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget((ImageView) holder.v.findViewById(R.id.image)) {
             @Override
             public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                 ((CustomImageView) getView()).transition(resource);

@@ -31,7 +31,8 @@ import pasta.streamer.PlayerService;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
 public class Playbar {
@@ -65,9 +66,9 @@ public class Playbar {
         this.playbar = playbar;
         ViewCompat.setElevation(playbar, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics()));
 
-        thumbnails = Settings.isThumbnails(activity);
-        palette = Settings.isPalette(activity);
-        dark = Settings.isDarkTheme(activity);
+        thumbnails = PreferenceUtils.isThumbnails(activity);
+        palette = PreferenceUtils.isPalette(activity);
+        dark = PreferenceUtils.isDarkTheme(activity);
 
         art = (CustomImageView) playbar.findViewById(R.id.art);
         prev = (ImageView) playbar.findViewById(R.id.prev);
@@ -93,8 +94,8 @@ public class Playbar {
         TypedValue tv = new TypedValue();
         activity.getTheme().resolveAttribute(android.R.attr.textColorPrimaryInverse, tv, true);
 
-        play = StaticUtils.getVectorDrawable(activity, R.drawable.ic_play);
-        pause = StaticUtils.getVectorDrawable(activity, R.drawable.ic_pause);
+        play = ImageUtils.getVectorDrawable(activity, R.drawable.ic_play);
+        pause = ImageUtils.getVectorDrawable(activity, R.drawable.ic_pause);
 
         playbar.setClickable(false);
         toggle.setClickable(false);
@@ -172,13 +173,13 @@ public class Playbar {
                 }
 
                 if (thumbnails) {
-                    Glide.with(activity).load(data.trackImage).placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
+                    Glide.with(activity).load(data.trackImage).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                             art.transition(resource);
 
                             if (!palette) return;
-                            Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                            Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                                 @Override
                                 public void onGenerated(Palette palette) {
                                     int color = palette.getDarkVibrantColor(Color.DKGRAY);
@@ -192,7 +193,7 @@ public class Playbar {
                                     td.startTransition(250);
 
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        activity.getWindow().setNavigationBarColor(StaticUtils.darkColor(color));
+                                        activity.getWindow().setNavigationBarColor(ImageUtils.darkColor(color));
                                     }
                                 }
                             });

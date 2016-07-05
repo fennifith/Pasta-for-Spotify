@@ -81,7 +81,8 @@ import pasta.streamer.fragments.FullScreenFragment;
 import pasta.streamer.fragments.HomeFragment;
 import pasta.streamer.fragments.SearchFragment;
 import pasta.streamer.fragments.SettingsFragment;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.Playbar;
 
@@ -120,15 +121,16 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Settings.isDarkTheme(this)) setTheme(R.style.AppTheme_Transparent_Dark);
+        if (PreferenceUtils.isDarkTheme(this)) setTheme(R.style.AppTheme_Transparent_Dark);
         DataBindingUtil.setContentView(this, R.layout.activity_home);
         ButterKnife.bind(this);
 
         limitMap = new HashMap<>();
-        limitMap.put(SpotifyService.LIMIT, (Settings.getLimit(this) + 1) * 10);
+        limitMap.put(SpotifyService.LIMIT, (PreferenceUtils.getLimit(this) + 1) * 10);
 
-        preload = Settings.isPreload(this);
+        preload = PreferenceUtils.isPreload(this);
         pasta = (Pasta) getApplicationContext();
+        pasta.setScreen(this);
 
         if (pasta.me == null || pasta.token == null || pasta.spotifyApi == null || pasta.spotifyService == null) {
             Intent intent = new Intent(this, MainActivity.class);
@@ -139,7 +141,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
         setSupportActionBar(toolbar);
         if (drawer_layout != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer_toggle);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
         }
 
         if (content != null) {
@@ -148,13 +150,13 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             content.setLayoutParams(layoutParams);
         }
 
-        fab.setBackgroundTintList(ColorStateList.valueOf(Settings.getAccentColor(this)));
+        fab.setBackgroundTintList(ColorStateList.valueOf(PreferenceUtils.getAccentColor(this)));
 
-        Drawable home = StaticUtils.getVectorDrawable(this, R.drawable.ic_home);
-        Drawable fav = StaticUtils.getVectorDrawable(this, R.drawable.ic_fav);
-        Drawable bookmark = StaticUtils.getVectorDrawable(this, R.drawable.ic_bookmark);
-        Drawable playing = StaticUtils.getVectorDrawable(this, R.drawable.ic_now_playing);
-        Drawable settings = StaticUtils.getVectorDrawable(this, R.drawable.ic_settings);
+        Drawable home = ImageUtils.getVectorDrawable(this, R.drawable.ic_home);
+        Drawable fav = ImageUtils.getVectorDrawable(this, R.drawable.ic_fav);
+        Drawable bookmark = ImageUtils.getVectorDrawable(this, R.drawable.ic_bookmark);
+        Drawable playing = ImageUtils.getVectorDrawable(this, R.drawable.ic_now_playing);
+        Drawable settings = ImageUtils.getVectorDrawable(this, R.drawable.ic_settings);
 
         int tint = ContextCompat.getColor(this, R.color.material_drawer_primary_icon);
         DrawableCompat.setTint(home, tint);
@@ -186,7 +188,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                         materialHeader.getActiveProfile().withIcon(resource);
-                        materialHeader.getHeaderBackgroundView().setImageBitmap(StaticUtils.blurBitmap(StaticUtils.drawableToBitmap(resource)));
+                        materialHeader.getHeaderBackgroundView().setImageBitmap(ImageUtils.blurBitmap(ImageUtils.drawableToBitmap(resource)));
                     }
                 });
             }
@@ -352,7 +354,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             drawer_layout.setDrawerLockMode(enabled ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         drawer_container.setVisibility(enabled ? View.VISIBLE : View.GONE);
         if (drawer_layout != null || !enabled)
-            getSupportActionBar().setHomeAsUpIndicator(enabled ? R.drawable.drawer_toggle : R.drawable.drawer_back);
+            getSupportActionBar().setHomeAsUpIndicator(enabled ? R.drawable.ic_drawer : R.drawable.ic_back);
     }
 
     public void setListeners(Fragment f) {
@@ -364,9 +366,9 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                 @Override
                 public void onDataReady(String title, int statusColor, int windowColor) {
                     setTitle(title);
-                    statusBackground.setBackgroundColor(StaticUtils.darkColor(statusColor));
+                    statusBackground.setBackgroundColor(ImageUtils.darkColor(statusColor));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        setTaskDescription(new ActivityManager.TaskDescription(getTitle().toString(), StaticUtils.drawableToBitmap(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.ic_launcher)), windowColor));
+                        setTaskDescription(new ActivityManager.TaskDescription(getTitle().toString(), ImageUtils.drawableToBitmap(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.ic_launcher)), windowColor));
                     }
                 }
             });
@@ -382,10 +384,10 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             else if (f instanceof SettingsFragment) materialDrawer.setSelection(5, false);
             else if (f instanceof AboutFragment) materialDrawer.setSelection(6, false);
 
-            statusBackground.setBackgroundColor(StaticUtils.darkColor(Settings.getPrimaryColor(this)));
+            statusBackground.setBackgroundColor(ImageUtils.darkColor(PreferenceUtils.getPrimaryColor(this)));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(title, StaticUtils.drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)), Settings.getPrimaryColor(this));
+                ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(title, ImageUtils.drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)), PreferenceUtils.getPrimaryColor(this));
                 setTaskDescription(desc);
             }
 
@@ -395,7 +397,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
                     public void onDataReady(boolean visible, int iconRes, View.OnClickListener clickListener) {
                         if (visible) fab.show();
                         else fab.hide();
-                        fab.setImageDrawable(StaticUtils.getVectorDrawable(HomeActivity.this, iconRes));
+                        fab.setImageDrawable(ImageUtils.getVectorDrawable(HomeActivity.this, iconRes));
                         fab.setOnClickListener(clickListener);
                     }
                 });
@@ -439,7 +441,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             protected ArrayList<TrackListData> run() throws InterruptedException {
                 ArrayList<TrackListData> list = new ArrayList<>();
                 TracksPager tracksPager = null;
-                for (int i = 0; tracksPager == null && i < Settings.getRetryCount(HomeActivity.this); i++) {
+                for (int i = 0; tracksPager == null && i < PreferenceUtils.getRetryCount(HomeActivity.this); i++) {
                     try {
                         tracksPager = pasta.spotifyService.searchTracks(searchTerm, limitMap);
                     } catch (Exception e) {
@@ -474,7 +476,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             protected ArrayList<String> run() throws InterruptedException {
                 ArrayList<String> list = new ArrayList<>();
                 AlbumsPager albumsPager = null;
-                for (int i = 0; albumsPager == null && i < Settings.getRetryCount(HomeActivity.this); i++) {
+                for (int i = 0; albumsPager == null && i < PreferenceUtils.getRetryCount(HomeActivity.this); i++) {
                     try {
                         albumsPager = pasta.spotifyService.searchAlbums(searchTerm, limitMap);
                     } catch (Exception e) {
@@ -547,7 +549,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             protected ArrayList<ArtistListData> run() throws InterruptedException {
                 ArrayList<ArtistListData> list = new ArrayList<>();
                 ArtistsPager artistsPager = null;
-                for (int i = 0; artistsPager == null && i < Settings.getRetryCount(HomeActivity.this); i++) {
+                for (int i = 0; artistsPager == null && i < PreferenceUtils.getRetryCount(HomeActivity.this); i++) {
                     try {
                         artistsPager = pasta.spotifyService.searchArtists(searchTerm, limitMap);
                     } catch (Exception e) {

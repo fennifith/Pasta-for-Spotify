@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings"/>
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
     </data>
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:text="Something"
-        android:textColor="@{Settings.getAccentColor(context)}"
+        android:textColor="@{PreferenceUtils.getAccentColor(context)}"
         android:textStyle="bold"
         android:padding="8dp"/>
 </layout>

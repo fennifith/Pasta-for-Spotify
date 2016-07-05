@@ -16,7 +16,7 @@ import android.view.animation.AnimationUtils;
 
 import com.afollestad.async.Action;
 
-import pasta.streamer.utils.StaticUtils;
+import pasta.streamer.utils.ImageUtils;
 
 public class CircleImageView extends CustomImageView {
     Paint paint;
@@ -38,7 +38,7 @@ public class CircleImageView extends CustomImageView {
 
     @Override
     public void onDraw(Canvas canvas) {
-        Bitmap image = StaticUtils.drawableToBitmap(getDrawable());
+        Bitmap image = ImageUtils.drawableToBitmap(getDrawable());
         if (image != null) {
             int size = Math.min(getWidth(), getHeight());
             image = ThumbnailUtils.extractThumbnail(image, size, size);
@@ -48,7 +48,7 @@ public class CircleImageView extends CustomImageView {
             roundedBitmapDrawable.setCornerRadius(size / 2);
             roundedBitmapDrawable.setAntiAlias(true);
 
-            canvas.drawBitmap(StaticUtils.drawableToBitmap(roundedBitmapDrawable), 0, 0, paint);
+            canvas.drawBitmap(ImageUtils.drawableToBitmap(roundedBitmapDrawable), 0, 0, paint);
         }
     }
 

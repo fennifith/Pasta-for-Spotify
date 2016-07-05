@@ -1,6 +1,7 @@
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings" />
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,8 +20,8 @@
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@{Settings.getPrimaryColor(context)}"
-                app:contentScrim="@{Settings.getPrimaryColor(context)}"
+                android:background="@{PreferenceUtils.getPrimaryColor(context)}"
+                app:contentScrim="@{PreferenceUtils.getPrimaryColor(context)}"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:titleEnabled="false">
 
@@ -29,7 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    android:background="@{Settings.getPrimaryColor(context)}"/>
+                    android:background="@{PreferenceUtils.getPrimaryColor(context)}" />
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -50,7 +51,7 @@
         <ProgressBar
             android:id="@+id/progressBar2"
             style="?android:attr/progressBarStyle"
-            android:progressTint="@{Settings.getAccentColor(context)}"
+            android:progressTint="@{PreferenceUtils.getAccentColor(context)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>

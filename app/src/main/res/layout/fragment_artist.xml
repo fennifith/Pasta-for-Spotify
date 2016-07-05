@@ -1,6 +1,7 @@
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings"/>
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -20,8 +21,8 @@
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@{Settings.getPrimaryColor(context)}"
-                app:contentScrim="@{Settings.getPrimaryColor(context)}"
+                android:background="@{PreferenceUtils.getPrimaryColor(context)}"
+                app:contentScrim="@{PreferenceUtils.getPrimaryColor(context)}"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:titleEnabled="false">
 
@@ -30,7 +31,7 @@
                     android:layout_height="172dp"
                     android:orientation="horizontal"
                     android:id="@+id/somethingbar"
-                    android:background="@{Settings.getPrimaryColor(context)}">
+                    android:background="@{PreferenceUtils.getPrimaryColor(context)}">
 
                     <FrameLayout
                         android:layout_width="wrap_content"

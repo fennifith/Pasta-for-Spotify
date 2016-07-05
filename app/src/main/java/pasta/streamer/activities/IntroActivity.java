@@ -8,7 +8,7 @@ import com.alexandrepiveteau.library.tutorial.TutorialActivity;
 import com.alexandrepiveteau.library.tutorial.TutorialFragment;
 
 import pasta.streamer.R;
-import pasta.streamer.utils.StaticUtils;
+import pasta.streamer.utils.ImageUtils;
 
 public class IntroActivity extends TutorialActivity {
     private int[] BACKGROUND_COLORS = {Color.parseColor("#009688"), Color.parseColor("#0D47A1"), Color.parseColor("#F44336"), Color.parseColor("#303030"), Color.parseColor("#2196F3")};
@@ -30,12 +30,12 @@ public class IntroActivity extends TutorialActivity {
 
     @Override
     public int getNavigationBarColor(int position) {
-        return StaticUtils.darkColor(BACKGROUND_COLORS[position]);
+        return ImageUtils.darkColor(BACKGROUND_COLORS[position]);
     }
 
     @Override
     public int getStatusBarColor(int position) {
-        return StaticUtils.darkColor(BACKGROUND_COLORS[position]);
+        return ImageUtils.darkColor(BACKGROUND_COLORS[position]);
     }
 
     @Override

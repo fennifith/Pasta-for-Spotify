@@ -30,7 +30,7 @@ import java.util.List;
 
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.data.TrackListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 
 public class PlayerService extends Service {
 
@@ -93,7 +93,7 @@ public class PlayerService extends Service {
         spotifyPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
             @Override
             public void onInitialized(Player player) {
-                spotifyPlayer.setPlaybackBitrate(Settings.getQuality(getApplicationContext()));
+                spotifyPlayer.setPlaybackBitrate(PreferenceUtils.getQuality(getApplicationContext()));
                 spotifyPlayer.setRepeat(true);
 
                 checkForState();
@@ -162,7 +162,7 @@ public class PlayerService extends Service {
         if (spotifyPlayer != null) {
             errorCount++;
             if (errorCount > 5 && errorCount < 20) {
-                if (Settings.isDebug(this))
+                if (PreferenceUtils.isDebug(this))
                     pasta.showToast(message + ", attempting to restart...");
 
                 stopService(new Intent(this, PlayerService.class));
@@ -173,7 +173,7 @@ public class PlayerService extends Service {
                 intent.putExtra(PlayerService.EXTRA_CLIENT_ID, playerConfig.clientId);
                 startService(intent);
                 errorCount = 20;
-            } else if (Settings.isDebug(this))
+            } else if (PreferenceUtils.isDebug(this))
                 pasta.showToast(message);
         }
     }

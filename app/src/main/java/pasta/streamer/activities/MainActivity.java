@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         pasta = (Pasta) getApplicationContext();
+        pasta.setScreen(this);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 

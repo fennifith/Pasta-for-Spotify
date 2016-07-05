@@ -45,7 +45,8 @@ import pasta.streamer.data.TrackListData;
 import pasta.streamer.fragments.AlbumFragment;
 import pasta.streamer.fragments.ArtistFragment;
 import pasta.streamer.fragments.PlaylistFragment;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.ImageUtils;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -69,10 +70,10 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         this.activity = activity;
         pasta = (Pasta) activity.getApplicationContext();
 
-        thumbnails = Settings.isThumbnails(activity);
-        cards = Settings.isCards(activity);
-        palette = Settings.isPalette(activity);
-        dark = Settings.isDarkTheme(activity);
+        thumbnails = PreferenceUtils.isThumbnails(activity);
+        cards = PreferenceUtils.isCards(activity);
+        palette = PreferenceUtils.isPalette(activity);
+        dark = PreferenceUtils.isDarkTheme(activity);
 
         if (list == null) {
             this.list = new ArrayList();
@@ -649,7 +650,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).placeholder(StaticUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(imageView) {
+            Glide.with(activity).load(image).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(imageView) {
                 @Override
                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                     ((CustomImageView) getView()).transition(resource);
@@ -657,7 +658,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
                     View bg = holder.v.findViewById(R.id.bg);
                     if (!thumbnails || !palette || bg == null) return;
-                    Palette.from(StaticUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                    Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
                             int defaultColor = dark ? Color.DKGRAY : Color.WHITE;

@@ -16,7 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import pasta.streamer.R;
 import pasta.streamer.adapters.HomePagerAdapter;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 
 public class HomeFragment extends Fragment {
 
@@ -35,7 +35,7 @@ public class HomeFragment extends Fragment {
 
         vp.setAdapter(new HomePagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
         tl.setupWithViewPager(vp);
-        tl.setSelectedTabIndicatorColor(Settings.getAccentColor(getContext()));
+        tl.setSelectedTabIndicatorColor(PreferenceUtils.getAccentColor(getContext()));
 
         return rootView;
     }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="pasta.streamer.utils.Settings"/>
+
+        <import type="pasta.streamer.utils.PreferenceUtils" />
     </data>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tl"
-            android:background="@{Settings.getPrimaryColor(context)}"
+            android:background="@{PreferenceUtils.getPrimaryColor(context)}"
             app:tabIndicatorColor="@color/colorAccent"
             app:tabSelectedTextColor="#fff"
             app:tabTextColor="#B3ffffff" />

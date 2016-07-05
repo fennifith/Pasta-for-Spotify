@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center">
+
+        <pasta.streamer.views.SquareImageView
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:tint="?android:textColorPrimary"
+            android:tintMode="src_in"
+            app:srcCompat="@drawable/ic_error"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error"
+            android:id="@+id/title"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_msg"
+            android:id="@+id/message"
+            android:textColor="?android:textColorSecondary"
+            android:textSize="14sp"
+            android:layout_margin="8dp"
+            android:gravity="center_horizontal" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom|end"
+        android:gravity="end">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:text="@string/restart"
+            android:textColor="?android:textColorPrimary"
+            android:background="?attr/selectableItemBackground"
+            android:id="@+id/restart"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:text="@string/close"
+            android:textColor="?android:textColorPrimary"
+            android:background="?attr/selectableItemBackground"
+            android:id="@+id/close"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</FrameLayout>

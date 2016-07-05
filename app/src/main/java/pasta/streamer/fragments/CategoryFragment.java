@@ -29,7 +29,7 @@ import pasta.streamer.R;
 import pasta.streamer.adapters.OmniAdapter;
 import pasta.streamer.data.CategoryListData;
 import pasta.streamer.data.PlaylistListData;
-import pasta.streamer.utils.Settings;
+import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
 public class CategoryFragment extends FullScreenFragment {
@@ -57,10 +57,10 @@ public class CategoryFragment extends FullScreenFragment {
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("category");
         limitMap = new HashMap<>();
-        limitMap.put(SpotifyService.LIMIT, (Settings.getLimit(getContext()) + 1) * 10);
+        limitMap.put(SpotifyService.LIMIT, (PreferenceUtils.getLimit(getContext()) + 1) * 10);
 
         toolbar.setTitle(data.categoryName);
-        toolbar.setNavigationIcon(R.drawable.drawer_back);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,13 +68,13 @@ public class CategoryFragment extends FullScreenFragment {
             }
         });
 
-        setData(data.categoryName, Settings.getPrimaryColor(getContext()), Settings.getPrimaryColor(getContext()));
+        setData(data.categoryName, PreferenceUtils.getPrimaryColor(getContext()), PreferenceUtils.getPrimaryColor(getContext()));
 
         spinner.setVisibility(View.VISIBLE);
 
-        manager = new GridLayoutManager(getContext(), Settings.getColumnNumber(getContext(), false));
+        manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), false));
 
-        if (Settings.isCards(getContext())) {
+        if (PreferenceUtils.isCards(getContext())) {
             manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
@@ -99,7 +99,7 @@ public class CategoryFragment extends FullScreenFragment {
             @Override
             protected ArrayList<PlaylistListData> run() throws InterruptedException {
                 PlaylistsPager pager = null;
-                for (int i = 0; pager == null && i < Settings.getRetryCount(getContext()); i++) {
+                for (int i = 0; pager == null && i < PreferenceUtils.getRetryCount(getContext()); i++) {
                     try {
                         pager = pasta.spotifyService.getPlaylistsForCategory(data.categoryId, limitMap);
                     } catch (Exception e) {
