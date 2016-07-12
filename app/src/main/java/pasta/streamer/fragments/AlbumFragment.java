@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,8 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,7 +33,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
 
@@ -48,7 +44,6 @@ import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.adapters.TrackAdapter;
 import pasta.streamer.data.AlbumListData;
-import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.utils.ImageUtils;
 import pasta.streamer.utils.PreferenceUtils;
@@ -69,8 +64,6 @@ public class AlbumFragment extends FullScreenFragment {
     CustomImageView header;
     @Bind(R.id.bar)
     View bar;
-    @Bind(R.id.artists)
-    FlexboxLayout artists;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.appbar)
@@ -132,66 +125,6 @@ public class AlbumFragment extends FullScreenFragment {
                 }
             }
         });
-
-        if (data.artists.size() > 0) {
-            new Action<ArrayList<ArtistListData>>() {
-                @NonNull
-                @Override
-                public String id() {
-                    return "getArtists";
-                }
-
-                @Nullable
-                @Override
-                protected ArrayList<ArtistListData> run() throws InterruptedException {
-                    ArrayList<ArtistListData> artists = new ArrayList<>();
-                    for (ArtistListData artist : data.artists) {
-                        ArtistListData artist2 = pasta.getArtist(artist.artistId);
-                        if (artist2 != null) artists.add(artist2);
-                    }
-                    return artists;
-                }
-
-                @Override
-                protected void done(@Nullable ArrayList<ArtistListData> result) {
-                    if (result == null) return;
-                    for (ArtistListData artist : result) {
-                        View v = LayoutInflater.from(getContext()).inflate(R.layout.artist_item_chip, null);
-                        ((TextView) v.findViewById(R.id.title)).setText(artist.artistName);
-                        Glide.with(getContext()).load(artist.artistImage).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
-                            @Override
-                            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                                ((CustomImageView) getView()).transition(resource);
-                            }
-                        });
-
-                        v.setTag(artist);
-                        v.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Bundle args = new Bundle();
-                                args.putParcelable("artist", (ArtistListData) v.getTag());
-
-                                Fragment f = new ArtistFragment();
-                                f.setArguments(args);
-
-                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                            }
-                        });
-                        artists.addView(v);
-                    }
-
-                    artists.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            if (recycler != null) recycler.setPadding(0, artists.getHeight(), 0, 0);
-                            if (artists != null)
-                                artists.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        }
-                    });
-                }
-            }.execute();
-        } else artists.setVisibility(View.GONE);
 
         spinner.setVisibility(View.VISIBLE);
 

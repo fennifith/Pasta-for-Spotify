@@ -82,42 +82,17 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/topTenTrackListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:clipToPadding="false"
             android:paddingLeft="4dp"
             android:paddingTop="4dp"
             android:paddingRight="4dp"
             android:paddingBottom="@dimen/bottom_playbar_padding"
-            android:scrollbars="vertical">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/topTenTrackListView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:clipToPadding="false" />
-
-                <com.google.android.flexbox.FlexboxLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="12dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:id="@+id/genres"
-                    app:flexWrap="wrap"
-                    app:justifyContent="flex_start" />
-
-            </FrameLayout>
-
-        </android.support.v4.widget.NestedScrollView>
+            android:scrollbars="vertical" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

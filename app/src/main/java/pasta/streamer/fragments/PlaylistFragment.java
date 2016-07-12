@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,8 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,14 +33,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -52,7 +43,6 @@ import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
 import pasta.streamer.adapters.TrackAdapter;
-import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.dialogs.NewPlaylistDialog;
@@ -75,8 +65,6 @@ public class PlaylistFragment extends FullScreenFragment {
     CustomImageView header;
     @Bind(R.id.bar)
     View bar;
-    @Bind(R.id.artists)
-    FlexboxLayout artists;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.appbar)
@@ -153,91 +141,6 @@ public class PlaylistFragment extends FullScreenFragment {
                 adapter.swapData(result);
                 adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
                 trackList = result;
-
-                new Action<ArrayList<ArtistListData>>() {
-                    @NonNull
-                    @Override
-                    public String id() {
-                        return "getCommonArtists";
-                    }
-
-                    @Nullable
-                    @Override
-                    protected ArrayList<ArtistListData> run() throws InterruptedException {
-                        ArrayList<ArtistListData> allArtists = new ArrayList<>();
-                        for (TrackListData track : trackList) {
-                            allArtists.addAll(track.artists);
-                        }
-
-                        HashMap<String, Integer> frequencies = new HashMap<>();
-
-                        for (int i = 0; i < allArtists.size(); i++) {
-                            int frequency = 0;
-                            ArtistListData artist1 = allArtists.get(i);
-                            for (ArtistListData artist2 : allArtists) {
-                                if (artist1.artistId.matches(artist2.artistId)) frequency++;
-                            }
-
-                            frequencies.put(artist1.artistId, frequency);
-                        }
-
-                        List<Map.Entry<String, Integer>> entries = new ArrayList<>(frequencies.entrySet());
-                        Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
-                            public int compare(Map.Entry<String, Integer> lhs, Map.Entry<String, Integer> rhs) {
-                                return lhs.getValue() < rhs.getValue() ? -1 : (lhs.getValue().equals(rhs.getValue()) ? 0 : 1);
-                            }
-                        });
-
-                        ArrayList<ArtistListData> commonArtists = new ArrayList<>();
-                        for (int i = 0; i < 5 && i < entries.size(); i++) {
-                            ArtistListData artist = pasta.getArtist(entries.get(i).getKey());
-                            if (artist != null) commonArtists.add(artist);
-                        }
-
-                        return commonArtists;
-                    }
-
-                    @Override
-                    protected void done(@Nullable ArrayList<ArtistListData> result) {
-                        if (result != null && result.size() > 0 && artists != null) {
-                            for (ArtistListData artist : result) {
-                                View v = LayoutInflater.from(getContext()).inflate(R.layout.artist_item_chip, null);
-                                ((TextView) v.findViewById(R.id.title)).setText(artist.artistName);
-                                Glide.with(getContext()).load(artist.artistImage).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
-                                    @Override
-                                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                                        ((CustomImageView) getView()).transition(resource);
-                                    }
-                                });
-
-                                v.setTag(artist);
-                                v.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Bundle args = new Bundle();
-                                        args.putParcelable("artist", (ArtistListData) v.getTag());
-
-                                        Fragment f = new ArtistFragment();
-                                        f.setArguments(args);
-
-                                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment, f).addToBackStack(null).commit();
-                                    }
-                                });
-                                artists.addView(v);
-                            }
-
-                            artists.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                                @Override
-                                public void onGlobalLayout() {
-                                    if (recycler != null)
-                                        recycler.setPadding(0, artists.getHeight(), 0, 0);
-                                    if (artists != null)
-                                        artists.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                }
-                            });
-                        } else if (artists != null) artists.setVisibility(View.GONE);
-                    }
-                }.execute();
             }
         };
         action.execute();
