@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
@@ -52,6 +53,7 @@ public class PreferenceUtils {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PALETTE, true);
     }
 
+    @ColorInt
     public static int getPrimaryColor(Context context) {
         int color = PreferenceManager.getDefaultSharedPreferences(context).getInt(PRIMARY, ContextCompat.getColor(context, R.color.primary));
 
@@ -62,6 +64,7 @@ public class PreferenceUtils {
         return color;
     }
 
+    @ColorInt
     public static int getAccentColor(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(ACCENT, ContextCompat.getColor(context, R.color.accent));
     }

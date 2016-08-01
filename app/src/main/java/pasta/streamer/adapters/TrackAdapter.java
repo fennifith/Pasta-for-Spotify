@@ -160,7 +160,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == 0) {
-            return new ArtistsViewHolder(LayoutInflater.from(activity).inflate(R.layout.artists_item, null));
+            return new ArtistsViewHolder(LayoutInflater.from(activity).inflate(cards ? R.layout.artists_item_card : R.layout.artists_item_tile, null));
         } else {
             return new TrackViewHolder(LayoutInflater.from(activity).inflate(trackList ? R.layout.track_item : (cards ? R.layout.track_item_card : R.layout.track_item_tile), null));
         }
@@ -169,6 +169,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         if (holder instanceof ArtistsViewHolder) {
+            FlexboxLayout layout = (FlexboxLayout) holder.v.findViewById(R.id.artists);
+            layout.removeAllViewsInLayout();
+
+            holder.v.findViewById(R.id.progress).setAlpha(1f);
+
             new Action<ArrayList<ArtistListData>>() {
                 @NonNull
                 @Override
@@ -246,6 +251,16 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
                         layout.setVisibility(View.VISIBLE);
                     } else holder.v.findViewById(R.id.artists).setVisibility(View.GONE);
+
+                    ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
+                    animator.setDuration(150);
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            holder.v.findViewById(R.id.progress).setAlpha((float) valueAnimator.getAnimatedValue());
+                        }
+                    });
+                    animator.start();
                 }
             }.execute();
 
