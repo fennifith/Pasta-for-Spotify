@@ -242,7 +242,7 @@ public class PlayerActivity extends AppCompatActivity {
                     @Nullable
                     @Override
                     protected Boolean run() throws InterruptedException {
-                        if (!pasta.toggleFavorite(trackList.get(curPosition))) {
+                        if (trackList == null || !pasta.toggleFavorite(trackList.get(curPosition))) {
                             return null;
                         } else return pasta.isFavorite(trackList.get(curPosition));
                     }
@@ -263,7 +263,9 @@ public class PlayerActivity extends AppCompatActivity {
                 }.execute();
                 break;
             case R.id.action_add:
-                new AddToPlaylistDialog(this, trackList.get(curPosition)).show();
+                if (trackList != null)
+                    new AddToPlaylistDialog(this, trackList.get(curPosition)).show();
+                else pasta.onError(PlayerActivity.this, "add playlist dialog");
                 break;
             case R.id.action_album:
                 new Action<AlbumListData>() {
@@ -276,7 +278,9 @@ public class PlayerActivity extends AppCompatActivity {
                     @Nullable
                     @Override
                     protected AlbumListData run() throws InterruptedException {
-                        return pasta.getAlbum(trackList.get(curPosition).albumId);
+                        if (trackList != null)
+                            return pasta.getAlbum(trackList.get(curPosition).albumId);
+                        else return null;
                     }
 
                     @Override
@@ -304,7 +308,9 @@ public class PlayerActivity extends AppCompatActivity {
                         @Nullable
                         @Override
                         protected ArtistListData run() throws InterruptedException {
-                            return pasta.getArtist(trackList.get(curPosition).artists.get(0).artistId);
+                            if (trackList != null)
+                                return pasta.getArtist(trackList.get(curPosition).artists.get(0).artistId);
+                            else return null;
                         }
 
                         @Override

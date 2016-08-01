@@ -180,10 +180,12 @@ public class PlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) return START_STICKY;
-        String action = intent.getAction();
-        if (action == null) return START_STICKY;
-        switch (action) {
+        if (intent == null || intent.getAction() == null || spotifyPlayer == null) {
+            pasta.onError(PlayerService.this, "random start command");
+            return START_STICKY;
+        }
+
+        switch (intent.getAction()) {
             case ACTION_INIT:
                 initPlayer(intent.getStringExtra(EXTRA_TOKEN), intent.getStringExtra(EXTRA_CLIENT_ID));
                 break;
