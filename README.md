@@ -45,7 +45,6 @@ Splash Screen | Home Screen | Now Playing
 
 ## Links
 
-- [Play Store beta](https://play.google.com/apps/testing/pasta.streamer)
 - [Google Plus Community](https://plus.google.com/communities/101536497390778012419)
 - [Website](http://theandroidmaster.github.io/apps/pasta/)
 
