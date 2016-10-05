@@ -11,11 +11,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.ExceptionReporter;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -49,27 +44,10 @@ public class Pasta extends Application {
     public SpotifyApi spotifyApi;
     public SpotifyService spotifyService;
     public UserPrivate me;
-    private Tracker tracker;
 
     private ErrorDialog errorDialog;
 
-    synchronized public Tracker getDefaultTracker() {
-        if (tracker == null) {
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            tracker = analytics.newTracker(R.xml.global_tracker);
-        }
-        return tracker;
-    }
-
     public void setScreen(Context context) {
-        Tracker tracker = getDefaultTracker();
-
-        tracker.setScreenName(context.getClass().getName());
-        tracker.send(new HitBuilders.ScreenViewBuilder()
-                .setNewSession()
-                .build());
-
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionReporter(tracker, Thread.getDefaultUncaughtExceptionHandler(), context));
     }
 
     public void onCriticalError(final Context context, String message) {
@@ -81,9 +59,6 @@ public class Pasta extends Application {
             errorDialog = new ErrorDialog(context).setMessage(errorMessage);
             errorDialog.show();
         }
-
-        getDefaultTracker().send(new HitBuilders.EventBuilder(context.getClass().getName(), message).build());
-        GoogleAnalytics.getInstance(context).dispatchLocalHits();
     }
 
     public void onError(Context context, String message) {
@@ -92,9 +67,6 @@ public class Pasta extends Application {
             toastMessage += "\n\nError: " + message + "\nLocation: " + context.getClass().getName();
 
         showToast(toastMessage);
-
-        getDefaultTracker().send(new HitBuilders.EventBuilder(context.getClass().getName(), message).build());
-        GoogleAnalytics.getInstance(context).dispatchLocalHits();
     }
 
     public void showToast(String message) {
