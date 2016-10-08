@@ -45,8 +45,9 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (viewType == 1) return new HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.header_item, null, false).getRoot());
-        else return new ViewHolder(inflater.inflate(R.layout.track_item, null));
+        if (viewType == 1)
+            return new HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.header_item, parent, false).getRoot());
+        else return new ViewHolder(inflater.inflate(R.layout.track_item, parent, false));
     }
 
     @Override

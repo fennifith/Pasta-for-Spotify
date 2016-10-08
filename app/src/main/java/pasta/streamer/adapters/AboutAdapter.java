@@ -32,7 +32,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ContribViewH
     @Override
     public AboutAdapter.ContribViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflater.inflate(R.layout.text_item, null);
+        View v = inflater.inflate(R.layout.text_item, parent, false);
         return new ContribViewHolder(v);
     }
 

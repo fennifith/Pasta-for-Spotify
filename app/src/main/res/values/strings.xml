@@ -190,4 +190,8 @@
         <item>https://github.com/JakeWharton/butterknife</item>
     </string-array>
 
+    <string name="image_transition">image</string>
+    <string name="title_transition">title</string>
+    <string name="subtitle_transition">subtitle</string>
+
 </resources>

@@ -4,30 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="4dp"
-        android:background="@color/colorAccent"
-        android:id="@+id/progress">
-
-        <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:fitsSystemWindows="true" />
-
-    </FrameLayout>
-
     <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/artists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="12dp"
+        android:animateLayoutChanges="true"
         android:paddingBottom="12dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:id="@+id/artists"
+        android:paddingTop="12dp"
         app:flexWrap="wrap"
         app:justifyContent="flex_start" />
 

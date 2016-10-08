@@ -10,8 +10,6 @@ android {
         targetSdkVersion 24
         versionCode 9
         versionName "1.8"
-        renderscriptTargetApi 19
-        renderscriptSupportModeEnabled true
         vectorDrawables.useSupportLibrary = true
     }
 

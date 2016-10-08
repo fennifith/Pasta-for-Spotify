@@ -14,6 +14,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -29,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -103,6 +106,7 @@ public class PlayerActivity extends AppCompatActivity {
     private UpdateReceiver updateReceiver;
     private NowPlayingAdapter adapter;
     private boolean palette;
+    private Drawable imageDrawable;
     private Pasta pasta;
     private Action action;
 
@@ -381,12 +385,32 @@ public class PlayerActivity extends AppCompatActivity {
                 Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(ImageUtils.getVectorDrawable(PlayerActivity.this, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                        art.transition(resource);
+                        if (imageDrawable == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            int cx = art.getWidth() / 2, cy = art.getHeight() / 2;
+
+                            art.setImageDrawable(resource);
+                            ViewAnimationUtils.createCircularReveal(art, cx, cy, 0, (float) Math.hypot(cx, cy)).start();
+                        } else art.transition(resource);
+
+                        imageDrawable = resource;
                         if (isLoading()) setLoading(false);
 
-                        Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
-                        if (backgroundImage != null)
-                            backgroundImage.transition(ImageUtils.blurBitmap(bitmap));
+                        final Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
+                        if (backgroundImage != null) {
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    final Bitmap blurredBitmap = ImageUtils.blurBitmap(PlayerActivity.this, bitmap);
+                                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (backgroundImage != null)
+                                                backgroundImage.transition(blurredBitmap);
+                                        }
+                                    });
+                                }
+                            }.start();
+                        }
 
                         if (palette) {
                             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {

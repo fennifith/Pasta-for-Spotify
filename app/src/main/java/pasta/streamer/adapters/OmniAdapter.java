@@ -125,13 +125,13 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case 0:
-                return new TrackViewHolder(inflater.inflate(trackList ? R.layout.track_item : (cards ? R.layout.track_item_card : R.layout.track_item_tile), null));
+                return new TrackViewHolder(inflater.inflate(trackList ? R.layout.track_item : (cards ? R.layout.track_item_card : R.layout.track_item_tile), parent, false));
             case 1:
-                return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, null));
+                return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, parent, false));
             case 2:
-                return new PlaylistViewHolder(inflater.inflate(cards ? R.layout.playlist_item_card : R.layout.playlist_item_tile, null));
+                return new PlaylistViewHolder(inflater.inflate(cards ? R.layout.playlist_item_card : R.layout.playlist_item_tile, parent, false));
             case 3:
-                return new ArtistViewHolder(inflater.inflate(cards ? R.layout.artist_item_card : R.layout.artist_item_tile, null));
+                return new ArtistViewHolder(inflater.inflate(cards ? R.layout.artist_item_card : R.layout.artist_item_tile, parent, false));
             default:
                 return null;
         }

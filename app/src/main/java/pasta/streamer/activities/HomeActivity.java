@@ -5,9 +5,12 @@ import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -186,9 +189,22 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             if (pasta.me.images.size() > 0) {
                 Glide.with(this).load(pasta.me.images.get(0).url).into(new SimpleTarget<GlideDrawable>() {
                     @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                    public void onResourceReady(final GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                         materialHeader.getActiveProfile().withIcon(resource);
-                        materialHeader.getHeaderBackgroundView().setImageBitmap(ImageUtils.blurBitmap(ImageUtils.drawableToBitmap(resource)));
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                final Bitmap blurredProfileImage = ImageUtils.blurBitmap(HomeActivity.this, ImageUtils.drawableToBitmap(resource));
+
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (materialHeader != null)
+                                            materialHeader.getHeaderBackgroundView().setImageBitmap(blurredProfileImage);
+                                    }
+                                });
+                            }
+                        }.start();
                     }
                 });
             }

@@ -182,15 +182,15 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case 0:
-                return new TrackViewHolder(inflater.inflate(R.layout.track_item, null));
+                return new TrackViewHolder(inflater.inflate(R.layout.track_item, parent, false));
             case 1:
-                return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, null));
+                return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, parent, false));
             case 2:
-                return new PlaylistViewHolder(inflater.inflate(cards ? R.layout.playlist_item_card : R.layout.playlist_item_tile, null));
+                return new PlaylistViewHolder(inflater.inflate(cards ? R.layout.playlist_item_card : R.layout.playlist_item_tile, parent, false));
             case 3:
-                return new ArtistViewHolder(inflater.inflate(cards ? R.layout.artist_item_card : R.layout.artist_item_tile, null));
+                return new ArtistViewHolder(inflater.inflate(cards ? R.layout.artist_item_card : R.layout.artist_item_tile, parent, false));
             case 4:
-                return new HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.header_item, null, false).getRoot());
+                return new HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.header_item, parent, false).getRoot());
             default:
                 return null;
         }

@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -330,9 +332,23 @@ public class ArtistFragment extends FullScreenFragment {
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);
 
-                Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
-                if (backgroundImage != null)
-                    backgroundImage.transition(ImageUtils.blurBitmap(bitmap));
+                final Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
+                if (backgroundImage != null) {
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            final Bitmap blurredBitmap = ImageUtils.blurBitmap(getContext(), bitmap);
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (backgroundImage != null)
+                                        backgroundImage.transition(blurredBitmap);
+                                }
+                            });
+                        }
+                    }.start();
+                }
+
                 if (palette) {
                     Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                         @Override

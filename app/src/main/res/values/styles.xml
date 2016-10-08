@@ -19,6 +19,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/colorPrimary</item>
 
         <item name="android:colorBackground">@color/colorBackgroundLight</item>
         <item name="colorBackground">@color/colorBackgroundLight</item>
@@ -30,8 +31,6 @@
         <item name="android:textColorPrimaryInverse">#FFFFFF</item>
         <item name="android:textColorSecondaryInverse">#B3FFFFFF</item>
         <item name="android:textColorTertiaryInverse">#80FFFFFF</item>
-
-        <item name="colorButtonNormal">@color/colorPrimary</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme">

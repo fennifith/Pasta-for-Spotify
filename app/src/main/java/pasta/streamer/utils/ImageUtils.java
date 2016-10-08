@@ -4,10 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.graphics.drawable.VectorDrawableCompat;
 
 public class ImageUtils {
@@ -60,24 +63,28 @@ public class ImageUtils {
         return bitmap;
     }
 
-    public static Bitmap blurBitmap(Bitmap bitmap) {
-        Paint paint = new Paint();
-        paint.setAlpha(180);
+    public static Bitmap blurBitmap(Context context, Bitmap bitmap) {
+        if (context == null || bitmap == null) return null;
 
-        Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(resultBitmap);
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-        int blurRadius = Math.max(bitmap.getWidth(), bitmap.getHeight()) / 10;
-        for (int row = -blurRadius; row < blurRadius; row += 2) {
-            for (int column = -blurRadius; column < blurRadius; column += 2) {
-                if (column * column + row * row <= blurRadius * blurRadius) {
-                    paint.setAlpha((blurRadius * blurRadius) / ((column * column + row * row) + 1) * 2);
-                    canvas.drawBitmap(bitmap, row, column, paint);
-                }
-            }
+        Bitmap blurredBitmap;
+        try {
+            blurredBitmap = Bitmap.createBitmap(bitmap);
+        } catch (OutOfMemoryError e) {
+            return null;
         }
 
-        return resultBitmap;
+        RenderScript renderScript = RenderScript.create(context);
+        Allocation input = Allocation.createFromBitmap(renderScript, bitmap, Allocation.MipmapControl.MIPMAP_FULL, Allocation.USAGE_SCRIPT);
+        Allocation output = Allocation.createTyped(renderScript, input.getType());
+        ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+
+        script.setInput(input);
+        script.setRadius(20);
+
+        script.forEach(output);
+        output.copyTo(blurredBitmap);
+
+        return blurredBitmap;
     }
 
 }
