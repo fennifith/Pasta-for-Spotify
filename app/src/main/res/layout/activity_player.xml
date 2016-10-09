@@ -29,8 +29,7 @@
                     android:layout_gravity="center_vertical|top"
                     android:scaleType="centerCrop"
                     app:srcCompat="@drawable/preload"
-                    android:background="#fafafa"
-                    android:transitionName="image" />
+                    android:background="#fafafa" />
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -132,8 +131,7 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="?android:textColorPrimary"
-                        android:transitionName="title" />
+                        android:textColor="?android:textColorPrimary" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -144,8 +142,7 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="?android:textColorSecondary"
-                        android:transitionName="subtitle" />
+                        android:textColor="?android:textColorSecondary" />
 
                 </LinearLayout>
 

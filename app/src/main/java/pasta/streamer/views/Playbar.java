@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -138,8 +139,8 @@ public class Playbar {
                     playbar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_up, R.anim.blank);
-                            activity.startActivity(new Intent(activity, PlayerActivity.class), options.toBundle());
+                            Bundle bundle = ActivityOptionsCompat.makeScaleUpAnimation(v, (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight()).toBundle();
+                            activity.startActivity(new Intent(activity, PlayerActivity.class), bundle);
                         }
                     });
 

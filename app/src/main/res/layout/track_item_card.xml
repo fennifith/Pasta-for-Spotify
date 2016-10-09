@@ -27,8 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/preload"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/image_transition" />
+                android:scaleType="centerCrop" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -58,8 +57,7 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textIsSelectable="false"
-                        android:transitionName="@string/title_transition" />
+                        android:textIsSelectable="false" />
 
                     <TextView
                         android:id="@+id/extra"
@@ -72,8 +70,7 @@
                         android:singleLine="true"
                         android:lines="1"
                         android:maxLines="1"
-                        android:ellipsize="end"
-                        android:transitionName="@string/subtitle_transition" />
+                        android:ellipsize="end" />
 
                 </LinearLayout>
 

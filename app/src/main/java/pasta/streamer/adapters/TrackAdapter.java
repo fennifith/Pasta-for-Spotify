@@ -442,9 +442,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                     trackList.addAll(list);
                     StaticUtils.play(holder.getAdapterPosition() - 1, trackList, activity);
 
-
-                    Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_up, R.anim.blank).toBundle();
-
+                    Bundle bundle = ActivityOptionsCompat.makeScaleUpAnimation(view, (int) view.getX(), (int) view.getY(), view.getWidth(), view.getHeight()).toBundle();
                     activity.startActivity(new Intent(activity, PlayerActivity.class), bundle);
                 }
             });

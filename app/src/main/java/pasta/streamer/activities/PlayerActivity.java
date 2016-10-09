@@ -1,5 +1,6 @@
 package pasta.streamer.activities;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ActivityManager;
@@ -107,6 +108,7 @@ public class PlayerActivity extends AppCompatActivity {
     private NowPlayingAdapter adapter;
     private boolean palette;
     private Drawable imageDrawable;
+    private Integer imageColor;
     private Pasta pasta;
     private Action action;
 
@@ -421,20 +423,15 @@ public class PlayerActivity extends AppCompatActivity {
                                         color = palette.getDarkVibrantColor(Color.DKGRAY);
                                     else color = palette.getLightVibrantColor(Color.LTGRAY);
 
-                                    ValueAnimator animator = ValueAnimator.ofInt(-100, 100);
+                                    if (imageColor == null)
+                                        imageColor = PreferenceUtils.getPrimaryColor(PlayerActivity.this);
+                                    ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), imageColor, color);
                                     animator.setDuration(250);
                                     animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-                                        boolean set;
-
                                         @Override
                                         public void onAnimationUpdate(ValueAnimator animation) {
                                             int value = (int) animation.getAnimatedValue();
-                                            if (value >= 0 && !set) {
-                                                bg.setBackgroundColor(color);
-                                                set = true;
-                                            }
-                                            bg.getBackground().setAlpha(Math.abs(value));
+                                            bg.setBackgroundColor(value);
                                         }
                                     });
                                     animator.start();
