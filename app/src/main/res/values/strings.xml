@@ -162,6 +162,7 @@
         <item>Sectioned RecyclerView</item>
         <item>Material Dialogs</item>
         <item>Butterknife</item>
+        <item>Pull Back Layout</item>
     </string-array>
 
     <string-array name="library_descs" translatable="true">
@@ -175,6 +176,7 @@
         <item>Sectioned RecyclerView allows you to easily split a RecyclerView into sections with headers.</item>
         <item>A beautiful, easy-to-use, and customizable dialogs API, enabling you to use Material designed dialogs down to API 8.</item>
         <item>Field and method binding for Android views which uses annotation processing to generate boilerplate codefor you.</item>
+        <item>Pull down to finish an Activity.</item>
     </string-array>
 
     <string-array name="library_urls" translatable="false">
@@ -188,6 +190,7 @@
         <item>https://github.com/afollestad/sectioned-recyclerview</item>
         <item>https://github.com/afollestad/material-dialogs</item>
         <item>https://github.com/JakeWharton/butterknife</item>
+        <item>https://github.com/oxoooo/pull-back-layout</item>
     </string-array>
 
     <string name="image_transition">image</string>

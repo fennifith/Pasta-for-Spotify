@@ -43,7 +43,7 @@
             android:name=".activities.PlayerActivity"
             android:label="@string/title_activity_playing"
             android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.Transparent"
+            android:theme="@style/PlayerTheme"
             android:configChanges="orientation|screenSize"/>
 
         <service

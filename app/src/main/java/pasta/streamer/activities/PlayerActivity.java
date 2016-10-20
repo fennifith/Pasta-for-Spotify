@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import ooo.oxo.library.widget.PullBackLayout;
 import pasta.streamer.Pasta;
 import pasta.streamer.PlayerService;
 import pasta.streamer.R;
@@ -63,7 +64,7 @@ import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerActivity extends AppCompatActivity implements PullBackLayout.Callback {
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -95,6 +96,8 @@ public class PlayerActivity extends AppCompatActivity {
     TextView subtitle;
     @Bind(R.id.rv)
     RecyclerView rv;
+    @Bind(R.id.puller)
+    PullBackLayout puller;
 
     private ArrayList<TrackListData> trackList;
     private MenuItem fav;
@@ -115,9 +118,11 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (PreferenceUtils.isDarkTheme(this)) setTheme(R.style.AppTheme_Transparent_Dark);
+        if (PreferenceUtils.isDarkTheme(this)) setTheme(R.style.PlayerTheme_Dark);
         DataBindingUtil.setContentView(this, R.layout.activity_player);
         ButterKnife.bind(this);
+
+        puller.setCallback(this);
 
         pasta = (Pasta) getApplicationContext();
         pasta.setScreen(this);
@@ -366,6 +371,27 @@ public class PlayerActivity extends AppCompatActivity {
 
     private boolean isLoading() {
         return progressBar.getVisibility() == View.VISIBLE;
+    }
+
+    @Override
+    public void onPullStart() {
+    }
+
+    @Override
+    public void onPull(float v) {
+        if (backgroundImage != null) {
+            backgroundImage.setScaleX(1 - (v / 3));
+            backgroundImage.setScaleY(1 - (v / 3));
+        }
+    }
+
+    @Override
+    public void onPullCancel() {
+    }
+
+    @Override
+    public void onPullComplete() {
+        finish();
     }
 
     private class UpdateReceiver extends BroadcastReceiver {
