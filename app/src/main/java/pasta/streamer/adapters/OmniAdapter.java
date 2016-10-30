@@ -47,7 +47,6 @@ import pasta.streamer.fragments.PlaylistFragment;
 import pasta.streamer.utils.ImageUtils;
 import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
-import pasta.streamer.views.CustomImageView;
 
 public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
@@ -446,7 +445,7 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
                                 ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
                                 if (artistImage != null)
-                                    Glide.with(activity).load(result.artistImage).into((ImageView) holder.v.findViewById(R.id.artist_image));
+                                    Glide.with(activity).load(result.artistImage).thumbnail(0.2f).into((ImageView) holder.v.findViewById(R.id.artist_image));
                             }
                         }.execute();
 
@@ -758,10 +757,10 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).asBitmap().placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new BitmapImageViewTarget(imageView) {
+            Glide.with(activity).load(image).asBitmap().placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).thumbnail(0.2f).into(new BitmapImageViewTarget(imageView) {
                 @Override
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    ((CustomImageView) getView()).transition(resource);
+                    super.onResourceReady(resource, glideAnimation);
                     if (!thumbnails) getView().setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);

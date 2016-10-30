@@ -42,7 +42,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Glide.with(activity).load(list.get(position).categoryImage).into((ImageView) holder.v.findViewById(R.id.image));
+        Glide.with(activity).load(list.get(position).categoryImage).thumbnail(0.2f).into((ImageView) holder.v.findViewById(R.id.image));
 
         ((TextView) holder.v.findViewById(R.id.title)).setText(list.get(position).categoryName);
 

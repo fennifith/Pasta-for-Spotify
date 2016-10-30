@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -24,7 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -81,7 +81,10 @@ public class ArtistFragment extends FullScreenFragment {
     Toolbar toolbar;
     @Bind(R.id.somethingbar)
     View somethingbar;
-    @Nullable @Bind(R.id.backgroundImage)
+    @Bind(R.id.appbar)
+    AppBarLayout appbar;
+    @Nullable
+    @Bind(R.id.backgroundImage)
     CustomImageView backgroundImage;
 
     private ArtistListData data;
@@ -141,18 +144,7 @@ public class ArtistFragment extends FullScreenFragment {
                 });
                 genres.addView(v);
             }
-
-            genres.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    if (recycler != null) recycler.setPadding(0, genres.getHeight(), 0, 0);
-                    if (genres != null)
-                        genres.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-            });
-        } else {
-            genres.setVisibility(View.GONE);
-        }
+        } else genres.setVisibility(View.GONE);
 
         spinner.setVisibility(View.VISIBLE);
 
@@ -168,7 +160,8 @@ public class ArtistFragment extends FullScreenFragment {
             manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4) return manager.getSpanCount();
+                    if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4)
+                        return manager.getSpanCount();
                     else return 1;
                 }
             });
@@ -327,7 +320,7 @@ public class ArtistFragment extends FullScreenFragment {
             }
         });
 
-        Glide.with(getContext()).load(data.artistImage).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.artistImage).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);

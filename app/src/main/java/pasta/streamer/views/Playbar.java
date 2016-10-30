@@ -174,7 +174,7 @@ public class Playbar {
                 }
 
                 if (thumbnails) {
-                    Glide.with(activity).load(data.trackImage).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
+                    Glide.with(activity).load(data.trackImage).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(art) {
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                             art.transition(resource);

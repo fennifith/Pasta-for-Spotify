@@ -48,7 +48,6 @@ import pasta.streamer.fragments.PlaylistFragment;
 import pasta.streamer.utils.ImageUtils;
 import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
-import pasta.streamer.views.CustomImageView;
 
 public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdapter.ViewHolder> {
 
@@ -343,7 +342,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
                             ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
                             if (artistImage != null)
-                                Glide.with(activity).load(result.artistImage).into((ImageView) holder.v.findViewById(R.id.artist_image));
+                                Glide.with(activity).load(result.artistImage).thumbnail(0.2f).into((ImageView) holder.v.findViewById(R.id.artist_image));
                         }
                     }.execute();
 
@@ -650,10 +649,10 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
         if (!thumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).into(new GlideDrawableImageViewTarget(imageView) {
+            Glide.with(activity).load(image).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(imageView) {
                 @Override
                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                    ((CustomImageView) getView()).transition(resource);
+                    super.onResourceReady(resource, animation);
                     if (!thumbnails) getView().setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);

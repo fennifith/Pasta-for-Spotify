@@ -59,7 +59,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ContribViewH
             image.setVisibility(View.VISIBLE);
             image.setImageDrawable(new ColorDrawable(Color.parseColor("#bdbdbd")));
 
-            Glide.with(activity).load(contribList.get(position).image).into(image);
+            Glide.with(activity).load(contribList.get(position).image).thumbnail(0.2f).into(image);
         } else {
             holder.v.findViewById(R.id.image).setVisibility(View.GONE);
         }

@@ -196,6 +196,7 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
 
     @OnClick(R.id.prevButton)
     public void prev() {
+        imageDrawable = null;
         StaticUtils.previous(this);
         setLoading(true);
         setClickable(false);
@@ -209,6 +210,7 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
 
     @OnClick(R.id.nextButton)
     public void next() {
+        imageDrawable = null;
         StaticUtils.next(this);
         setLoading(true);
         setClickable(false);
@@ -410,7 +412,7 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
                 if (!isLoading()) setLoading(true);
                 if (action != null && action.isExecuting()) action.cancel();
 
-                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(ImageUtils.getVectorDrawable(PlayerActivity.this, R.drawable.preload)).into(new GlideDrawableImageViewTarget(art) {
+                Glide.with(PlayerActivity.this).load(data.trackImageLarge).placeholder(ImageUtils.getVectorDrawable(PlayerActivity.this, R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(art) {
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                         if (imageDrawable == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -420,11 +422,8 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
                             ViewAnimationUtils.createCircularReveal(art, cx, cy, 0, (float) Math.hypot(cx, cy)).start();
                         } else art.transition(resource);
 
-                        imageDrawable = resource;
-                        if (isLoading()) setLoading(false);
-
                         final Bitmap bitmap = ImageUtils.drawableToBitmap(resource);
-                        if (backgroundImage != null) {
+                        if (backgroundImage != null && imageDrawable == null) {
                             new Thread() {
                                 @Override
                                 public void run() {
@@ -440,7 +439,7 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
                             }.start();
                         }
 
-                        if (palette) {
+                        if (palette && imageDrawable == null) {
                             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                                 @Override
                                 public void onGenerated(Palette palette) {
@@ -467,6 +466,9 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
                                 }
                             });
                         }
+
+                        imageDrawable = resource;
+                        if (isLoading()) setLoading(false);
                     }
 
                     @Override

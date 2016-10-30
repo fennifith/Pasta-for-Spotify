@@ -145,7 +145,7 @@ public class PlaylistFragment extends FullScreenFragment {
         };
         action.execute();
 
-        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).into(new GlideDrawableImageViewTarget(header) {
+        Glide.with(getContext()).load(data.playlistImageLarge).placeholder(ImageUtils.getVectorDrawable(getContext(), R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(header) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);

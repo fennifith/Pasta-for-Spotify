@@ -221,10 +221,10 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
                         for (ArtistListData artist : result) {
                             View v = LayoutInflater.from(activity).inflate(R.layout.artist_item_chip, null);
                             ((TextView) v.findViewById(R.id.title)).setText(artist.artistName);
-                            Glide.with(activity).load(artist.artistImage).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
+                            Glide.with(activity).load(artist.artistImage).thumbnail(0.2f).into(new GlideDrawableImageViewTarget((ImageView) v.findViewById(R.id.image)) {
                                 @Override
                                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                                    ((CustomImageView) getView()).transition(resource);
+                                    super.onResourceReady(resource, animation);
                                 }
                             });
 
