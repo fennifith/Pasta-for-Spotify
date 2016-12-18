@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -16,6 +15,7 @@ import android.widget.ProgressBar;
 import com.afollestad.async.Action;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,8 +23,9 @@ import kaaes.spotify.webapi.android.models.CategoriesPager;
 import kaaes.spotify.webapi.android.models.Category;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
-import pasta.streamer.adapters.CategoryAdapter;
+import pasta.streamer.adapters.ListAdapter;
 import pasta.streamer.data.CategoryListData;
+import pasta.streamer.data.ListData;
 import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 
@@ -35,7 +36,7 @@ public class CategoriesFragment extends Fragment {
     @Bind(R.id.progressBar)
     ProgressBar spinner;
 
-    CategoryAdapter adapter;
+    ListAdapter adapter;
     Pasta pasta;
     Action action;
 
@@ -51,11 +52,11 @@ public class CategoriesFragment extends Fragment {
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
-        adapter = new CategoryAdapter((AppCompatActivity) getActivity(), null);
+        adapter = new ListAdapter(new ArrayList<ListData>());
         recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);
 
-        action = new Action<ArrayList<CategoryListData>>() {
+        action = new Action<List<ListData>>() {
             @NonNull
             @Override
             public String id() {
@@ -64,7 +65,7 @@ public class CategoriesFragment extends Fragment {
 
             @Nullable
             @Override
-            protected ArrayList<CategoryListData> run() throws InterruptedException {
+            protected List<ListData> run() throws InterruptedException {
                 CategoriesPager categories = null;
                 for (int i = 0; categories == null && i < PreferenceUtils.getRetryCount(getContext()); i++) {
                     try {
@@ -77,7 +78,7 @@ public class CategoriesFragment extends Fragment {
                 }
                 if (categories == null) return null;
 
-                ArrayList<CategoryListData> list = new ArrayList<>();
+                List<ListData> list = new ArrayList<>();
                 for (Category category : categories.categories.items) {
                     list.add(new CategoryListData(category));
                 }
@@ -85,13 +86,13 @@ public class CategoriesFragment extends Fragment {
             }
 
             @Override
-            protected void done(@Nullable ArrayList<CategoryListData> result) {
+            protected void done(@Nullable List<ListData> result) {
                 if (spinner != null) spinner.setVisibility(View.GONE);
                 if (result == null) {
                     pasta.onCriticalError(getActivity(), "categories action");
                     return;
                 }
-                adapter.swapData(result);
+                adapter.setList(result);
             }
         };
         action.execute();

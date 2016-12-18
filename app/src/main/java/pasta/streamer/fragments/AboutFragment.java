@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +12,14 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pasta.streamer.R;
-import pasta.streamer.adapters.AboutAdapter;
+import pasta.streamer.adapters.ListAdapter;
+import pasta.streamer.data.ListData;
 import pasta.streamer.data.TextListData;
 
 public class AboutFragment extends FabFragment {
@@ -35,7 +37,7 @@ public class AboutFragment extends FabFragment {
 
         progressBar.setVisibility(View.GONE);
 
-        ArrayList<TextListData> textList = new ArrayList<>();
+        List<ListData> textList = new ArrayList<>();
 
         textList.add(new TextListData(null, getResources().getString(R.string.contributors), null, null));
 
@@ -58,8 +60,8 @@ public class AboutFragment extends FabFragment {
             textList.add(new TextListData(null, libNames[i], libDescs[i], Uri.parse(libPrimary[i])));
         }
 
-        rv.setLayoutManager(new GridLayoutManager(getContext(), 1));
-        rv.setAdapter(new AboutAdapter(getActivity(), textList));
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.setAdapter(new ListAdapter(textList));
 
         setFab(true, R.drawable.ic_star, new View.OnClickListener() {
             @Override
