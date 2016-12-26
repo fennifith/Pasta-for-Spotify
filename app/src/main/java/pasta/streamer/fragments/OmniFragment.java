@@ -1,9 +1,7 @@
 package pasta.streamer.fragments;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -17,15 +15,16 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pasta.streamer.R;
-import pasta.streamer.adapters.OmniAdapter;
+import pasta.streamer.adapters.ListAdapter;
+import pasta.streamer.data.ListData;
+import pasta.streamer.data.TrackListData;
 import pasta.streamer.utils.PreferenceUtils;
 
 public class OmniFragment extends Fragment {
 
-    private OmniAdapter adapter;
+    private ListAdapter adapter;
     private ArrayList list;
     private GridLayoutManager manager;
-    private boolean isFavoriteBehavior;
 
     @Bind(R.id.progressBar)
     ProgressBar spinner;
@@ -48,15 +47,12 @@ public class OmniFragment extends Fragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        Bundle args = getArguments();
-        if (args != null) isFavoriteBehavior = getArguments().getBoolean("favorite", false);
-
-        adapter = new OmniAdapter((AppCompatActivity) getActivity(), list, isFavoriteBehavior);
+        adapter = new ListAdapter(list);
         manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels));
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if ((adapter.getItemViewType(position) == 0 && PreferenceUtils.isListTracks(getContext())) || (adapter.getItemViewType(position) != 0 && PreferenceUtils.isCards(getContext())))
+                if ((adapter.getList().get(adapter.getItemViewType(position)) instanceof TrackListData && PreferenceUtils.isListTracks(getContext())) || (!(adapter.getList().get(adapter.getItemViewType(position)) instanceof TrackListData) && PreferenceUtils.isCards(getContext())))
                     return manager.getSpanCount();
                 else return 1;
             }
@@ -74,8 +70,8 @@ public class OmniFragment extends Fragment {
         ButterKnife.unbind(this);
     }
 
-    public void addData(Parcelable data) {
-        if (adapter != null) adapter.addData(data);
+    public void addData(ListData data) {
+        if (adapter != null) adapter.addListData(data);
         else {
             if (list == null) list = new ArrayList();
             list.add(data);
@@ -86,7 +82,7 @@ public class OmniFragment extends Fragment {
 
     public void swapData(ArrayList list) {
         this.list = list;
-        if (adapter != null) adapter.swapData(this.list);
+        if (adapter != null) adapter.setList(list);
         if (spinner != null) spinner.setVisibility(View.GONE);
         if (empty != null) empty.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
     }

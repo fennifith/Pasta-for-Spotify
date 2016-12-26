@@ -761,10 +761,9 @@ public class OmniAdapter extends RecyclerView.Adapter<OmniAdapter.ViewHolder> {
                 @Override
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     super.onResourceReady(resource, glideAnimation);
-                    if (!thumbnails) getView().setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);
-                    if (!thumbnails || !palette || bg == null) return;
+                    if (!palette || bg == null) return;
                     Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {

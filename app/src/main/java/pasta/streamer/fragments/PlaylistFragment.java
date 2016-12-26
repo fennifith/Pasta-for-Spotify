@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,7 +41,8 @@ import butterknife.OnClick;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
-import pasta.streamer.adapters.TrackAdapter;
+import pasta.streamer.adapters.ListAdapter;
+import pasta.streamer.data.ListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.dialogs.NewPlaylistDialog;
@@ -77,7 +77,7 @@ public class PlaylistFragment extends FullScreenFragment {
     private ArrayList<TrackListData> trackList;
     private Action action;
     private int selectedOrder;
-    private TrackAdapter adapter;
+    private ListAdapter adapter;
     private boolean palette;
 
     @Override
@@ -112,8 +112,7 @@ public class PlaylistFragment extends FullScreenFragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        adapter = new TrackAdapter((AppCompatActivity) getActivity(), null);
-        if (data.editable) adapter.setPlaylistBehavior(data);
+        adapter = new ListAdapter(new ArrayList<ListData>());
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.isListTracks(getContext()) ? 1 : PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         recycler.setHasFixedSize(true);
@@ -138,8 +137,9 @@ public class PlaylistFragment extends FullScreenFragment {
                     pasta.onCriticalError(getContext(), "playlist tracks action");
                     return;
                 }
-                adapter.swapData(result);
-                adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
+
+                adapter.setOrder(PreferenceUtils.getTrackOrder(getContext()));
+                adapter.setList(result);
                 trackList = result;
             }
         };
@@ -313,7 +313,7 @@ public class PlaylistFragment extends FullScreenFragment {
                 }, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface d, int which) {
                         PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(PreferenceUtils.ORDER, selectedOrder).apply();
-                        adapter.sort(PreferenceUtils.getTrackOrder(getContext()));
+                        adapter.setOrder(PreferenceUtils.getTrackOrder(getContext()));
                         d.dismiss();
                     }
                 }).show();

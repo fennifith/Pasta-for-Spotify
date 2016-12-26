@@ -73,8 +73,7 @@
             android:gravity="center"
             android:padding="16dp"
             app:srcCompat="@drawable/menu"
-            android:tint="?android:textColorPrimary"
-            android:visibility="gone" />
+            android:tint="?android:textColorPrimary" />
 
     </LinearLayout>
 

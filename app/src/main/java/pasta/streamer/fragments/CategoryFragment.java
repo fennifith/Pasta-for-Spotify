@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -26,8 +25,9 @@ import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import kaaes.spotify.webapi.android.models.PlaylistsPager;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
-import pasta.streamer.adapters.OmniAdapter;
+import pasta.streamer.adapters.ListAdapter;
 import pasta.streamer.data.CategoryListData;
+import pasta.streamer.data.ListData;
 import pasta.streamer.data.PlaylistListData;
 import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
@@ -41,7 +41,7 @@ public class CategoryFragment extends FullScreenFragment {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    OmniAdapter adapter;
+    ListAdapter adapter;
     GridLayoutManager manager;
     CategoryListData data;
     Action action;
@@ -84,7 +84,7 @@ public class CategoryFragment extends FullScreenFragment {
         }
 
         recycler.setLayoutManager(manager);
-        adapter = new OmniAdapter((AppCompatActivity) getActivity(), null, false);
+        adapter = new ListAdapter(new ArrayList<ListData>());
         recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);
 
@@ -124,7 +124,7 @@ public class CategoryFragment extends FullScreenFragment {
                     pasta.onCriticalError(getActivity(), "category playlists action");
                     return;
                 }
-                adapter.swapData(result);
+                adapter.setList(result);
             }
         };
         action.execute();

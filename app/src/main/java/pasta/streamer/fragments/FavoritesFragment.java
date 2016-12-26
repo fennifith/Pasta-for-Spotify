@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnPageChange;
-import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.adapters.FavoritePagerAdapter;
 import pasta.streamer.dialogs.NewPlaylistDialog;
@@ -28,15 +27,12 @@ public class FavoritesFragment extends FabFragment {
     TabLayout tl;
 
     private FavoritePagerAdapter adapter;
-    private Pasta pasta;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false).getRoot();
         ButterKnife.bind(this, rootView);
-
-        pasta = (Pasta) getContext().getApplicationContext();
 
         ViewCompat.setElevation(tl, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
 
