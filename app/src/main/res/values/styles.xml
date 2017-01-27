@@ -4,7 +4,7 @@
         <item name="colorPrimary">#303030</item>
         <item name="colorPrimaryDark">#212121</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorBackground">#303030</item>
+        <item name="android:colorBackground">@color/colorBackgroundDark</item>
         <item name="android:textColorSecondary">#B3ffffff</item>
         <item name="android:textColorPrimary">#ffffff</item>
         <item name="android:textColorPrimaryInverse">#DE000000</item>

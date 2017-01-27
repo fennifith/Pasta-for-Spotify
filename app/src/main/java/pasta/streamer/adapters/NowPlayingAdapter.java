@@ -59,6 +59,7 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         final ViewHolder holder = (ViewHolder) viewHolder;
         TrackListData track = trackList.get(getAbsPosition(position));
 
+        ButterKnife.findById(holder.v, R.id.menu).setVisibility(View.GONE);
         ButterKnife.findById(holder.v, R.id.image).setVisibility(View.GONE);
 
         ((TextView) ButterKnife.findById(holder.v, R.id.name)).setText(track.trackName);
