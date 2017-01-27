@@ -39,7 +39,7 @@ import pasta.streamer.utils.StaticUtils;
 public class Pasta extends Application {
     //below is where the client id is stored, which has been removed from the public repo for security reasons
     //instructions to obtain a client id are here: https://developer.spotify.com/web-api/tutorial/
-    public final String CLIENT_ID = "c877bc11753a44d184a5ee46527dab62";
+    public final String CLIENT_ID = "INSERT_CLIENT_ID_HERE";
     public String token;
     public SpotifyApi spotifyApi;
     public SpotifyService spotifyService;
