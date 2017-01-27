@@ -1,9 +1,9 @@
 package pasta.streamer.fragments;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -51,7 +51,7 @@ public class CategoryFragment extends FullScreenFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_category, container, false).getRoot();
+        View rootView = inflater.inflate(R.layout.fragment_category, container, false);
         ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
@@ -68,20 +68,12 @@ public class CategoryFragment extends FullScreenFragment {
             }
         });
 
-        setData(data.categoryName, PreferenceUtils.getPrimaryColor(getContext()), PreferenceUtils.getPrimaryColor(getContext()));
+        int color = ContextCompat.getColor(getContext(), R.color.colorPrimary);
+        setData(data.categoryName, color, color);
 
         spinner.setVisibility(View.VISIBLE);
 
-        manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), false));
-
-        if (PreferenceUtils.isCards(getContext())) {
-            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    return manager.getSpanCount();
-                }
-            });
-        }
+        manager = new GridLayoutManager(getContext(), 1);
 
         recycler.setLayoutManager(manager);
         adapter = new ListAdapter(new ArrayList<ListData>());

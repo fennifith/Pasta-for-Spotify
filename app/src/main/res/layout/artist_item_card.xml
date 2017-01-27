@@ -4,88 +4,83 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
+    app:cardBackgroundColor="?attr/cardBackgroundColor"
     app:cardCornerRadius="2dp"
-    app:cardUseCompatPadding="true"
-    app:cardBackgroundColor="?attr/cardBackgroundColor">
+    app:cardUseCompatPadding="true">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/bg"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?attr/cardBackgroundColor"
+            android:orientation="vertical">
+
+            <pasta.streamer.views.CircleImageView
+                android:id="@+id/image"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="32dp"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/preload" />
 
             <LinearLayout
-                android:id="@+id/bg"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="68dp"
                 android:background="@android:color/transparent"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingEnd="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingStart="16dp">
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="?android:textColorSecondary"
+                    android:textIsSelectable="false"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/extra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="?android:textColorTertiary"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="68dp"
-                    android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:paddingLeft="16dp"
-                    android:paddingStart="16dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:textColor="?android:textColorPrimary"
-                        android:textSize="16sp"
-                        android:singleLine="true"
-                        android:lines="1"
-                        android:maxLines="1"
-                        android:ellipsize="end"/>
-
-                    <TextView
-                        android:id="@+id/extra"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:textColor="?android:textColorSecondary"
-                        android:textSize="12sp"
-                        android:singleLine="true"
-                        android:lines="1"
-                        android:maxLines="1"
-                        android:ellipsize="end"/>
-
-                </LinearLayout>
-
-                <pasta.streamer.views.CustomImageView
-                    android:layout_width="56dp"
-                    android:layout_height="68dp"
-                    android:id="@+id/menu"
-                    app:srcCompat="@drawable/menu"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:scaleType="fitCenter"
-                    android:padding="16dp"
-                    android:tint="?android:textColorPrimary"/>
-            </LinearLayout>
         </LinearLayout>
 
-        <pasta.streamer.views.CircleImageView
-            android:id="@+id/image"
+        <pasta.streamer.views.CustomImageView
+            android:id="@+id/menu"
             android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_margin="28dp"/>
+            android:layout_height="68dp"
+            android:layout_gravity="bottom|end"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:padding="16dp"
+            android:tint="?android:textColorPrimary"
+            app:srcCompat="@drawable/menu" />
 
     </FrameLayout>
 

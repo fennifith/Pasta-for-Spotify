@@ -53,7 +53,7 @@ public class Playbar {
     private PlaybarListener listener;
 
     private Drawable play, pause;
-    private boolean thumbnails, palette, dark;
+    private boolean thumbnails;
 
     public Playbar(Activity activity) {
         this.activity = activity;
@@ -68,8 +68,6 @@ public class Playbar {
         ViewCompat.setElevation(playbar, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics()));
 
         thumbnails = PreferenceUtils.isThumbnails(activity);
-        palette = PreferenceUtils.isPalette(activity);
-        dark = PreferenceUtils.isDarkTheme(activity);
 
         art = (CustomImageView) playbar.findViewById(R.id.art);
         prev = (ImageView) playbar.findViewById(R.id.prev);
@@ -179,12 +177,10 @@ public class Playbar {
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                             art.transition(resource);
 
-                            if (!palette) return;
                             Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                                 @Override
                                 public void onGenerated(Palette palette) {
-                                    int color = palette.getDarkVibrantColor(Color.DKGRAY);
-                                    if (dark) color = palette.getLightVibrantColor(Color.LTGRAY);
+                                    int color = palette.getLightVibrantColor(Color.LTGRAY);
 
                                     Drawable prev = playbar.getBackground();
                                     if (prev instanceof TransitionDrawable) prev = ((TransitionDrawable) prev).getDrawable(1);

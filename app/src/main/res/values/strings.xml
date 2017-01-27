@@ -160,7 +160,6 @@
         <item>MaterialTutorial</item>
         <item>Async</item>
         <item>Sectioned RecyclerView</item>
-        <item>Material Dialogs</item>
         <item>Butterknife</item>
         <item>Pull Back Layout</item>
     </string-array>
@@ -174,7 +173,6 @@
         <item>An Android library that provides a simple Material-Designed tutorial.</item>
         <item>A library designed to make the organized execution of async processes in Java easy.</item>
         <item>Sectioned RecyclerView allows you to easily split a RecyclerView into sections with headers.</item>
-        <item>A beautiful, easy-to-use, and customizable dialogs API, enabling you to use Material designed dialogs down to API 8.</item>
         <item>Field and method binding for Android views which uses annotation processing to generate boilerplate codefor you.</item>
         <item>Pull down to finish an Activity.</item>
     </string-array>
@@ -188,7 +186,6 @@
         <item>https://github.com/cadialex/MaterialTutorial</item>
         <item>https://github.com/afollestad/async</item>
         <item>https://github.com/afollestad/sectioned-recyclerview</item>
-        <item>https://github.com/afollestad/material-dialogs</item>
         <item>https://github.com/JakeWharton/butterknife</item>
         <item>https://github.com/oxoooo/pull-back-layout</item>
     </string-array>

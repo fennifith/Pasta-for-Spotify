@@ -3,15 +3,12 @@ package pasta.streamer.activities;
 import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -40,7 +37,6 @@ import com.afollestad.async.Async;
 import com.afollestad.async.Done;
 import com.afollestad.async.Pool;
 import com.afollestad.async.Result;
-import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -89,7 +85,7 @@ import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.Playbar;
 
-public class HomeActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
+public class HomeActivity extends AppCompatActivity {
 
     @Bind(R.id.playbar)
     View playbarView;
@@ -124,8 +120,7 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (PreferenceUtils.isDarkTheme(this)) setTheme(R.style.AppTheme_Transparent_Dark);
-        DataBindingUtil.setContentView(this, R.layout.activity_home);
+        setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
 
         limitMap = new HashMap<>();
@@ -152,8 +147,6 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             layoutParams.topMargin = StaticUtils.getStatusBarMargin(this);
             content.setLayoutParams(layoutParams);
         }
-
-        fab.setBackgroundTintList(ColorStateList.valueOf(PreferenceUtils.getAccentColor(this)));
 
         Drawable home = ImageUtils.getVectorDrawable(this, R.drawable.ic_home);
         Drawable fav = ImageUtils.getVectorDrawable(this, R.drawable.ic_fav);
@@ -400,10 +393,12 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
             else if (f instanceof SettingsFragment) materialDrawer.setSelection(5, false);
             else if (f instanceof AboutFragment) materialDrawer.setSelection(6, false);
 
-            statusBackground.setBackgroundColor(ImageUtils.darkColor(PreferenceUtils.getPrimaryColor(this)));
+            int primary = ContextCompat.getColor(this, R.color.colorPrimaryDark);
+
+            statusBackground.setBackgroundColor(primary);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(title, ImageUtils.drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)), PreferenceUtils.getPrimaryColor(this));
+                ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(title, ImageUtils.drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)), primary);
                 setTaskDescription(desc);
             }
 
@@ -680,10 +675,5 @@ public class HomeActivity extends AppCompatActivity implements ColorChooserDialo
              else onBackPressed();
          }
         return false;
-    }
-
-    @Override
-    public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
-        if (f instanceof SettingsFragment) ((SettingsFragment) f).onColorSelection(dialog, selectedColor);
     }
 }

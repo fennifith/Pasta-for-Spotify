@@ -59,9 +59,6 @@ dependencies {
         transitive = true
     }
     compile 'com.github.afollestad:async:0.2.3'
-    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') {
-        transitive = true
-    }
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.github.oxoooo:pull-back-layout:1.0.1'
 }

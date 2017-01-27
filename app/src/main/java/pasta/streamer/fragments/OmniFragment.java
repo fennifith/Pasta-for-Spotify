@@ -16,6 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import pasta.streamer.R;
 import pasta.streamer.adapters.ListAdapter;
+import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.ListData;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.utils.PreferenceUtils;
@@ -52,7 +53,7 @@ public class OmniFragment extends Fragment {
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if ((adapter.getList().get(adapter.getItemViewType(position)) instanceof TrackListData && PreferenceUtils.isListTracks(getContext())) || (!(adapter.getList().get(adapter.getItemViewType(position)) instanceof TrackListData) && PreferenceUtils.isCards(getContext())))
+                if (!(adapter.getList().get(adapter.getItemViewType(position)) instanceof TrackListData) && !(adapter.getList().get(adapter.getItemViewType(position)) instanceof ArtistListData))
                     return manager.getSpanCount();
                 else return 1;
             }

@@ -3,7 +3,6 @@ package pasta.streamer.fragments;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -14,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.GridLayoutManager;
@@ -91,19 +91,17 @@ public class ArtistFragment extends FullScreenFragment {
     private SectionedOmniAdapter adapter;
     private GridLayoutManager manager;
     private Pool pool;
-    private boolean palette;
     private Pasta pasta;
     private Map<String, Object> limitMap;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_artist, container, false).getRoot();
+        View rootView = inflater.inflate(R.layout.fragment_artist, container, false);
         ButterKnife.bind(this, rootView);
 
         data = getArguments().getParcelable("artist");
 
-        palette = PreferenceUtils.isPalette(getContext());
         pasta = (Pasta) getContext().getApplicationContext();
         limitMap = new HashMap<>();
         limitMap.put(SpotifyService.LIMIT, (PreferenceUtils.getLimit(getContext()) + 1) * 10);
@@ -128,12 +126,12 @@ public class ArtistFragment extends FullScreenFragment {
         });
 
         title.setText(data.artistName);
-        extra.setText(String.valueOf(data.followers) + " followers");
+        extra.setText(String.format("%s followers", String.valueOf(data.followers)));
 
-        if (data.genres.size() > 0) {
-            for (String genre : data.genres) {
-                View v = LayoutInflater.from(getContext()).inflate(R.layout.genre_item, null);
-                ((TextView) v.findViewById(R.id.title)).setText(genre);
+        if (data.genres != null && data.genres.size() > 0) {
+            for (int i = 0; i < data.genres.size() && i < 10; i++) {
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.genre_item, genres, false);
+                ((TextView) v.findViewById(R.id.title)).setText(data.genres.get(i));
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -149,23 +147,14 @@ public class ArtistFragment extends FullScreenFragment {
         spinner.setVisibility(View.VISIBLE);
 
         manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), false));
-        if (PreferenceUtils.isCards(getContext())) {
-            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4)
                     return manager.getSpanCount();
-                }
-            });
-        } else {
-            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4)
-                        return manager.getSpanCount();
-                    else return 1;
-                }
-            });
-        }
+                else return 1;
+            }
+        });
         recycler.setLayoutManager(manager);
 
 
@@ -342,29 +331,27 @@ public class ArtistFragment extends FullScreenFragment {
                     }.start();
                 }
 
-                if (palette) {
-                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                        @Override
-                        public void onGenerated(Palette palette) {
-                            int primary = palette.getMutedColor(Color.GRAY);
-                            if (collapsingToolbarLayout != null)
-                                collapsingToolbarLayout.setContentScrimColor(primary);
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        int primary = palette.getMutedColor(Color.GRAY);
+                        if (collapsingToolbarLayout != null)
+                            collapsingToolbarLayout.setContentScrimColor(primary);
 
-                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), PreferenceUtils.getPrimaryColor(getContext()), primary);
-                            animator.setDuration(250);
-                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    if (somethingbar != null)
-                                        somethingbar.setBackgroundColor((int) animation.getAnimatedValue());
-                                }
-                            });
-                            animator.start();
+                        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), ContextCompat.getColor(getContext(), R.color.colorPrimary), primary);
+                        animator.setDuration(250);
+                        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator animation) {
+                                if (somethingbar != null)
+                                    somethingbar.setBackgroundColor((int) animation.getAnimatedValue());
+                            }
+                        });
+                        animator.start();
 
-                            setData(data.artistName, primary, palette.getDarkVibrantColor(primary));
-                        }
-                    });
-                }
+                        setData(data.artistName, primary, palette.getDarkVibrantColor(primary));
+                    }
+                });
             }
         });
 

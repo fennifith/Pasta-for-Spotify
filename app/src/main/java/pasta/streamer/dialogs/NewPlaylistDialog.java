@@ -27,13 +27,13 @@ import pasta.streamer.utils.ImageUtils;
 
 public class NewPlaylistDialog extends AppCompatDialog {
 
-    Pasta pasta;
-    PlaylistListData data;
-    OnCreateListener listener;
+    private Pasta pasta;
+    private PlaylistListData data;
+    private OnCreateListener listener;
 
-    Toolbar toolbar;
-    EditText titleView;
-    CheckBox isPublicView;
+    private Toolbar toolbar;
+    private EditText titleView;
+    private CheckBox isPublicView;
 
     Map<String, Object> map;
 

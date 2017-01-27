@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -60,7 +59,6 @@ import pasta.streamer.data.ArtistListData;
 import pasta.streamer.data.TrackListData;
 import pasta.streamer.dialogs.AddToPlaylistDialog;
 import pasta.streamer.utils.ImageUtils;
-import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
 import pasta.streamer.views.CustomImageView;
 
@@ -109,7 +107,6 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
     private Drawable play, pause;
     private UpdateReceiver updateReceiver;
     private NowPlayingAdapter adapter;
-    private boolean palette;
     private Drawable imageDrawable;
     private Integer imageColor;
     private Pasta pasta;
@@ -118,16 +115,13 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (PreferenceUtils.isDarkTheme(this)) setTheme(R.style.PlayerTheme_Dark);
-        DataBindingUtil.setContentView(this, R.layout.activity_player);
+        setContentView(R.layout.activity_player);
         ButterKnife.bind(this);
 
         puller.setCallback(this);
 
         pasta = (Pasta) getApplicationContext();
         pasta.setScreen(this);
-
-        palette = PreferenceUtils.isPalette(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && subtitle2 == null) {
             BottomSheetBehavior.from(rv).setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -439,17 +433,14 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
                             }.start();
                         }
 
-                        if (palette && imageDrawable == null) {
+                        if (imageDrawable == null) {
                             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                                 @Override
                                 public void onGenerated(Palette palette) {
-                                    final int color;
-                                    if (PreferenceUtils.isDarkTheme(PlayerActivity.this))
-                                        color = palette.getDarkVibrantColor(Color.DKGRAY);
-                                    else color = palette.getLightVibrantColor(Color.LTGRAY);
-
+                                    int color = palette.getDarkVibrantColor(Color.DKGRAY);
                                     if (imageColor == null)
-                                        imageColor = PreferenceUtils.getPrimaryColor(PlayerActivity.this);
+                                        imageColor = ContextCompat.getColor(PlayerActivity.this, R.color.colorPrimary);
+
                                     ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), imageColor, color);
                                     animator.setDuration(250);
                                     animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

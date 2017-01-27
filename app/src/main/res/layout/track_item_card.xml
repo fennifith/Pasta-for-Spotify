@@ -82,7 +82,7 @@
                     android:gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="16dp"
-                    android:tint="?android:textColorPrimary"/>
+                    android:tint="?android:textColorPrimary" />
             </LinearLayout>
 
         </LinearLayout>

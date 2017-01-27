@@ -21,25 +21,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorPrimary</item>
 
-        <item name="android:colorBackground">@color/colorBackgroundLight</item>
-        <item name="colorBackground">@color/colorBackgroundLight</item>
-        <item name="cardBackgroundColor">@color/colorBackgroundFloatingLight</item>
-
-        <item name="android:textColorPrimary">#DE000000</item>
-        <item name="android:textColorSecondary">#8A000000</item>
-        <item name="android:textColorTertiary">#61000000</item>
-        <item name="android:textColorPrimaryInverse">#FFFFFF</item>
-        <item name="android:textColorSecondaryInverse">#B3FFFFFF</item>
-        <item name="android:textColorTertiaryInverse">#80FFFFFF</item>
-    </style>
-
-    <style name="AppTheme.Dark" parent="AppTheme">
         <item name="android:colorBackground">@color/colorBackgroundDark</item>
         <item name="colorBackground">@color/colorBackgroundDark</item>
         <item name="cardBackgroundColor">@color/colorBackgroundFloatingDark</item>
 
-        <item name="android:textColorSecondary">#B3ffffff</item>
         <item name="android:textColorPrimary">#ffffff</item>
+        <item name="android:textColorSecondary">#B3ffffff</item>
         <item name="android:textColorTertiary">#80FFFFFF</item>
         <item name="android:textColorPrimaryInverse">#DE000000</item>
         <item name="android:textColorSecondaryInverse">#8A000000</item>
@@ -60,14 +47,7 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
-    <style name="PlayerTheme.Dark" parent="AppTheme.Transparent.Dark">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsTranslucent">true</item>
-    </style>
-
     <style name="AppTheme.Transparent" parent="AppTheme" />
-
-    <style name="AppTheme.Transparent.Dark" parent="AppTheme.Dark" />
 
     <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
         <item name="searchIcon">@null</item>

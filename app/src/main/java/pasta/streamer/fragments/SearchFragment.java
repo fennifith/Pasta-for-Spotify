@@ -40,22 +40,14 @@ public class SearchFragment extends Fragment {
 
         adapter = new SectionedOmniAdapter((AppCompatActivity) getActivity(), list) ;
         manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), false));
-        if (PreferenceUtils.isCards(getContext())) {
-            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4)
                     return manager.getSpanCount();
-                }
-            });
-        } else {
-            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4) return manager.getSpanCount();
-                    else return 1;
-                }
-            });
-        }
+                else return 1;
+            }
+        });
         recycler.setLayoutManager(manager);
         recycler.setAdapter(adapter);
 

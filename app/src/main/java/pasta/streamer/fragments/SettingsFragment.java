@@ -4,43 +4,28 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.player.PlaybackBitrate;
 
 import java.io.File;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
-import pasta.streamer.activities.HomeActivity;
 import pasta.streamer.utils.PreferenceUtils;
-import pasta.streamer.views.CustomImageView;
 
 public class SettingsFragment extends FabFragment {
-
-    @Bind(R.id.primary_color)
-    CustomImageView primary;
-    @Bind(R.id.accent_color)
-    CustomImageView accent;
-
-    private View rootView;
 
     private int selectedLimit, selectedQuality, selectedOrder;
     private SharedPreferences prefs;
@@ -49,7 +34,7 @@ public class SettingsFragment extends FabFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false).getRoot();
+        View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
         ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
@@ -155,83 +140,12 @@ public class SettingsFragment extends FabFragment {
         return dir.delete();
     }
 
-    @OnCheckedChanged(R.id.darkmode)
-    public void changeDarkMode(boolean dark) {
-        if (prefs != null && dark != PreferenceUtils.isDarkTheme(getContext())) {
-            prefs.edit().putBoolean(PreferenceUtils.DARK_THEME, dark).apply();
-            pasta.showToast(getString(R.string.restart_msg));
-        }
-    }
-
     @OnCheckedChanged(R.id.thumbnails)
     public void changeThumbnails(boolean thumbnails) {
         if (prefs != null && thumbnails != PreferenceUtils.isThumbnails(getContext())) {
             prefs.edit().putBoolean(PreferenceUtils.THUMBNAILS, thumbnails).apply();
             pasta.showToast(getString(R.string.restart_msg));
         }
-    }
-
-    @OnCheckedChanged(R.id.cards)
-    public void changeCards(boolean cards) {
-        if (prefs != null && cards != PreferenceUtils.isCards(getContext())) {
-            prefs.edit().putBoolean(PreferenceUtils.CARDS, cards).apply();
-        }
-    }
-
-    @OnCheckedChanged(R.id.lists)
-    public void changeListTracks(boolean listTracks) {
-        if (prefs != null && listTracks != PreferenceUtils.isListTracks(getContext())) {
-            prefs.edit().putBoolean(PreferenceUtils.LIST_TRACKS, listTracks).apply();
-        }
-    }
-
-    @OnCheckedChanged(R.id.palette)
-    public void changePalette(boolean palette) {
-        if (prefs != null && palette != PreferenceUtils.isPalette(getContext())) {
-            prefs.edit().putBoolean(PreferenceUtils.PALETTE, palette).apply();
-            pasta.showToast(getString(R.string.restart_msg));
-        }
-    }
-
-    @OnClick(R.id.primary)
-    public void setPrimary() {
-        new ColorChooserDialog.Builder((HomeActivity) getActivity(), R.string.primary_color)
-                .titleSub(R.string.primary_color)
-                .doneButton(R.string.save)
-                .cancelButton(R.string.cancel)
-                .backButton(R.string.md_back_label)
-                .preselect(PreferenceUtils.getPrimaryColor(getContext()))
-                .show();
-    }
-
-    @OnClick(R.id.accent)
-    public void setAccent() {
-        new ColorChooserDialog.Builder((HomeActivity) getActivity(), R.string.accent_color)
-                .titleSub(R.string.accent_color)
-                .doneButton(R.string.save)
-                .cancelButton(R.string.cancel)
-                .backButton(R.string.md_back_label)
-                .accentMode(true)
-                .preselect(PreferenceUtils.getAccentColor(getContext()))
-                .show();
-    }
-
-    public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
-        switch (dialog.getTitle()) {
-            case R.string.primary_color:
-                if (PreferenceUtils.getPrimaryColor(getContext()) == selectedColor) return;
-                prefs.edit().putInt(PreferenceUtils.PRIMARY, selectedColor).apply();
-                primary.transition(new ColorDrawable(selectedColor));
-                break;
-            case R.string.accent_color:
-                if (PreferenceUtils.getAccentColor(getContext()) == selectedColor) return;
-                prefs.edit().putInt(PreferenceUtils.ACCENT, selectedColor).apply();
-                accent.transition(new ColorDrawable(selectedColor));
-                break;
-            default:
-                return;
-        }
-        pasta.showToast(getString(R.string.restart_msg));
     }
 
     @OnClick(R.id.quality)

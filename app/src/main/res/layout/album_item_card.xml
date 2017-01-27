@@ -4,140 +4,119 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
+    app:cardBackgroundColor="?attr/cardBackgroundColor"
     app:cardCornerRadius="2dp"
-    app:cardUseCompatPadding="true"
-    app:cardBackgroundColor="?attr/cardBackgroundColor">
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
-        android:id="@+id/bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@android:color/transparent">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:orientation="horizontal"
-            android:background="#1f000000"
-            android:id="@+id/artist">
-
-            <pasta.streamer.views.CircleImageView
-                android:id="@+id/artist_image"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:scaleType="fitXY"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="16dp"/>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="72dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/artist_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="?android:textColorSecondary"
-                    android:textSize="16sp"
-                    android:singleLine="true"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-
-                <TextView
-                    android:id="@+id/artist_extra"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="?android:textColorTertiary"
-                    android:textSize="14sp"
-                    android:singleLine="true"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <FrameLayout
+        <pasta.streamer.views.RatioImageView
+            android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/album"
-            android:background="?attr/selectableItemBackground">
+            android:scaleType="centerCrop" />
+
+        <FrameLayout
+            android:id="@+id/bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/cardBackgroundColor">
 
             <LinearLayout
+                android:id="@+id/album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
                 android:orientation="vertical"
-                android:paddingTop="36dp"
                 android:paddingBottom="36dp"
-                android:paddingRight="24dp"
                 android:paddingEnd="24dp"
                 android:paddingLeft="24dp"
+                android:paddingRight="24dp"
                 android:paddingStart="24dp"
-                android:layout_marginBottom="42dp"
-                android:layout_marginLeft="144dp"
-                android:layout_marginStart="144dp" >
+                android:paddingTop="36dp">
 
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="2dp"
+                    android:ellipsize="end"
                     android:gravity="center_vertical"
-                    android:textColor="?android:textColorSecondary"
-                    android:textSize="24sp"
-                    android:singleLine="true"
                     android:lines="1"
                     android:maxLines="1"
-                    android:ellipsize="end"
-                    android:layout_marginBottom="2dp" />
+                    android:singleLine="true"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/extra"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="56dp"
+                    android:layout_marginRight="56dp"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
                     android:gravity="center_vertical"
-                    android:textColor="?android:textColorTertiary"
-                    android:textSize="14sp"
-                    android:singleLine="true"
                     android:lines="1"
                     android:maxLines="1"
-                    android:ellipsize="end"
-                    android:layout_marginTop="2dp"/>
+                    android:singleLine="true"
+                    android:textColor="?android:textColorTertiary"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
-            <pasta.streamer.views.SquareImageView
-                android:id="@+id/image"
-                android:layout_width="136dp"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/preload"
-                android:layout_margin="16dp"
-                android:scaleType="centerCrop"
-                android:layout_gravity="start" />
-
             <pasta.streamer.views.CustomImageView
+                android:id="@+id/menu"
                 android:layout_width="56dp"
                 android:layout_height="68dp"
                 android:layout_gravity="bottom|end"
-                android:id="@+id/menu"
-                app:srcCompat="@drawable/menu"
-                android:gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:scaleType="fitCenter"
+                android:gravity="center"
                 android:padding="16dp"
-                android:tint="?android:textColorPrimary"/>
+                android:scaleType="fitCenter"
+                android:tint="?android:textColorPrimary"
+                app:srcCompat="@drawable/menu" />
         </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/artist"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:background="?attr/cardBackgroundColor"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp">
+
+            <TextView
+                android:id="@+id/artist_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="?android:textColorSecondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/artist_extra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="?android:textColorTertiary"
+                android:textSize="14sp" />
+        </LinearLayout>
 
     </LinearLayout>
 

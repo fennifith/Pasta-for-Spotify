@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
 
         <import type="pasta.streamer.utils.PreferenceUtils" />
@@ -34,7 +35,7 @@
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold"
                     android:layout_margin="8dp"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
@@ -49,6 +50,19 @@
                     android:paddingBottom="16dp"
                     android:checked="@{PreferenceUtils.isPreload(context)}" />
 
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_height="52dp"
+                    android:layout_width="match_parent"
+                    android:id="@+id/thumbnails"
+                    android:text="Load Thumbnails"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:checked="@{PreferenceUtils.isThumbnails(context)}" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
@@ -58,7 +72,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"/>
+                    android:textColor="?android:textColorPrimary" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:layout_height="52dp"
@@ -82,143 +96,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:padding="4dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Appearance"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="bold"
-                    android:layout_margin="8dp"
-                    android:textSize="14sp" />
-
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_height="52dp"
-                    android:layout_width="match_parent"
-                    android:id="@+id/darkmode"
-                    android:text="Dark Mode"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:checked="@{PreferenceUtils.isDarkTheme(context)}" />
-
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_height="52dp"
-                    android:layout_width="match_parent"
-                    android:id="@+id/thumbnails"
-                    android:text="Load Thumbnails"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:checked="@{PreferenceUtils.isThumbnails(context)}" />
-
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_height="52dp"
-                    android:layout_width="match_parent"
-                    android:id="@+id/cards"
-                    android:text="Use Cards"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:checked="@{PreferenceUtils.isCards(context)}" />
-
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_height="52dp"
-                    android:layout_width="match_parent"
-                    android:id="@+id/lists"
-                    android:text="Prefer Lists to Grids"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:checked="@{PreferenceUtils.isListTracks(context)}" />
-
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_height="52dp"
-                    android:layout_width="match_parent"
-                    android:id="@+id/palette"
-                    android:text="Dynamic Backgrounds"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:checked="@{PreferenceUtils.isPalette(context)}" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/primary"
-                    android:background="?attr/selectableItemBackground">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:text="Primary Color"
-                        android:textSize="16sp"
-                        android:padding="8dp"
-                        android:gravity="center_vertical|start"
-                        android:textColor="?android:textColorPrimary" />
-
-                    <pasta.streamer.views.CircleImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:id="@+id/primary_color"
-                        android:src="@{PreferenceUtils.getPrimaryColor(context)}"
-                        android:layout_gravity="center_vertical|end"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accent"
-                    android:background="?attr/selectableItemBackground">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:text="Accent Color"
-                        android:textSize="16sp"
-                        android:padding="8dp"
-                        android:gravity="center_vertical|start"
-                        android:textColor="?android:textColorPrimary"/>
-
-                    <pasta.streamer.views.CircleImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:id="@+id/accent_color"
-                        android:src="@{PreferenceUtils.getAccentColor(context)}"
-                        android:layout_gravity="center_vertical|end"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp" />
-
-                </FrameLayout>
+                    android:textColor="?android:textColorPrimary" />
 
             </LinearLayout>
 
@@ -237,7 +115,7 @@
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold"
                     android:layout_margin="8dp"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -248,7 +126,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"/>
+                    android:textColor="?android:textColorPrimary" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -259,7 +137,7 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:gravity="center_vertical|start"
-                    android:textColor="?android:textColorPrimary"/>
+                    android:textColor="?android:textColorPrimary" />
             </LinearLayout>
 
         </LinearLayout>

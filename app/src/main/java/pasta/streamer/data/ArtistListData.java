@@ -114,7 +114,7 @@ public class ArtistListData extends ListData<ArtistListData.ViewHolder> implemen
 
     @Override
     public ViewHolder getViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        return new ViewHolder(inflater.inflate(PreferenceUtils.isCards(parent.getContext()) ? R.layout.artist_item_card : R.layout.artist_item_tile, parent, false), this);
+        return new ViewHolder(inflater.inflate(R.layout.artist_item_card, parent, false), this);
     }
 
     @Override
@@ -129,16 +129,11 @@ public class ArtistListData extends ListData<ArtistListData.ViewHolder> implemen
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     super.onResourceReady(resource, glideAnimation);
 
-                    if (!PreferenceUtils.isPalette(holder.activity) || holder.bg == null) return;
+                    if (holder.bg == null) return;
                     Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            int defaultColor = PreferenceUtils.isDarkTheme(holder.activity) ? Color.DKGRAY : Color.WHITE;
-                            int color = palette.getLightVibrantColor(defaultColor);
-                            if (PreferenceUtils.isDarkTheme(holder.activity))
-                                color = palette.getDarkVibrantColor(defaultColor);
-
-                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), Color.DKGRAY, palette.getDarkVibrantColor(Color.DKGRAY));
                             animator.setDuration(250);
                             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override

@@ -1,96 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <data>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
-        <import type="pasta.streamer.utils.PreferenceUtils" />
+    <FrameLayout
+        android:id="@+id/drawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="left" />
 
-        <import type="pasta.streamer.utils.ImageUtils" />
-    </data>
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:id="@+id/drawer" />
+    <FrameLayout
+        android:id="@+id/status_background"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/colorPrimaryDark">
 
         <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@{ImageUtils.darkColor(PreferenceUtils.getPrimaryColor(context.getApplicationContext()))}"
-            android:id="@+id/status_background"
-            android:layout_weight="1">
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <FrameLayout
+            <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/coordinator"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/content">
+                android:layout_height="match_parent"
+                android:background="?android:colorBackground">
 
-                <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <android.support.design.widget.AppBarLayout
+                    android:id="@+id/appbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:elevation="0dp">
+
+                    <android.support.design.widget.CollapsingToolbarLayout
+                        android:id="@+id/collapsing_toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        app:contentScrim="@color/colorPrimary"
+                        app:layout_scrollFlags="scroll|snap|enterAlways"
+                        app:titleEnabled="false">
+
+                        <android.support.v7.widget.Toolbar
+                            android:id="@+id/toolbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="?attr/actionBarSize"
+                            android:background="@color/colorPrimary"
+                            app:layout_scrollFlags="scroll" />
+
+                    </android.support.design.widget.CollapsingToolbarLayout>
+
+                </android.support.design.widget.AppBarLayout>
+
+                <FrameLayout
+                    android:id="@+id/fragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/coordinator"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:background="?android:colorBackground">
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-                    <android.support.design.widget.AppBarLayout
-                        android:id="@+id/appbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                        app:elevation="0dp">
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:tint="?android:textColorSecondaryInverse"
+                    android:tintMode="src_in" />
 
-                        <android.support.design.widget.CollapsingToolbarLayout
-                            android:id="@+id/collapsing_toolbar"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@{PreferenceUtils.getPrimaryColor(context.getApplicationContext())}"
-                            app:contentScrim="@{PreferenceUtils.getPrimaryColor(context.getApplicationContext())}"
-                            app:layout_scrollFlags="scroll|snap|enterAlways"
-                            app:titleEnabled="false">
+                <include layout="@layout/playbar_layout" />
 
-                            <android.support.v7.widget.Toolbar
-                                android:id="@+id/toolbar"
-                                android:background="@{PreferenceUtils.getPrimaryColor(context.getApplicationContext())}"
-                                android:layout_width="match_parent"
-                                android:layout_height="?attr/actionBarSize"
-                                app:layout_scrollFlags="scroll"/>
-
-                        </android.support.design.widget.CollapsingToolbarLayout>
-
-                    </android.support.design.widget.AppBarLayout>
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/fragment"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/fab"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:tint="?android:textColorSecondaryInverse"
-                        android:tintMode="src_in"/>
-
-                    <include layout="@layout/playbar_layout"/>
-
-                </android.support.design.widget.CoordinatorLayout>
-
-            </FrameLayout>
+            </android.support.design.widget.CoordinatorLayout>
 
         </FrameLayout>
 
-    </LinearLayout>
-</layout>
+    </FrameLayout>
+
+</LinearLayout>

@@ -106,7 +106,7 @@ public class AlbumListData extends ListData<AlbumListData.ViewHolder> implements
 
     @Override
     public ViewHolder getViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        return new ViewHolder(inflater.inflate(PreferenceUtils.isCards(parent.getContext()) ? R.layout.album_item_card : R.layout.album_item_tile, parent, false), this);
+        return new ViewHolder(inflater.inflate(R.layout.album_item_card, parent, false), this);
     }
 
     @Override
@@ -137,9 +137,6 @@ public class AlbumListData extends ListData<AlbumListData.ViewHolder> implements
                         }
 
                         holder.artist.setTag(result);
-
-                        if (holder.artistImage != null)
-                            Glide.with(holder.pasta).load(result.artistImage).thumbnail(0.2f).into(holder.artistImage);
                     }
                 }.execute();
             } else holder.artist.setVisibility(View.GONE);
@@ -155,16 +152,12 @@ public class AlbumListData extends ListData<AlbumListData.ViewHolder> implements
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     super.onResourceReady(resource, glideAnimation);
 
-                    if (!PreferenceUtils.isPalette(holder.pasta) || holder.bg == null) return;
+                    if (holder.bg == null) return;
                     Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            int defaultColor = PreferenceUtils.isDarkTheme(holder.pasta) ? Color.DKGRAY : Color.WHITE;
-                            int color = palette.getLightVibrantColor(defaultColor);
-                            if (PreferenceUtils.isDarkTheme(holder.pasta))
-                                color = palette.getDarkVibrantColor(defaultColor);
 
-                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), Color.DKGRAY, palette.getDarkVibrantColor(Color.DKGRAY));
                             animator.setDuration(250);
                             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override
@@ -186,7 +179,7 @@ public class AlbumListData extends ListData<AlbumListData.ViewHolder> implements
 
         private AlbumListData listData;
         private TextView name, extra, artistName, artistExtra;
-        private ImageView image, artistImage;
+        private ImageView image;
         private View artist;
         private View bg;
 
@@ -198,7 +191,6 @@ public class AlbumListData extends ListData<AlbumListData.ViewHolder> implements
             image = (ImageView) itemView.findViewById(R.id.image);
             artistName = (TextView) itemView.findViewById(R.id.artist_name);
             artistExtra = (TextView) itemView.findViewById(R.id.artist_extra);
-            artistImage = (ImageView) itemView.findViewById(R.id.artist_image);
             artist = itemView.findViewById(R.id.artist);
             bg = itemView.findViewById(R.id.bg);
 

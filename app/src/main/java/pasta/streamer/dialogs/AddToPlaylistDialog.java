@@ -51,7 +51,7 @@ public class AddToPlaylistDialog extends AppCompatDialog {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         Drawable close = ImageUtils.getVectorDrawable(getContext(), R.drawable.ic_close);
-        DrawableCompat.setTint(close, Color.BLACK);
+        DrawableCompat.setTint(close, Color.WHITE);
         toolbar.setNavigationIcon(close);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

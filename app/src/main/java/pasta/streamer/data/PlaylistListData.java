@@ -148,13 +148,13 @@ public class PlaylistListData extends ListData<PlaylistListData.ViewHolder> impl
 
     @Override
     public ViewHolder getViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        return new ViewHolder(inflater.inflate(PreferenceUtils.isCards(parent.getContext()) ? R.layout.playlist_item_card : R.layout.playlist_item_tile, parent, false), this);
+        return new ViewHolder(inflater.inflate(R.layout.playlist_item_card, parent, false), this);
     }
 
     @Override
     public void bindView(final ViewHolder holder) {
         holder.name.setText(playlistName);
-        holder.extra.setText(tracks + " tracks");
+        holder.extra.setText(String.format("%d %s", tracks, tracks == 1 ? "track" : "tracks"));
 
         if (!PreferenceUtils.isThumbnails(holder.activity)) holder.image.setVisibility(View.GONE);
         else {
@@ -163,16 +163,11 @@ public class PlaylistListData extends ListData<PlaylistListData.ViewHolder> impl
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     super.onResourceReady(resource, glideAnimation);
 
-                    if (!PreferenceUtils.isPalette(holder.activity) || holder.bg == null) return;
+                    if (holder.bg == null) return;
                     Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            int defaultColor = PreferenceUtils.isDarkTheme(holder.activity) ? Color.DKGRAY : Color.WHITE;
-                            int color = palette.getLightVibrantColor(defaultColor);
-                            if (PreferenceUtils.isDarkTheme(holder.activity))
-                                color = palette.getDarkVibrantColor(defaultColor);
-
-                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), Color.DKGRAY, palette.getDarkVibrantColor(Color.DKGRAY));
                             animator.setDuration(250);
                             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override

@@ -9,7 +9,7 @@
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
     app:behavior_peekHeight="@dimen/playbar_size"
     app:behavior_hideable="true"
-    android:fitsSystemWindows="true" >
+    android:fitsSystemWindows="true">
 
     <ProgressBar
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"

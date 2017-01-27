@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -57,7 +56,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
     private ArrayList<ArtistListData> artists;
     private AppCompatActivity activity;
     private ArrayList list;
-    private boolean thumbnails, cards, palette, dark;
+    private boolean isThumbnails;
     private Pasta pasta;
 
     public SectionedOmniAdapter(AppCompatActivity activity, ArrayList list) {
@@ -69,10 +68,8 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         this.activity = activity;
         pasta = (Pasta) activity.getApplicationContext();
 
-        thumbnails = PreferenceUtils.isThumbnails(activity);
-        cards = PreferenceUtils.isCards(activity);
-        palette = PreferenceUtils.isPalette(activity);
-        dark = PreferenceUtils.isDarkTheme(activity);
+        isThumbnails = PreferenceUtils.isThumbnails(activity);
+
 
         if (list == null) {
             this.list = new ArrayList();
@@ -183,13 +180,13 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
             case 0:
                 return new TrackViewHolder(inflater.inflate(R.layout.track_item, parent, false));
             case 1:
-                return new AlbumViewHolder(inflater.inflate(cards ? R.layout.album_item_card : R.layout.album_item_tile, parent, false));
+                return new AlbumViewHolder(inflater.inflate(R.layout.album_item_card, parent, false));
             case 2:
-                return new PlaylistViewHolder(inflater.inflate(cards ? R.layout.playlist_item_card : R.layout.playlist_item_tile, parent, false));
+                return new PlaylistViewHolder(inflater.inflate(R.layout.playlist_item_card, parent, false));
             case 3:
-                return new ArtistViewHolder(inflater.inflate(cards ? R.layout.artist_item_card : R.layout.artist_item_tile, parent, false));
+                return new ArtistViewHolder(inflater.inflate(R.layout.artist_item_card, parent, false));
             case 4:
-                return new HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.header_item, parent, false).getRoot());
+                return new HeaderViewHolder(inflater.inflate(R.layout.header_item, parent, false));
             default:
                 return null;
         }
@@ -339,10 +336,6 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                             }
 
                             holder.v.findViewById(R.id.artist).setTag(result);
-
-                            ImageView artistImage = (ImageView) holder.v.findViewById(R.id.artist_image);
-                            if (artistImage != null)
-                                Glide.with(activity).load(result.artistImage).thumbnail(0.2f).into((ImageView) holder.v.findViewById(R.id.artist_image));
                         }
                     }.execute();
 
@@ -394,7 +387,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                 } else holder.v.findViewById(R.id.artist).setVisibility(View.GONE);
 
                 ((TextView) holder.v.findViewById(R.id.name)).setText(albumData.albumName);
-                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(albumData.tracks) + " tracks");
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.format("%d %s", albumData.tracks, albumData.tracks == 1 ? "track" : "tracks"));
 
                 holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -513,7 +506,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                 image = playlistData.playlistImage;
 
                 ((TextView) holder.v.findViewById(R.id.name)).setText(playlistData.playlistName);
-                ((TextView) holder.v.findViewById(R.id.extra)).setText(playlistData.tracks + " tracks");
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.format("%d %s", playlistData.tracks, playlistData.tracks == 1 ? "track" : "tracks"));
 
                 holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -623,7 +616,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                 image = artistData.artistImage;
 
                 ((TextView) holder.v.findViewById(R.id.name)).setText(artistData.artistName);
-                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.valueOf(artistData.followers) + " followers");
+                ((TextView) holder.v.findViewById(R.id.extra)).setText(String.format("%s followers", String.valueOf(artistData.followers)));
 
                 holder.v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -647,24 +640,20 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
 
         ImageView imageView = (ImageView) holder.v.findViewById(R.id.image);
 
-        if (!thumbnails) imageView.setVisibility(View.GONE);
+        if (!isThumbnails) imageView.setVisibility(View.GONE);
         else {
             Glide.with(activity).load(image).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(imageView) {
                 @Override
                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                     super.onResourceReady(resource, animation);
-                    if (!thumbnails) getView().setVisibility(View.GONE);
+                    if (!isThumbnails) getView().setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);
-                    if (!thumbnails || !palette || bg == null) return;
+                    if (!isThumbnails || bg == null) return;
                     Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            int defaultColor = dark ? Color.DKGRAY : Color.WHITE;
-                            int color = palette.getLightVibrantColor(defaultColor);
-                            if (dark) color = palette.getDarkVibrantColor(defaultColor);
-
-                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), defaultColor, color);
+                            ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), Color.DKGRAY, palette.getDarkVibrantColor(Color.DKGRAY));
                             animator.setDuration(250);
                             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override
@@ -684,7 +673,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         }
     }
 
-    public String getSectionName(int position) {
+    private String getSectionName(int position) {
         if (position == tracks.size() + albums.size() + playlists.size() + 3) return "Artists";
         else if (position == tracks.size() + albums.size() + 2) return "Playlists";
         else if (position == tracks.size() + 1) return "Albums";
@@ -692,7 +681,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         else return null;
     }
 
-    public int getAbsPosition(int position) {
+    private int getAbsPosition(int position) {
         if (position > tracks.size() + albums.size() + playlists.size() + 3 && position < tracks.size() + albums.size() + playlists.size() + artists.size() + 4) return position - 4;
         else if (position > tracks.size() + albums.size() + 2 && position < tracks.size() + albums.size() + playlists.size() + 3) return position - 3;
         else if (position > tracks.size() + 1 && position < tracks.size() + albums.size() + 2) return position - 2;
@@ -700,7 +689,7 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         else return -1;
     }
 
-    public int getRelPosition(int position) {
+    private int getRelPosition(int position) {
         if (position > tracks.size() + albums.size() + playlists.size() + 3 && position < tracks.size() + albums.size() + playlists.size() + artists.size() + 4) return position - (tracks.size() + albums.size() + playlists.size() + 4);
         else if (position > tracks.size() + albums.size() + 2 && position < tracks.size() + albums.size() + playlists.size() + 3) return position - (tracks.size() + albums.size() + 3);
         else if (position > tracks.size() + 1 && position < tracks.size() + albums.size() + 2) return position - (tracks.size() + 2);
@@ -720,46 +709,46 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
         return list.size() + sections;
     }
 
-    public static class HeaderViewHolder extends ViewHolder {
+    private static class HeaderViewHolder extends ViewHolder {
         public View v;
 
-        public HeaderViewHolder(View v) {
+        HeaderViewHolder(View v) {
             super(v);
             this.v = v;
         }
     }
 
-    public static class TrackViewHolder extends ViewHolder {
+    private static class TrackViewHolder extends ViewHolder {
         public View v;
 
-        public TrackViewHolder(View v) {
+        TrackViewHolder(View v) {
             super(v);
             this.v = v;
         }
     }
 
-    public static class AlbumViewHolder extends ViewHolder {
+    private static class AlbumViewHolder extends ViewHolder {
         public View v;
 
-        public AlbumViewHolder(View v) {
+        AlbumViewHolder(View v) {
             super(v);
             this.v = v;
         }
     }
 
-    public static class PlaylistViewHolder extends ViewHolder {
+    private static class PlaylistViewHolder extends ViewHolder {
         public View v;
 
-        public PlaylistViewHolder(View v) {
+        PlaylistViewHolder(View v) {
             super(v);
             this.v = v;
         }
     }
 
-    public static class ArtistViewHolder extends ViewHolder {
+    private static class ArtistViewHolder extends ViewHolder {
         public View v;
 
-        public ArtistViewHolder(View v) {
+        ArtistViewHolder(View v) {
             super(v);
             this.v = v;
         }

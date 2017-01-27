@@ -3,7 +3,6 @@ package pasta.streamer.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +45,7 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (viewType == 1)
-            return new HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.header_item, parent, false).getRoot());
+            return new HeaderViewHolder(inflater.inflate(R.layout.header_item, parent, false));
         else return new ViewHolder(inflater.inflate(R.layout.track_item, parent, false));
     }
 

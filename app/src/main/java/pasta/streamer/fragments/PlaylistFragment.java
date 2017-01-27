@@ -3,7 +3,6 @@ package pasta.streamer.fragments;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -78,23 +77,19 @@ public class PlaylistFragment extends FullScreenFragment {
     private Action action;
     private int selectedOrder;
     private ListAdapter adapter;
-    private boolean palette;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = DataBindingUtil.inflate(inflater, R.layout.fragment_tracks, container, false).getRoot();
+        View rootView = inflater.inflate(R.layout.fragment_tracks, container, false);
         ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("playlist");
 
-        palette = PreferenceUtils.isPalette(getContext());
-
-        fab.setBackgroundTintList(ColorStateList.valueOf(PreferenceUtils.getAccentColor(getContext())));
         fab.setImageDrawable(ImageUtils.getVectorDrawable(getContext(), R.drawable.ic_play));
 
         collapsingToolbarLayout.setTitle(data.playlistName);
-        tracksLength.setText(String.valueOf(data.tracks) + (data.tracks == 1 ? " track" : " tracks"));
+        tracksLength.setText(String.format("%s%s", String.valueOf(data.tracks), data.tracks == 1 ? " track" : " tracks"));
 
         appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
@@ -114,7 +109,7 @@ public class PlaylistFragment extends FullScreenFragment {
 
         adapter = new ListAdapter(new ArrayList<ListData>());
         recycler.setAdapter(adapter);
-        recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.isListTracks(getContext()) ? 1 : PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), metrics.widthPixels > metrics.heightPixels)));
         recycler.setHasFixedSize(true);
 
         action = new Action<ArrayList<TrackListData>>() {
@@ -150,21 +145,19 @@ public class PlaylistFragment extends FullScreenFragment {
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
                 if (header != null) header.transition(resource);
 
-                if (palette) {
-                    Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
-                        @Override
-                        public void onGenerated(Palette palette) {
-                            int primary = palette.getMutedColor(Color.GRAY);
-                            int accent = palette.getVibrantColor(ImageUtils.darkColor(primary));
-                            if (collapsingToolbarLayout != null)
-                                collapsingToolbarLayout.setContentScrimColor(primary);
-                            if (fab != null)
-                                fab.setBackgroundTintList(ColorStateList.valueOf(accent));
-                            if (bar != null) bar.setBackgroundColor(primary);
-                            setData(data.playlistName, primary, accent);
-                        }
-                    });
-                }
+                Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        int primary = palette.getMutedColor(Color.GRAY);
+                        int accent = palette.getVibrantColor(ImageUtils.darkColor(primary));
+                        if (collapsingToolbarLayout != null)
+                            collapsingToolbarLayout.setContentScrimColor(primary);
+                        if (fab != null)
+                            fab.setBackgroundTintList(ColorStateList.valueOf(accent));
+                        if (bar != null) bar.setBackgroundColor(primary);
+                        setData(data.playlistName, primary, accent);
+                    }
+                });
             }
         });
 
