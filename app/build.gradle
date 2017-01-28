@@ -61,4 +61,5 @@ dependencies {
     compile 'com.github.afollestad:async:0.2.3'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.github.oxoooo:pull-back-layout:1.0.1'
+    compile 'james.buttons:buttons:0.0.3'
 }
