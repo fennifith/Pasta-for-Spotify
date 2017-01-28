@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     Pasta pasta;
     SharedPreferences prefs;
 
-    @Bind(R.id.start)
-    View start;
     @Bind(R.id.login)
     View login;
     @Bind(R.id.text)
@@ -61,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (prefs.getBoolean("first_time", true)) {
-            startActivity(new Intent(MainActivity.this, IntroActivity.class));
             login.setVisibility(View.VISIBLE);
             text.setVisibility(View.GONE);
         } else openRequest();
