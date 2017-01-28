@@ -35,13 +35,19 @@ import pasta.streamer.data.AlbumListData;
 import pasta.streamer.data.TrackListData;
 
 public class MainActivity extends AppCompatActivity {
+
     private static final String REDIRECT_URI = "spotifystreamer://callback";
     private static final int REQUEST_CODE = 1234;
+
     Pasta pasta;
     SharedPreferences prefs;
 
     @Bind(R.id.start)
     View start;
+    @Bind(R.id.login)
+    View login;
+    @Bind(R.id.text)
+    View text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (prefs.getBoolean("first_time", true)) {
             startActivity(new Intent(MainActivity.this, IntroActivity.class));
-            start.setVisibility(View.VISIBLE);
+            login.setVisibility(View.VISIBLE);
+            text.setVisibility(View.GONE);
         } else openRequest();
     }
 

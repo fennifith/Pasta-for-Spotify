@@ -5,10 +5,11 @@
         <item name="colorPrimaryDark">#212121</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/colorBackgroundDark</item>
-        <item name="android:textColorSecondary">#B3ffffff</item>
-        <item name="android:textColorPrimary">#ffffff</item>
-        <item name="android:textColorPrimaryInverse">#DE000000</item>
-        <item name="android:textColorSecondaryInverse">#8A000000</item>
+
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <item name="android:textColorPrimaryInverse">@color/textColorPrimaryInverse</item>
+        <item name="android:textColorSecondaryInverse">@color/textColorSecondaryInverse</item>
 
         <item name="colorButtonNormal">@color/colorAccent</item>
 
@@ -25,12 +26,12 @@
         <item name="colorBackground">@color/colorBackgroundDark</item>
         <item name="cardBackgroundColor">@color/colorBackgroundFloatingDark</item>
 
-        <item name="android:textColorPrimary">#ffffff</item>
-        <item name="android:textColorSecondary">#B3ffffff</item>
-        <item name="android:textColorTertiary">#80FFFFFF</item>
-        <item name="android:textColorPrimaryInverse">#DE000000</item>
-        <item name="android:textColorSecondaryInverse">#8A000000</item>
-        <item name="android:textColorTertiaryInverse">#26000000</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <item name="android:textColorTertiary">@color/textColorTertiary</item>
+        <item name="android:textColorPrimaryInverse">@color/textColorPrimaryInverse</item>
+        <item name="android:textColorSecondaryInverse">@color/textColorSecondaryInverse</item>
+        <item name="android:textColorTertiaryInverse">@color/textColorTertiaryInverse</item>
     </style>
 
     <style name="AppTheme.Dialog" parent="AppTheme">

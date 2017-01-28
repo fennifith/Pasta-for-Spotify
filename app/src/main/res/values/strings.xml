@@ -193,5 +193,6 @@
     <string name="image_transition">image</string>
     <string name="title_transition">title</string>
     <string name="subtitle_transition">subtitle</string>
+    <string name="help_premium_acc">You must have a premium Spotify account in order to use this app.</string>
 
 </resources>

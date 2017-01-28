@@ -10,4 +10,11 @@
     <color name="colorBackgroundFloatingLight">#FFFFFF</color>
     <color name="colorBackgroundFloatingDark">#424242</color>
 
+    <color name="textColorPrimary">#ffffff</color>
+    <color name="textColorSecondary">#B3ffffff</color>
+    <color name="textColorTertiary">#80FFFFFF</color>
+    <color name="textColorPrimaryInverse">#DE000000</color>
+    <color name="textColorSecondaryInverse">#8A000000</color>
+    <color name="textColorTertiaryInverse">#26000000</color>
+
 </resources>
