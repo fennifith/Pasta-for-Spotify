@@ -21,14 +21,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.async.Action;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +46,7 @@ import pasta.streamer.fragments.PlaylistFragment;
 import pasta.streamer.utils.ImageUtils;
 import pasta.streamer.utils.PreferenceUtils;
 import pasta.streamer.utils.StaticUtils;
+import pasta.streamer.views.CustomImageView;
 
 public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdapter.ViewHolder> {
 
@@ -638,18 +638,21 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                 return;
         }
 
-        ImageView imageView = (ImageView) holder.v.findViewById(R.id.image);
-
+        CustomImageView imageView = (CustomImageView) holder.v.findViewById(R.id.image);
         if (!isThumbnails) imageView.setVisibility(View.GONE);
         else {
-            Glide.with(activity).load(image).placeholder(ImageUtils.getVectorDrawable(activity, R.drawable.preload)).thumbnail(0.2f).into(new GlideDrawableImageViewTarget(imageView) {
+            imageView.load(Glide.with(activity).load(image).thumbnail(0.2f).listener(new RequestListener<String, GlideDrawable>() {
                 @Override
-                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> animation) {
-                    super.onResourceReady(resource, animation);
-                    if (!isThumbnails) getView().setVisibility(View.GONE);
+                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    if (!isThumbnails) holder.v.findViewById(R.id.image).setVisibility(View.GONE);
 
                     View bg = holder.v.findViewById(R.id.bg);
-                    if (!isThumbnails || bg == null) return;
+                    if (!isThumbnails || bg == null) return false;
                     Palette.from(ImageUtils.drawableToBitmap(resource)).generate(new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
@@ -668,8 +671,9 @@ public class SectionedOmniAdapter extends RecyclerView.Adapter<SectionedOmniAdap
                             animator.start();
                         }
                     });
+                    return false;
                 }
-            });
+            }));
         }
     }
 

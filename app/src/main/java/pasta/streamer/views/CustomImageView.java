@@ -3,15 +3,17 @@ package pasta.streamer.views;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.ThumbnailUtils;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import com.afollestad.async.Action;
+import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import pasta.streamer.utils.ImageUtils;
 
@@ -29,58 +31,58 @@ public class CustomImageView extends AppCompatImageView {
         super(context, attrs, defStyle);
     }
 
-    public void transition(final Bitmap second) {
-        if (second == null || second.getWidth() < 1 || second.getHeight() < 1) return;
-        final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-        new Action<Bitmap>() {
-            @NonNull
-            @Override
-            public String id() {
-                return "transitionDrawable";
-            }
+    public void transition(final Bitmap bitmap) {
+        if (bitmap == null || bitmap.getWidth() < 1 || bitmap.getHeight() < 1) return;
 
-            @Nullable
+        Animation exitAnim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+        exitAnim.setDuration(150);
+        exitAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            protected Bitmap run() throws InterruptedException {
-                try {
-                    return ThumbnailUtils.extractThumbnail(second, size, size);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
+            public void onAnimationStart(Animation animation) {
+
             }
 
             @Override
-            protected void done(@Nullable final Bitmap result) {
-                if (result == null) {
-                    setImageBitmap(second);
-                    return;
-                }
+            public void onAnimationRepeat(Animation animation) {
 
-                Animation exitAnim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
-                exitAnim.setDuration(150);
-                exitAnim.setAnimationListener(new Animation.AnimationListener() {
-                    @Override public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override public void onAnimationRepeat(Animation animation) {
-
-                    }
-
-                    @Override public void onAnimationEnd(Animation animation) {
-                        setImageBitmap(result);
-                        Animation enterAnim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
-                        enterAnim.setDuration(150);
-                        startAnimation(enterAnim);
-                    }
-                });
-                startAnimation(exitAnim);
             }
-        }.execute();
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                setImageBitmap(bitmap);
+                Animation enterAnim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
+                enterAnim.setDuration(150);
+                startAnimation(enterAnim);
+            }
+        });
+        startAnimation(exitAnim);
     }
 
     public void transition(Drawable second) {
         transition(ImageUtils.drawableToBitmap(second));
     }
+
+    public void loadFromUrl(String url) {
+        load(Glide.with(getContext()).load(url));
+    }
+
+    public void load(final DrawableRequestBuilder request) {
+        if (getWidth() > 0 && getHeight() > 0) {
+            request.dontAnimate().into(new SimpleTarget<GlideDrawable>(getWidth(), getHeight()) {
+                @Override
+                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                    transition(resource);
+                }
+            });
+        } else {
+            getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    load(request);
+                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        }
+    }
+
 }

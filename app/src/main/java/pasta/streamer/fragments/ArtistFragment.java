@@ -150,7 +150,7 @@ public class ArtistFragment extends FullScreenFragment {
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 4)
+                if (adapter.getItemViewType(position) == 0 || adapter.getItemViewType(position) == 2 || adapter.getItemViewType(position) == 4)
                     return manager.getSpanCount();
                 else return 1;
             }
