@@ -3,8 +3,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
+}
+
+plugins {
+    id 'com.github.ben-manes.versions' version '0.14.0'
 }
 
 allprojects {
