@@ -18,12 +18,11 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
-import com.spotify.sdk.android.player.PlayConfig;
+import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Player;
-import com.spotify.sdk.android.player.PlayerNotificationCallback;
-import com.spotify.sdk.android.player.PlayerState;
-import com.spotify.sdk.android.player.PlayerStateCallback;
+import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
+import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,15 +59,23 @@ public class PlayerService extends Service {
 
     private static final int NOTIFICATION_ID = 12345;
 
-    private Player spotifyPlayer;
+    private SpotifyPlayer spotifyPlayer;
     private Config playerConfig;
-    private PlayConfig spotifyPlayConfig;
-    private PlayerState spotifyPlayerState;
     private ArrayList<TrackListData> trackList;
     private int curPos, errorCount;
     private boolean debugPlaying;
 
     private Pasta pasta;
+
+    private Player.OperationCallback emptyCallback = new Player.OperationCallback() {
+        @Override
+        public void onSuccess() {
+        }
+
+        @Override
+        public void onError(Error error) {
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -79,7 +86,7 @@ public class PlayerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (spotifyPlayer != null) spotifyPlayer.shutdownNow();
+        if (spotifyPlayer != null) spotifyPlayer.shutdown();
     }
 
     private void initPlayer(String token, String clientId) {
@@ -90,11 +97,11 @@ public class PlayerService extends Service {
             playerConfig.useCache(false);
         }
 
-        spotifyPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
+        spotifyPlayer = Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
             @Override
-            public void onInitialized(Player player) {
-                spotifyPlayer.setPlaybackBitrate(PreferenceUtils.getQuality(getApplicationContext()));
-                spotifyPlayer.setRepeat(true);
+            public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                spotifyPlayer.setPlaybackBitrate(emptyCallback, PreferenceUtils.getQuality(getApplicationContext()));
+                spotifyPlayer.setRepeat(emptyCallback, true);
 
                 checkForState();
             }
@@ -106,16 +113,16 @@ public class PlayerService extends Service {
             }
         });
 
-        spotifyPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
+        spotifyPlayer.addNotificationCallback(new Player.NotificationCallback() {
             @Override
-            public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-                spotifyPlayerState = playerState;
+            public void onPlaybackEvent(PlayerEvent playerEvent) {
                 if (trackList != null) {
-                    if (!trackList.get(curPos).trackUri.matches(playerState.trackUri)) {
-                        if (trackList.get(getInfinitePos(curPos + 1)).trackUri.matches(playerState.trackUri)) curPos = getInfinitePos(curPos + 1);
+                    if (!trackList.get(curPos).trackUri.matches(spotifyPlayer.getMetadata().currentTrack.uri)) {
+                        if (trackList.get(getInfinitePos(curPos + 1)).trackUri.matches(spotifyPlayer.getMetadata().currentTrack.uri))
+                            curPos = getInfinitePos(curPos + 1);
                         else {
                             for (int i = 0; i < trackList.size(); i++) {
-                                if (trackList.get(i).trackUri.matches(playerState.trackUri)) {
+                                if (trackList.get(i).trackUri.matches(spotifyPlayer.getMetadata().currentTrack.uri)) {
                                     curPos = i;
                                     break;
                                 }
@@ -127,9 +134,9 @@ public class PlayerService extends Service {
             }
 
             @Override
-            public void onPlaybackError(ErrorType errorType, String s) {
-                Log.e("PlayerService", errorType.name() + " " + s);
-                onError(errorType.name() + " " + s);
+            public void onPlaybackError(Error error) {
+                Log.e("PlayerService", error.name() + "");
+                onError(error.name() + "");
             }
         });
 
@@ -143,8 +150,8 @@ public class PlayerService extends Service {
             }
 
             @Override
-            public void onLoginFailed(Throwable throwable) {
-                onError("Login Failed: " + throwable.getMessage());
+            public void onLoginFailed(Error error) {
+                onError("Login Failed: " + error);
             }
 
             @Override
@@ -195,53 +202,54 @@ public class PlayerService extends Service {
                 initPlayer(intent.getStringExtra(EXTRA_TOKEN), intent.getStringExtra(EXTRA_CLIENT_ID));
                 break;
             case ACTION_PLAY:
-                spotifyPlayer.pause();
+            case ACTION_MOVE_TRACK:
+                spotifyPlayer.pause(emptyCallback);
 
-                trackList = intent.getParcelableArrayListExtra(ACTION_PLAY_EXTRA_TRACKS);
+                if (intent.getAction().equals(ACTION_PLAY))
+                    trackList = intent.getParcelableArrayListExtra(ACTION_PLAY_EXTRA_TRACKS);
 
                 List<String> trackUris = new ArrayList<>();
                 for (TrackListData trackListData : trackList) {
                     trackUris.add(trackListData.trackUri);
                 }
 
-                curPos = getInfinitePos(intent.getIntExtra(ACTION_PLAY_EXTRA_START_POS, -1));
-                spotifyPlayConfig = PlayConfig.createFor(trackUris).withTrackIndex(curPos);
-                spotifyPlayer.play(spotifyPlayConfig);
+                if (intent.getAction().equals(ACTION_PLAY))
+                    curPos = getInfinitePos(intent.getIntExtra(ACTION_PLAY_EXTRA_START_POS, -1));
+                else curPos = getInfinitePos(intent.getIntExtra(ACTION_MOVE_TRACK_EXTRA_POS, 0));
+
+                spotifyPlayer.playUri(emptyCallback, trackUris.get(0), 0, 0);
+                for (int i = 1; i < trackUris.size(); i++)
+                    spotifyPlayer.queue(emptyCallback, trackUris.get(i));
+                if (curPos > 0)
+                    for (int i = 0; i < curPos; i++) spotifyPlayer.skipToNext(emptyCallback);
 
                 debugPlaying = true;
                 break;
             case ACTION_TOGGLE:
-                if (spotifyPlayerState.playing) {
-                    spotifyPlayer.pause();
+                if (spotifyPlayer.getPlaybackState().isPlaying) {
+                    spotifyPlayer.pause(emptyCallback);
                 } else {
-                    spotifyPlayer.resume();
+                    spotifyPlayer.resume(emptyCallback);
                 }
 
                 debugPlaying = !debugPlaying;
                 break;
             case ACTION_NEXT:
-                spotifyPlayer.pause();
+                spotifyPlayer.pause(emptyCallback);
                 curPos = getInfinitePos(curPos + 1);
-                spotifyPlayer.play(spotifyPlayConfig.withTrackIndex(curPos));
+                spotifyPlayer.skipToNext(emptyCallback);
 
                 debugPlaying = true;
                 break;
             case ACTION_PREV:
-                spotifyPlayer.pause();
+                spotifyPlayer.pause(emptyCallback);
                 curPos = getInfinitePos(curPos - 1);
-                spotifyPlayer.play(spotifyPlayConfig.withTrackIndex(curPos));
-
-                debugPlaying = true;
-                break;
-            case ACTION_MOVE_TRACK:
-                spotifyPlayer.pause();
-                curPos = getInfinitePos(intent.getIntExtra(ACTION_MOVE_TRACK_EXTRA_POS, 0));
-                spotifyPlayer.play(spotifyPlayConfig.withTrackIndex(curPos));
+                spotifyPlayer.skipToPrevious(emptyCallback);
 
                 debugPlaying = true;
                 break;
             case ACTION_MOVE_POS:
-                spotifyPlayer.seekToPosition(intent.getIntExtra(ACTION_MOVE_POS_EXTRA_POS, -1));
+                spotifyPlayer.seekToPosition(emptyCallback, intent.getIntExtra(ACTION_MOVE_POS_EXTRA_POS, -1));
                 return START_STICKY;
         }
         return START_STICKY;
@@ -254,37 +262,31 @@ public class PlayerService extends Service {
     }
 
     private void checkForState() {
-        spotifyPlayer.getPlayerState(new PlayerStateCallback() {
+        if (trackList != null && trackList.size() > 0) {
+            sendUpdateToUI();
+        }
+
+        if (debugPlaying && !spotifyPlayer.getPlaybackState().isPlaying && spotifyPlayer.getMetadata().currentTrack.durationMs == 0) {
+            onError("Unknown error");
+            return;
+        }
+
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onPlayerState(PlayerState playerState) {
-                spotifyPlayerState = playerState;
-                if (trackList != null && trackList.size() > 0) {
-                    sendUpdateToUI();
-                }
-
-                if (debugPlaying && !playerState.playing && playerState.durationInMs == 0) {
-                    onError("Unknown error");
-                    return;
-                }
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!spotifyPlayer.isShutdown()) checkForState();
-                    }
-                }, UPDATE_INTERVAL);
+            public void run() {
+                if (!spotifyPlayer.isShutdown()) checkForState();
             }
-        });
+        }, UPDATE_INTERVAL);
     }
 
     private void sendUpdateToUI() {
         TrackListData curTrack = trackList.get(curPos);
 
         Intent intent = new Intent(STATE_UPDATE);
-        intent.putExtra(EXTRA_PLAYING, spotifyPlayerState.playing);
+        intent.putExtra(EXTRA_PLAYING, spotifyPlayer.getPlaybackState().isPlaying);
         intent.putExtra(EXTRA_CUR_POSITION, curPos);
-        intent.putExtra(EXTRA_CUR_TIME, spotifyPlayerState.positionInMs);
-        intent.putExtra(EXTRA_MAX_TIME, spotifyPlayerState.durationInMs);
+        intent.putExtra(EXTRA_CUR_TIME, spotifyPlayer.getPlaybackState().positionMs);
+        intent.putExtra(EXTRA_MAX_TIME, spotifyPlayer.getMetadata().currentTrack.durationMs);
         intent.putExtra(EXTRA_CUR_TRACK, curTrack);
         intent.putExtra(EXTRA_TRACK_LIST, trackList);
         sendBroadcast(intent);
@@ -297,7 +299,7 @@ public class PlayerService extends Service {
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(trackList.get(curPos).trackName)
                 .addAction(vectors ? R.drawable.ic_prev : 0, "Previous", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_PREV), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(vectors ? (spotifyPlayerState.playing ? R.drawable.ic_pause : R.drawable.ic_play) : 0, spotifyPlayerState.playing ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(vectors ? (spotifyPlayer.getPlaybackState().isPlaying ? R.drawable.ic_pause : R.drawable.ic_play) : 0, spotifyPlayer.getPlaybackState().isPlaying ? "Pause" : "Play", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(vectors ? R.drawable.ic_next : 0, "Next", PendingIntent.getService(getApplicationContext(), 1, new Intent(getApplicationContext(), PlayerService.class).setAction(PlayerService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(PendingIntent.getActivities(PlayerService.this, 0, new Intent[]{new Intent(PlayerService.this, PlayerActivity.class)}, 0));
 

@@ -93,7 +93,7 @@ public class SettingsFragment extends FabFragment {
         new AlertDialog.Builder(getContext()).setTitle(R.string.sign_out).setMessage(R.string.sign_out_msg).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                AuthenticationClient.clearCookies(getContext().getApplicationContext());
+                //AuthenticationClient.clearCookies(getContext().getApplicationContext());
 
                 try {
                     File cache = getContext().getCacheDir();

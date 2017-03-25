@@ -126,7 +126,7 @@
                                 android:layout_margin="8dp"
                                 android:progressTint="?android:textColorSecondary"
                                 android:thumbTint="?android:textColorPrimary"
-                                app:theme="@style/Widget.AppCompat.SeekBar" />
+                                android:theme="@style/Widget.AppCompat.SeekBar" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"

@@ -75,7 +75,7 @@
                         android:layout_weight="0.3"
                         android:progressTint="#eee"
                         android:thumbTint="#fff"
-                        app:theme="@style/Widget.AppCompat.SeekBar" />
+                        android:theme="@style/Widget.AppCompat.SeekBar" />
 
                     <TextView
                         android:id="@+id/finalDuration"
