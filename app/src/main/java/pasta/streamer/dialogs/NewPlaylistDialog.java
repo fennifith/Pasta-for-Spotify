@@ -1,12 +1,9 @@
 package pasta.streamer.dialogs;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -49,9 +46,7 @@ public class NewPlaylistDialog extends AppCompatDialog {
         setContentView(R.layout.dialog_new_playlist);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        Drawable close = ImageUtils.getVectorDrawable(getContext(), R.drawable.ic_close);
-        DrawableCompat.setTint(close, Color.BLACK);
-        toolbar.setNavigationIcon(close);
+        toolbar.setNavigationIcon(ImageUtils.getVectorDrawable(getContext(), R.drawable.ic_close));
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
