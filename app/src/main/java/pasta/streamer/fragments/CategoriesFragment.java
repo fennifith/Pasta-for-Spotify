@@ -17,8 +17,9 @@ import com.afollestad.async.Action;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import kaaes.spotify.webapi.android.models.CategoriesPager;
 import kaaes.spotify.webapi.android.models.Category;
 import pasta.streamer.Pasta;
@@ -31,10 +32,12 @@ import pasta.streamer.utils.StaticUtils;
 
 public class CategoriesFragment extends Fragment {
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView recycler;
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar spinner;
+
+    private Unbinder unbinder;
 
     ListAdapter adapter;
     Pasta pasta;
@@ -44,7 +47,7 @@ public class CategoriesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recycler, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
 
@@ -104,6 +107,6 @@ public class CategoriesFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (action != null && action.isExecuting()) action.cancel();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 }

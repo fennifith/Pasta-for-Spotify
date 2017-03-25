@@ -21,6 +21,7 @@ import java.io.File;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.utils.PreferenceUtils;
@@ -31,11 +32,13 @@ public class SettingsFragment extends FabFragment {
     private SharedPreferences prefs;
     private Pasta pasta;
 
+    private Unbinder unbinder;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -46,7 +49,7 @@ public class SettingsFragment extends FabFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 
     @OnCheckedChanged(R.id.preload)
@@ -95,10 +98,10 @@ public class SettingsFragment extends FabFragment {
                 try {
                     File cache = getContext().getCacheDir();
                     File appDir = new File(cache.getParent());
-                    if(appDir.exists()){
+                    if (appDir.exists()) {
                         String[] children = appDir.list();
-                        for(String child : children){
-                            if(!child.equals("lib")) deleteDir(new File(appDir, child));
+                        for (String child : children) {
+                            if (!child.equals("lib")) deleteDir(new File(appDir, child));
                         }
                     }
 

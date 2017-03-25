@@ -46,7 +46,7 @@ import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ooo.oxo.library.widget.PullBackLayout;
@@ -64,37 +64,39 @@ import pasta.streamer.views.CustomImageView;
 
 public class PlayerActivity extends AppCompatActivity implements PullBackLayout.Callback {
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.trackImage)
+    @BindView(R.id.trackImage)
     CustomImageView art;
-    @Nullable @Bind(R.id.backgroundImage)
+    @Nullable
+    @BindView(R.id.backgroundImage)
     CustomImageView backgroundImage;
-    @Bind(R.id.currentDuration)
+    @BindView(R.id.currentDuration)
     TextView currentDuration;
-    @Bind(R.id.finalDuration)
+    @BindView(R.id.finalDuration)
     TextView finalDuration;
-    @Bind(R.id.prevButton)
+    @BindView(R.id.prevButton)
     CustomImageView prevButton;
-    @Bind(R.id.playButton)
+    @BindView(R.id.playButton)
     CustomImageView playButton;
-    @Bind(R.id.nextButton)
+    @BindView(R.id.nextButton)
     CustomImageView nextButton;
-    @Bind(R.id.bg)
+    @BindView(R.id.bg)
     View bg;
-    @Bind(R.id.seekBar)
+    @BindView(R.id.seekBar)
     AppCompatSeekBar seekBar;
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar progressBar;
-    @Bind(R.id.title)
+    @BindView(R.id.title)
     TextView title;
-    @Nullable @Bind(R.id.subtitle2)
+    @Nullable
+    @BindView(R.id.subtitle2)
     TextView subtitle2;
-    @Bind(R.id.subtitle)
+    @BindView(R.id.subtitle)
     TextView subtitle;
-    @Bind(R.id.rv)
+    @BindView(R.id.rv)
     RecyclerView rv;
-    @Bind(R.id.puller)
+    @BindView(R.id.puller)
     PullBackLayout puller;
 
     private ArrayList<TrackListData> trackList;
@@ -215,7 +217,8 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
         super.onResume();
         lastUri = null;
         trackList = null;
-        if (updateReceiver != null) registerReceiver(updateReceiver, new IntentFilter(PlayerService.STATE_UPDATE));
+        if (updateReceiver != null)
+            registerReceiver(updateReceiver, new IntentFilter(PlayerService.STATE_UPDATE));
     }
 
     @Override
@@ -465,7 +468,8 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
                     @Override
                     public void onLoadFailed(Exception e, Drawable errorDrawable) {
                         super.onLoadFailed(e, errorDrawable);
-                        if (backgroundImage != null) backgroundImage.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.image_gradient));
+                        if (backgroundImage != null)
+                            backgroundImage.transition(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.image_gradient));
                         if (isLoading()) setLoading(false);
                     }
                 });
@@ -513,7 +517,7 @@ public class PlayerActivity extends AppCompatActivity implements PullBackLayout.
 
             if (!isClickable()) setClickable(true);
 
-            if (seekBar.getProgress() != curTime && !playbarDragging){
+            if (seekBar.getProgress() != curTime && !playbarDragging) {
                 ObjectAnimator.ofInt(seekBar, "progress", curTime).setDuration(PlayerService.UPDATE_INTERVAL).start();
 
                 String current = String.valueOf(curTime);

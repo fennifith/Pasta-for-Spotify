@@ -18,8 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import kaaes.spotify.webapi.android.models.PlaylistsPager;
@@ -34,12 +35,14 @@ import pasta.streamer.utils.StaticUtils;
 
 public class CategoryFragment extends FullScreenFragment {
 
-    @Bind(R.id.topTenTrackListView)
+    @BindView(R.id.topTenTrackListView)
     RecyclerView recycler;
-    @Bind(R.id.progressBar2)
+    @BindView(R.id.progressBar2)
     ProgressBar spinner;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    private Unbinder unbinder;
 
     ListAdapter adapter;
     GridLayoutManager manager;
@@ -52,7 +55,7 @@ public class CategoryFragment extends FullScreenFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_category, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("category");
@@ -128,6 +131,6 @@ public class CategoryFragment extends FullScreenFragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (action != null && action.isExecuting()) action.cancel();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 }

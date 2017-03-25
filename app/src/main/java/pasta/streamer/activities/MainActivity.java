@@ -21,7 +21,7 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -42,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
     Pasta pasta;
     SharedPreferences prefs;
 
-    @Bind(R.id.login)
+    @BindView(R.id.login)
     View login;
-    @Bind(R.id.text)
+    @BindView(R.id.text)
     View text;
 
     @Override

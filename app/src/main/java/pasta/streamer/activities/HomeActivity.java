@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.AlbumSimple;
@@ -87,21 +87,23 @@ import pasta.streamer.views.Playbar;
 
 public class HomeActivity extends AppCompatActivity {
 
-    @Bind(R.id.playbar)
+    @BindView(R.id.playbar)
     View playbarView;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.appbar)
+    @BindView(R.id.appbar)
     AppBarLayout appbar;
-    @Nullable @Bind(R.id.drawer_layout)
+    @Nullable
+    @BindView(R.id.drawer_layout)
     DrawerLayout drawer_layout;
-    @Bind(R.id.drawer)
+    @BindView(R.id.drawer)
     FrameLayout drawer_container;
-    @Bind(R.id.fab)
+    @BindView(R.id.fab)
     FloatingActionButton fab;
-    @Bind(R.id.status_background)
+    @BindView(R.id.status_background)
     FrameLayout statusBackground;
-    @Nullable @Bind(R.id.content)
+    @Nullable
+    @BindView(R.id.content)
     FrameLayout content;
 
     private Playbar playbar;
@@ -240,7 +242,8 @@ public class HomeActivity extends AppCompatActivity {
                                 if (!playbar.playing) {
                                     pasta.showToast(getString(R.string.nothing_playing));
 
-                                    if (drawer_layout != null) drawer_layout.closeDrawer(Gravity.LEFT);
+                                    if (drawer_layout != null)
+                                        drawer_layout.closeDrawer(Gravity.LEFT);
                                     return false;
                                 }
 
@@ -371,7 +374,7 @@ public class HomeActivity extends AppCompatActivity {
             appbar.setExpanded(false, false);
             fab.hide();
 
-            ((FullScreenFragment) f).setDataListener(new FullScreenFragment.DataListener(){
+            ((FullScreenFragment) f).setDataListener(new FullScreenFragment.DataListener() {
                 @Override
                 public void onDataReady(String title, int statusColor, int windowColor) {
                     setTitle(title);
@@ -595,9 +598,12 @@ public class HomeActivity extends AppCompatActivity {
                 Action<?> artistsResult = result.get("searchArtists");
                 Action<?> albumsResult = result.get("searchAlbums");
 
-                if (tracksResult != null && tracksResult.getResult() != null) searchDatas.addAll((ArrayList<TrackListData>) tracksResult.getResult());
-                if (playlistsResult != null && playlistsResult.getResult() != null) searchDatas.addAll((ArrayList<PlaylistListData>) playlistsResult.getResult());
-                if (artistsResult != null && artistsResult.getResult() != null) searchDatas.addAll((ArrayList<ArtistListData>) artistsResult.getResult());
+                if (tracksResult != null && tracksResult.getResult() != null)
+                    searchDatas.addAll((ArrayList<TrackListData>) tracksResult.getResult());
+                if (playlistsResult != null && playlistsResult.getResult() != null)
+                    searchDatas.addAll((ArrayList<PlaylistListData>) playlistsResult.getResult());
+                if (artistsResult != null && artistsResult.getResult() != null)
+                    searchDatas.addAll((ArrayList<ArtistListData>) artistsResult.getResult());
 
                 ((SearchFragment) f).swapData(searchDatas);
 
@@ -669,11 +675,11 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-         if (item.getItemId() == android.R.id.home) {
-             if (drawer_layout != null && drawer_layout.getDrawerLockMode(Gravity.LEFT) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                 drawer_layout.openDrawer(Gravity.LEFT);
-             else onBackPressed();
-         }
+        if (item.getItemId() == android.R.id.home) {
+            if (drawer_layout != null && drawer_layout.getDrawerLockMode(Gravity.LEFT) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                drawer_layout.openDrawer(Gravity.LEFT);
+            else onBackPressed();
+        }
         return false;
     }
 }

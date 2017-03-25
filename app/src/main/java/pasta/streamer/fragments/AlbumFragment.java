@@ -34,9 +34,10 @@ import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import pasta.streamer.Pasta;
 import pasta.streamer.R;
 import pasta.streamer.activities.PlayerActivity;
@@ -51,24 +52,26 @@ import pasta.streamer.views.CustomImageView;
 
 public class AlbumFragment extends FullScreenFragment {
 
-    @Bind(R.id.topTenTrackListView)
+    @BindView(R.id.topTenTrackListView)
     RecyclerView recycler;
-    @Bind(R.id.progressBar2)
+    @BindView(R.id.progressBar2)
     ProgressBar spinner;
-    @Bind(R.id.fab)
+    @BindView(R.id.fab)
     FloatingActionButton fab;
-    @Bind(R.id.collapsing_toolbar)
+    @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
-    @Bind(R.id.header)
+    @BindView(R.id.header)
     CustomImageView header;
-    @Bind(R.id.bar)
+    @BindView(R.id.bar)
     View bar;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.appbar)
+    @BindView(R.id.appbar)
     AppBarLayout appbar;
-    @Bind(R.id.tracksLength)
+    @BindView(R.id.tracksLength)
     TextView tracksLength;
+
+    private Unbinder unbinder;
 
     private AlbumListData data;
     private ArrayList<TrackListData> trackList;
@@ -80,7 +83,7 @@ public class AlbumFragment extends FullScreenFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tracks, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
 
         pasta = (Pasta) getContext().getApplicationContext();
         data = getArguments().getParcelable("album");
@@ -207,7 +210,7 @@ public class AlbumFragment extends FullScreenFragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (action != null && action.isExecuting()) action.cancel();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 
     private void modifyMenu(final Menu menu) {

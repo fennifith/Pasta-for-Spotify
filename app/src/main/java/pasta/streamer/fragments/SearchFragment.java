@@ -13,8 +13,9 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import pasta.streamer.R;
 import pasta.streamer.adapters.SectionedOmniAdapter;
 import pasta.streamer.utils.PreferenceUtils;
@@ -25,20 +26,22 @@ public class SearchFragment extends Fragment {
     private ArrayList list;
     private GridLayoutManager manager;
 
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar spinner;
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView recycler;
+
+    private Unbinder unbinder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recycler, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
 
         if (list == null) list = new ArrayList<>();
         else spinner.setVisibility(View.GONE);
 
-        adapter = new SectionedOmniAdapter((AppCompatActivity) getActivity(), list) ;
+        adapter = new SectionedOmniAdapter((AppCompatActivity) getActivity(), list);
         manager = new GridLayoutManager(getContext(), PreferenceUtils.getColumnNumber(getContext(), false));
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -76,6 +79,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 }

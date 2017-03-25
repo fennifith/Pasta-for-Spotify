@@ -41,8 +41,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.Artist;
@@ -63,29 +64,31 @@ import pasta.streamer.views.CustomImageView;
 
 public class ArtistFragment extends FullScreenFragment {
 
-    @Bind(R.id.progressBar2)
+    @BindView(R.id.progressBar2)
     ProgressBar spinner;
-    @Bind(R.id.collapsing_toolbar)
+    @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
-    @Bind(R.id.topTenTrackListView)
+    @BindView(R.id.topTenTrackListView)
     RecyclerView recycler;
-    @Bind(R.id.header)
+    @BindView(R.id.header)
     CustomImageView header;
-    @Bind(R.id.title)
+    @BindView(R.id.title)
     TextView title;
-    @Bind(R.id.extra)
+    @BindView(R.id.extra)
     TextView extra;
-    @Bind(R.id.genres)
+    @BindView(R.id.genres)
     FlexboxLayout genres;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.somethingbar)
+    @BindView(R.id.somethingbar)
     View somethingbar;
-    @Bind(R.id.appbar)
+    @BindView(R.id.appbar)
     AppBarLayout appbar;
     @Nullable
-    @Bind(R.id.backgroundImage)
+    @BindView(R.id.backgroundImage)
     CustomImageView backgroundImage;
+
+    private Unbinder unbinder;
 
     private ArtistListData data;
     private SectionedOmniAdapter adapter;
@@ -98,7 +101,7 @@ public class ArtistFragment extends FullScreenFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_artist, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
 
         data = getArguments().getParcelable("artist");
 
@@ -376,7 +379,7 @@ public class ArtistFragment extends FullScreenFragment {
     public void onDestroyView() {
         if (pool != null && pool.isExecuting()) pool.cancel();
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 
     private void modifyMenu(final Menu menu) {

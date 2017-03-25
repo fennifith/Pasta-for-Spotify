@@ -14,9 +14,10 @@ import android.widget.ProgressBar;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import pasta.streamer.R;
 import pasta.streamer.adapters.ListAdapter;
 import pasta.streamer.data.ListData;
@@ -24,16 +25,18 @@ import pasta.streamer.data.TextListData;
 
 public class AboutFragment extends FabFragment {
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView rv;
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar progressBar;
+
+    private Unbinder unbinder;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_about, container, false);
-        ButterKnife.bind(this, v);
+        unbinder = ButterKnife.bind(this, v);
 
         progressBar.setVisibility(View.GONE);
 
@@ -91,6 +94,6 @@ public class AboutFragment extends FabFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 }
