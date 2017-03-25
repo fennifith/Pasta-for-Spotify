@@ -38,7 +38,7 @@
             android:id="@+id/pub"
             android:layout_margin="16dp"
             android:text="@string/pub"
-            android:textColor="#8A000000" />
+            android:textColor="?android:textColorPrimary" />
 
     </LinearLayout>
 
