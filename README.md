@@ -1,5 +1,4 @@
-# Pasta-for-Spotify
-A [material design](https://material.google.com/) Spotify client for Android.
+Pasta for Spotify is a third party [material design](https://material.google.com/) Spotify client for Android.
 
 ## About
 
