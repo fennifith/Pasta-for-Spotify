@@ -30,7 +30,7 @@ Pasta for Spotify has almost all the features of the official app, though playli
 
 ### Limitations
 There are a few major issues with the implementation of the Spotify API, some of which are because of the API itself (meaning they cannot be fixed by me), and some are internal but require a lot of refactoring to come up with an appropriate solution. Examples:
-- [The app will occasionally refuse to play a song until a restart](https://github.com/TheAndroidMaster/Pasta-for-Spotify/issues/1). The "Unknown error, please restart" toast message is specific to this issue. 
+- [The app will occasionally refuse to play a song until a restart](https://jfenn.me/redirects/?t=github&d=Pasta-for-Spotify/issues/1). The "Unknown error, please restart" toast message is specific to this issue. 
 - It is not possible to download a track to play it offline. See [this issue](https://github.com/spotify/android-sdk/issues/2) for progress updates.
 - The 'restart' button usually causes an authentication error resulting in the app force closing.
 - The 'Sign Out' option in the settings menu will cause a crash if the official Spotify app is installed.
@@ -40,7 +40,7 @@ There are a few major issues with the implementation of the Spotify API, some of
 
 Splash Screen | Home Screen | Now Playing
 ------------- | ----------- | -----------
-![](http://theandroidmaster.github.io/images/screenshots/Screenshot_2016-04-17-15-33-39.png) | ![](http://theandroidmaster.github.io/images/screenshots/image4155.png) | ![](http://theandroidmaster.github.io/images/screenshots/image4646.png)
+![](./.github/images/splash.png?raw=true) | ![](./.github/images/home.png?raw=true) | ![](./.github/images/playing.png?raw=true)
 
 ## Contributing
 ### Issues
@@ -52,10 +52,10 @@ I usually don't have any organization over how I handle issues and what I commit
 ## Links
 
 - [Google Plus Community](https://plus.google.com/communities/101536497390778012419)
-- [Website](http://theandroidmaster.github.io/apps/pasta/)
+- [Website](http://jfenn.me/projects/pasta-for-spotify/)
 
 #### Contributors:
-- [James Fenn](http://theandroidmaster.github.io/)
+- [James Fenn](http://jfenn.me/)
 - [Jan-Lk Else](https://plus.google.com/+JanLkElse)
 - [Patrick J](http://pddstudio.com/)
 - [Vukašin Anđelković](https://plus.google.com/+Vuka%C5%A1inAn%C4%91elkovi%C4%87zavukodlak)
